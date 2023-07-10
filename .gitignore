@@ -15,11 +15,14 @@
 *.out
 
 # Dependency directories (remove the comment below to include it)
- vendor/
- build/
+vendor/
+build/
 
 # Go workspace file
 go.work
 
 # Personal Notes
 notes.txt
+
+# Ignore Docker Compose Files
+*_compose.yml
