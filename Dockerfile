@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 FROM --platform=$BUILDPLATFORM gocv/opencv:latest AS base
-#FROM golang:1.20-bullseye
+#FROM golang:1.20.5-bookworm
 WORKDIR /app
 
 RUN mkdir -p ./html
@@ -18,7 +18,8 @@ COPY go.mod go.sum ./
 
 RUN go mod download
 
-RUN CGO_ENABLED=1 GOOS=linux go build -o /goremotecontrol_web
+#RUN CGO_ENABLED=1 GOOS=linux go build -o /goremotecontrol_web
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o /goremotecontrol_web
 
 EXPOSE 8080
 

@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -12,6 +13,7 @@ import (
 	"github.com/pion/webrtc/v3"
 	"github.com/pion/webrtc/v3/pkg/media"
 	"github.com/pion/webrtc/v3/pkg/media/oggreader"
+	"gocv.io/x/gocv"
 )
 
 func (s *Server) NewClient(socketConn socketio.Conn) (*Client, error) {
@@ -253,5 +255,22 @@ func (c *Client) PlayTempAudio(ctx context.Context) error {
 			}
 		}
 	}()
+	return nil
+}
+
+func PlayReadWebCam() error {
+	log.Printf("Start Reading Webcam")
+	defer log.Printf("Done Reading Webcam")
+
+	deviceID := 0
+	webcam, _ := gocv.VideoCaptureDevice(deviceID)
+	img := gocv.NewMat()
+	ok := webcam.Read(&img)
+	if !ok {
+		return fmt.Errorf("error reading from video devide %d\n", deviceID)
+	}
+
+	size := img.Size()
+	log.Printf("Frame Empty: %t Frame Size - 0: %d 1: %d\n", img.Empty(), size[0], size[1])
 	return nil
 }
