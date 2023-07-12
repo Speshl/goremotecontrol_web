@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/googollee/go-socket.io v1.7.0
 	github.com/pion/webrtc/v3 v3.2.11
-	gocv.io/x/gocv v0.26.0
+	gocv.io/x/gocv v0.33.0
 )
 
 require (
