@@ -320,7 +320,6 @@ func (c *Client) TempStreamVideo(ctx context.Context) error {
 
 		ticker := time.NewTicker(frameDuration)
 		for ; true; <-ticker.C {
-			log.Println("Sending frame")
 			nal, h264Err := fileReader.NextNAL()
 			if h264Err == io.EOF {
 				fmt.Printf("All video frames parsed and sent")
@@ -331,6 +330,7 @@ func (c *Client) TempStreamVideo(ctx context.Context) error {
 				return
 			}
 
+			log.Printf("Sending frame - NAL - %+v\n", nal.Data)
 			if h264Err = videoTrack.WriteSample(media.Sample{Data: nal.Data, Duration: frameDuration}); h264Err != nil {
 				log.Printf("error writing sample: %s\n", err.Error())
 				return
