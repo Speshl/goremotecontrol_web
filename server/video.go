@@ -129,9 +129,9 @@ func (c *Client) handleOfferChannel() {
 				return
 			}
 
-			err = c.PlayTempCam(c.CTX)
+			err = c.TempStreamVideo(c.CTX)
 			if err != nil {
-				log.Printf("Failed playing audio: %s", err.Error())
+				log.Printf("Failed playing video: %s", err.Error())
 				return
 			}
 
@@ -281,6 +281,7 @@ func (c *Client) PlayTempCam(ctx context.Context) error {
 }
 
 func (c *Client) TempStreamVideo(ctx context.Context) error {
+	log.Println("Start streaming video")
 	frameDuration := time.Millisecond * 40
 
 	videoTrack, videoTrackErr := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: webrtc.MimeTypeH264}, "video", "pion")
