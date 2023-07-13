@@ -283,7 +283,7 @@ func (c *Client) PlayTempCam(ctx context.Context) error {
 	return nil
 }
 
-func (c *Client) TempRecordCam(ctx context.Context) (err error) {
+func TempRecordCam() (err error) {
 	file, err := os.Create("screen.264")
 	if err != nil {
 		return fmt.Errorf("Error creating video file: %w", err)
