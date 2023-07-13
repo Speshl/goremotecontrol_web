@@ -123,11 +123,11 @@ func (c *Client) handleOfferChannel() {
 				return
 			}
 
-			err = c.PlayTempAudio(c.CTX)
-			if err != nil {
-				log.Printf("Failed playing audio: %s", err.Error())
-				return
-			}
+			// err = c.PlayTempAudio(c.CTX)
+			// if err != nil {
+			// 	log.Printf("Failed playing audio: %s", err.Error())
+			// 	return
+			// }
 
 			err = c.TempStreamVideo(c.CTX)
 			if err != nil {
