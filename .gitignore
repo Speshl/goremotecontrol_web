@@ -26,3 +26,6 @@ notes.txt
 
 # Ignore Docker Compose Files
 *_compose.yml
+
+# Ignore test video files
+*.264

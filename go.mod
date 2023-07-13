@@ -6,6 +6,7 @@ require (
 	github.com/gen2brain/x264-go v0.2.4
 	github.com/googollee/go-socket.io v1.7.0
 	github.com/pion/webrtc/v3 v3.2.11
+	gocv.io/x/gocv v0.33.0
 )
 
 require (
