@@ -54,10 +54,10 @@ func main() {
 
 	http.Handle("/socket.io/", socketServer.GetHandler())
 
-	err := server.TempRecordCam()
-	if err != nil {
-		log.Fatalf("Failed temp record cam: %s\n", err.Error())
-	}
+	// err := server.TempRecordCam()
+	// if err != nil {
+	// 	log.Fatalf("Failed temp record cam: %s\n", err.Error())
+	// }
 
 	log.Println("Start serving...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
