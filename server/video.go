@@ -14,6 +14,7 @@ import (
 	"github.com/pion/webrtc/v3/pkg/media"
 	"github.com/pion/webrtc/v3/pkg/media/h264reader"
 	"github.com/pion/webrtc/v3/pkg/media/oggreader"
+	"gocv.io/x/gocv"
 
 	x264 "github.com/gen2brain/x264-go"
 )
@@ -24,7 +25,7 @@ var opts = &x264.Options{
 	FrameRate: 25,
 	Tune:      "zerolatency",
 	Preset:    "ultrafast",
-	Profile:   "baseline",
+	Profile:   "main",
 	LogLevel:  x264.LogDebug,
 }
 
@@ -330,7 +331,7 @@ func (c *Client) TempStreamVideo(ctx context.Context) error {
 				return
 			}
 
-			log.Printf("Sending frame - NAL - %+v\n", nal.Data)
+			//log.Printf("Sending frame - NAL - %+v\n", nal.Data)
 			if h264Err = videoTrack.WriteSample(media.Sample{Data: nal.Data, Duration: frameDuration}); h264Err != nil {
 				log.Printf("error writing sample: %s\n", err.Error())
 				return
@@ -340,71 +341,71 @@ func (c *Client) TempStreamVideo(ctx context.Context) error {
 	return nil
 }
 
-// func TempRecordCam() (err error) {
-// 	deviceID := 0
-// 	webcam, err := gocv.VideoCaptureDevice(deviceID)
-// 	if err != nil {
-// 		log.Printf("Failing opening video capture device: %s\n", err.Error())
-// 		return err
-// 	}
+func TempRecordCam() (err error) {
+	deviceID := 0
+	webcam, err := gocv.VideoCaptureDevice(deviceID)
+	if err != nil {
+		log.Printf("Failing opening video capture device: %s\n", err.Error())
+		return err
+	}
 
-// 	file, err := os.Create("screen.264")
-// 	if err != nil {
-// 		return fmt.Errorf("Error creating video file: %w", err)
-// 	}
+	file, err := os.Create("screen.264")
+	if err != nil {
+		return fmt.Errorf("Error creating video file: %w", err)
+	}
 
-// 	enc, err := x264.NewEncoder(file, opts)
-// 	if err != nil {
-// 		return fmt.Errorf("Error creating encoder: %w", err)
-// 	}
+	enc, err := x264.NewEncoder(file, opts)
+	if err != nil {
+		return fmt.Errorf("Error creating encoder: %w", err)
+	}
 
-// 	frameTicker := time.NewTicker(time.Second / time.Duration(25))
+	frameTicker := time.NewTicker(time.Second / time.Duration(25))
 
-// 	defer func() {
-// 		err = enc.Flush()
-// 		if err != nil {
-// 			err = fmt.Errorf("Error flushing encoder: %w", err)
-// 			return
-// 		}
+	defer func() {
+		err = enc.Flush()
+		if err != nil {
+			err = fmt.Errorf("Error flushing encoder: %w", err)
+			return
+		}
 
-// 		file.Close()
-// 		if err != nil {
-// 			err = fmt.Errorf("Error flushing encoder: %w", err)
-// 		}
+		file.Close()
+		if err != nil {
+			err = fmt.Errorf("Error flushing encoder: %w", err)
+		}
 
-// 	}()
+	}()
 
-// 	frameCounter := 0
-// 	for range frameTicker.C {
-// 		if frameCounter > 500 {
-// 			frameTicker.Stop()
-// 			return nil
-// 		}
+	frameCounter := 0
+	for range frameTicker.C {
+		if frameCounter > 500 {
+			frameTicker.Stop()
+			return nil
+		}
 
-// 		matImg := gocv.NewMat()
-// 		ok := webcam.Read(&matImg)
-// 		if !ok {
-// 			return fmt.Errorf("error reading from video devide %d\n", deviceID)
-// 		}
+		matImg := gocv.NewMat()
+		ok := webcam.Read(&matImg)
+		if !ok {
+			return fmt.Errorf("error reading from video devide %d\n", deviceID)
+		}
 
-// 		img, err := matImg.ToImage()
-// 		if err != nil {
-// 			return fmt.Errorf("error converting from gocv mat to image: %w", err)
-// 		}
+		img, err := matImg.ToImage()
+		if err != nil {
+			return fmt.Errorf("error converting from gocv mat to image: %w", err)
+		}
 
-// 		// img := x264.NewYCbCr(image.Rect(0, 0, opts.Width, opts.Height))
-// 		// draw.Draw(img, img.Bounds(), image.Black, image.ZP, draw.Src)
-// 		// img.Set(frameCounter, opts.Height/2, color.RGBA{255, 0, 0, 255})
+		// img := x264.NewYCbCr(image.Rect(0, 0, opts.Width, opts.Height))
+		// draw.Draw(img, img.Bounds(), image.Black, image.ZP, draw.Src)
+		// img.Set(frameCounter, opts.Height/2, color.RGBA{255, 0, 0, 255})
 
-// 		log.Println("Encoding frame %d\n", frameCounter)
-// 		frameCounter++
-// 		err = enc.Encode(img)
-// 		if err != nil {
-// 			return fmt.Errorf("Error encoding frame: %w", err)
-// 		}
-// 	}
-// 	return nil
-// }
+		log.Println("Encoding frame %d\n", frameCounter)
+		frameCounter++
+		err = enc.Encode(img)
+		if err != nil {
+			return fmt.Errorf("Error encoding frame: %w", err)
+		}
+	}
+	return nil
+}
 
 // func TempRecordPainted() (err error) {
 // 	file, err := os.Create("screen.264")
