@@ -305,7 +305,7 @@ func (c *Client) TempStreamVideo(ctx context.Context) error {
 
 	go func() {
 		defer log.Println("Done streaming video")
-		file, err := os.Open("output.h264") //screen.264
+		file, err := os.Open("screen.264") //screen.264 output.h264
 		if err != nil {
 			log.Printf("failed opening video file: %w", err)
 			return
