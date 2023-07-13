@@ -304,6 +304,7 @@ func (c *Client) TempStreamVideo(ctx context.Context) error {
 	}()
 
 	go func() {
+		defer log.Println("Done streaming video")
 		file, err := os.Open("screen.264")
 		if err != nil {
 			log.Printf("failed opening video file: %w", err)
@@ -319,6 +320,7 @@ func (c *Client) TempStreamVideo(ctx context.Context) error {
 
 		ticker := time.NewTicker(frameDuration)
 		for ; true; <-ticker.C {
+			log.Println("Sending frame")
 			nal, h264Err := fileReader.NextNAL()
 			if h264Err == io.EOF {
 				fmt.Printf("All video frames parsed and sent")
