@@ -16,10 +16,10 @@
 <body>
 
     Video<br />
-    <div id="remoteVideos"></div> <br />
+    <div id="remoteVideos" controls autoplay></div> <br />
 
-    Audio<br />
-    <audio id="audioElement" controls autoplay></audio>
+    <!-- Audio<br />
+    <audio id="audioElement" controls autoplay></audio> -->
     
     Logs<br />
     <div id="div"></div>
@@ -88,14 +88,18 @@
     
         document.getElementById('remoteVideos').appendChild(el);
 
-        const audioElement = document.getElementById('audioElement');
-        audioElement.srcObject = event.streams[0];
+        
+        // const audioElement = document.getElementById('audioElement');
+        // audioElement.srcObject = event.streams[0];
+
+        // const videoElement = document.getElementById('videoElement');
+        // audioElement.srcObject = event.streams[0];
     }
 
     //Offer to receive 1 audio, and 1 video track
-    // pc.addTransceiver('video', {
-    //     direction: 'recvonly'
-    // })
+    pc.addTransceiver('video', {
+        direction: 'recvonly'
+    })
     pc.addTransceiver('audio', {
         direction: 'recvonly'
     })

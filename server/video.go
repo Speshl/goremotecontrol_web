@@ -12,6 +12,7 @@ import (
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/pion/webrtc/v3"
 	"github.com/pion/webrtc/v3/pkg/media"
+	"github.com/pion/webrtc/v3/pkg/media/h264reader"
 	"github.com/pion/webrtc/v3/pkg/media/oggreader"
 
 	x264 "github.com/gen2brain/x264-go"
@@ -277,6 +278,63 @@ func (c *Client) PlayTempAudio(ctx context.Context) error {
 }
 
 func (c *Client) PlayTempCam(ctx context.Context) error {
+	return nil
+}
+
+func (c *Client) TempStreamVideo(ctx context.Context) error {
+	frameDuration := time.Millisecond * 40
+
+	videoTrack, videoTrackErr := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: webrtc.MimeTypeH264}, "video", "pion")
+	if videoTrackErr != nil {
+		panic(videoTrackErr)
+	}
+
+	rtpSender, videoTrackErr := c.PeerConnection.AddTrack(videoTrack)
+	if videoTrackErr != nil {
+		panic(videoTrackErr)
+	}
+
+	go func() {
+		rtcpBuf := make([]byte, 1500)
+		for {
+			if _, _, rtcpErr := rtpSender.Read(rtcpBuf); rtcpErr != nil {
+				return
+			}
+		}
+	}()
+
+	go func() {
+		file, err := os.Open("screen.264")
+		if err != nil {
+			log.Printf("failed opening video file: %w", err)
+			return
+		}
+		defer file.Close()
+
+		fileReader, err := h264reader.NewReader(file)
+		if err != nil {
+			fmt.Errorf("failed opening with h264 reader: %w", err)
+			return
+		}
+
+		ticker := time.NewTicker(frameDuration)
+		for ; true; <-ticker.C {
+			nal, h264Err := fileReader.NextNAL()
+			if h264Err == io.EOF {
+				fmt.Printf("All video frames parsed and sent")
+				return
+			}
+			if h264Err != nil {
+				log.Printf("error reading next nal: %s\n", err.Error())
+				return
+			}
+
+			if h264Err = videoTrack.WriteSample(media.Sample{Data: nal.Data, Duration: frameDuration}); h264Err != nil {
+				log.Printf("error writing sample: %s\n", err.Error())
+				return
+			}
+		}
+	}()
 	return nil
 }
 
