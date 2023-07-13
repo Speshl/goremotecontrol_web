@@ -1,8 +1,15 @@
+--Compile Opencv first to make sure that will work, takes hours - 
+
+mkdir ./scripts
+
+sudo raspi-config - #Advanced then expand file system then reboot
+
+#Follow these steps to compile 4.7 opencv source
+#https://qengineering.eu/install-opencv-on-raspberry-64-os.html
+
 sudo apt-get update
 
 sudo apt-get upgrade
-
-mkdir ./scripts
 
 mkdir ./go
 
@@ -31,12 +38,15 @@ git clone https://github.com/hybridgroup/gocv.git
 make install_raspi
 
 
+#Install docker and docker compose
 
 curl -fsSL https://get.docker.com -o get-docker.sh
 
 sudo sh get-docker.sh
 
-sudo usermod -aG docker [user_name]
+sudo usermod -aG docker $USER
+
+grep docker /etc/group #to verify user was added
 
 docker run hello-world
 
@@ -49,19 +59,3 @@ sudo apt-get install -y python3 python3-pip
 sudo pip3 install docker-compose
 
 sudo systemctl enable docker
-
-
-
-
---Opencv compile
-
-cmake -D CMAKE_BUILD_TYPE=RELEASE \
-    -D CMAKE_INSTALL_PREFIX=/usr/local \
-    -D OPENCV_EXTRA_MODULES_PATH=~/go/src/github.com/opencv_contrib/modules \
-    -D ENABLE_NEON=ON \
-    -D ENABLE_VFPV3=ON \
-    -D BUILD_TESTS=OFF \
-    -D INSTALL_PYTHON_EXAMPLES=OFF \
-    -D OPENCV_ENABLE_NONFREE=ON \
-    -D CMAKE_SHARED_LINKER_FLAGS=-latomic \
-    -D BUILD_EXAMPLES=OFF ..

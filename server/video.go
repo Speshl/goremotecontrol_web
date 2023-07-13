@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"image"
+	"image/color"
+	"image/draw"
 	"io"
 	"log"
 	"os"
@@ -13,8 +16,20 @@ import (
 	"github.com/pion/webrtc/v3"
 	"github.com/pion/webrtc/v3/pkg/media"
 	"github.com/pion/webrtc/v3/pkg/media/oggreader"
-	"gocv.io/x/gocv"
+
+	//"gocv.io/x/gocv"
+	x264 "github.com/gen2brain/x264-go"
 )
+
+var opts = &x264.Options{
+	Width:     640,
+	Height:    480,
+	FrameRate: 25,
+	Tune:      "zerolatency",
+	Preset:    "ultrafast",
+	Profile:   "baseline",
+	LogLevel:  x264.LogDebug,
+}
 
 func (s *Server) NewClient(socketConn socketio.Conn) (*Client, error) {
 	id := socketConn.ID()
@@ -112,6 +127,12 @@ func (c *Client) handleOfferChannel() {
 			}
 
 			err = c.PlayTempAudio(c.CTX)
+			if err != nil {
+				log.Printf("Failed playing audio: %s", err.Error())
+				return
+			}
+
+			err = c.PlayTempCam(c.CTX)
 			if err != nil {
 				log.Printf("Failed playing audio: %s", err.Error())
 				return
@@ -258,19 +279,76 @@ func (c *Client) PlayTempAudio(ctx context.Context) error {
 	return nil
 }
 
-func PlayReadWebCam() error {
-	log.Printf("Start Reading Webcam")
-	defer log.Printf("Done Reading Webcam")
-
-	deviceID := 0
-	webcam, _ := gocv.VideoCaptureDevice(deviceID)
-	img := gocv.NewMat()
-	ok := webcam.Read(&img)
-	if !ok {
-		return fmt.Errorf("error reading from video devide %d\n", deviceID)
-	}
-
-	size := img.Size()
-	log.Printf("Frame Empty: %t Frame Size - 0: %d 1: %d\n", img.Empty(), size[0], size[1])
+func (c *Client) PlayTempCam(ctx context.Context) error {
 	return nil
 }
+
+func (c *Client) TempRecordCam(ctx context.Context) (err error) {
+	file, err := os.Create("screen.264")
+	if err != nil {
+		return fmt.Errorf("Error creating video file: %w", err)
+	}
+
+	enc, err := x264.NewEncoder(file, opts)
+	if err != nil {
+		return fmt.Errorf("Error creating encoder: %w", err)
+	}
+
+	frameTicker := time.NewTicker(time.Second / time.Duration(25))
+	stopTime := time.Now().Add(time.Second * 30)
+
+	defer func() {
+		err = enc.Flush()
+		if err != nil {
+			err = fmt.Errorf("Error flushing encoder: %w", err)
+			return
+		}
+
+		file.Close()
+		if err != nil {
+			err = fmt.Errorf("Error flushing encoder: %w", err)
+		}
+
+	}()
+
+	frameCounter := 0
+	for range frameTicker.C {
+		if time.Now().Compare(stopTime) > 1 {
+			frameTicker.Stop()
+			return nil
+		}
+		img := x264.NewYCbCr(image.Rect(0, 0, opts.Width, opts.Height))
+		draw.Draw(img, img.Bounds(), image.Black, image.ZP, draw.Src)
+		img.Set(frameCounter, opts.Height/2, color.RGBA{255, 0, 0, 255})
+
+		log.Println("Encoding frame %d\n", frameCounter)
+		frameCounter++
+		err = enc.Encode(img)
+		if err != nil {
+			return fmt.Errorf("Error encoding frame: %w", err)
+		}
+	}
+	return nil
+}
+
+// func PlayReadWebCam() error {
+// 	log.Printf("Start Reading Webcam")
+// 	defer log.Printf("Done Reading Webcam")
+
+// 	deviceID := 0
+// 	webcam, err := gocv.VideoCaptureDevice(deviceID)
+// 	if err != nil {
+// 		log.Printf("Failing opening video capture device: %s\n", err.Error())
+// 		return err
+// 	}
+
+// 	img := gocv.NewMat()
+// 	ok := webcam.Read(&img)
+// 	if !ok {
+// 		return fmt.Errorf("error reading from video devide %d\n", deviceID)
+// 	}
+
+// 	size := img.Size()
+// 	log.Printf("Frame Empty: %t Frame Size - 0: %d 1: %d\n", img.Empty(), size[0], size[1])
+// 	return nil
+// }

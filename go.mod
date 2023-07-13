@@ -3,13 +3,15 @@ module github.com/Speshl/goremotecontrol_web
 go 1.20
 
 require (
+	github.com/gen2brain/x264-go v0.2.4
 	github.com/googollee/go-socket.io v1.7.0
 	github.com/pion/webrtc/v3 v3.2.11
-	gocv.io/x/gocv v0.33.0
 )
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/gen2brain/x264-go/x264c v0.0.0-20221204084822-82ee2951dea2 // indirect
+	github.com/gen2brain/x264-go/yuv v0.0.0-20221204084822-82ee2951dea2 // indirect
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/gomodule/redigo v1.8.4 // indirect
 	github.com/google/uuid v1.3.0 // indirect

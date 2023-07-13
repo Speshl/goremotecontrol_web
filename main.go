@@ -57,6 +57,5 @@ func main() {
 	//server.TempViewImg(nil)
 
 	log.Println("Start serving...")
-	server.PlayReadWebCam()
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
