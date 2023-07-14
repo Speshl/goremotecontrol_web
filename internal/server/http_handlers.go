@@ -9,7 +9,7 @@ func (s *Server) RegisterHTTPHandlers() {
 	http.HandleFunc("/drive", s.driveHandler)
 	http.HandleFunc("/login", s.loginHandler)
 	http.HandleFunc("/gpt", s.gptHandler)
-	http.HandleFunc("/audio", s.audioHandler)
+	http.HandleFunc("/stream", s.streamHandler)
 
 	http.Handle("/socket.io/", s.socketio)
 }
@@ -37,7 +37,7 @@ func (s *Server) gptHandler(w http.ResponseWriter, req *http.Request) {
 	template.Execute(w, nil)
 }
 
-func (s *Server) audioHandler(w http.ResponseWriter, req *http.Request) {
-	template := template.Must(template.ParseFiles("html/audio.html"))
+func (s *Server) streamHandler(w http.ResponseWriter, req *http.Request) {
+	template := template.Must(template.ParseFiles("html/stream.html"))
 	template.Execute(w, nil)
 }
