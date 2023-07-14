@@ -183,7 +183,7 @@ func (c *Connection) startStreaming() {
 
 	//libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert
 	//autovideosrc ! video/x-raw, width=320, height=240 ! videoconvert ! queue
-	videoSrc := "libcamerasrc ! jpegdec ! videoconvert ! queue" //autovideosrc videotestsrc
+	videoSrc := "libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert ! queue" //autovideosrc videotestsrc
 	c.VideoPipeline = gst.CreatePipeline("vp8", []*webrtc.TrackLocalStaticSample{c.VideoTracks[0], c.VideoTracks[1]}, videoSrc)
 	c.VideoPipeline.Start()
 }
@@ -205,10 +205,18 @@ image/jpeg, width=640, height=480
 
 gst-launch-1.0 libcamerasrc ! jpegdec ! videoconvert ! queue ! vp8enc error-resilient=partitions keyframe-max-dist=10 auto-alt-ref=true cpu-used=5 deadline=1 ! testsink
 
+gst-launch-1.0 libcamerasrc ! jpegdec ! videoconvert ! queue ! filesink location=gstreamer_capture
+
+gst-launch-1.0 libcamerasrc ! jpegdec ! videoconvert ! filesink location=gstreamer_capture
+
 gst-launch-1.0 -v filesrc location=mjpeg.avi ! avidemux !  queue ! jpegdec ! videoconvert ! videoscale ! autovideosink
 
 
 
 
+
+video/x-raw, format=YUY2, width=1280, height=960
+
+gst-launch-1.0 libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert ! queue ! vp8enc error-resilient=partitions keyframe-max-dist=10 auto-alt-ref=true cpu-used=5 deadline=1 ! testsink
 
 */
