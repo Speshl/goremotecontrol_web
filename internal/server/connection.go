@@ -176,20 +176,20 @@ func (c *Connection) addTracks() error {
 }
 
 func (c *Connection) startStreaming() {
-	fmt.Println("connection %s starting streams...\n", c.Socket.ID())
+	fmt.Printf("connection %s starting streams...\n", c.Socket.ID())
 	audioSrc := "audiotestsrc" //audiotestsrc
 	c.AudioPipeline = gst.CreatePipeline("opus", []*webrtc.TrackLocalStaticSample{c.AudioTracks[0]}, audioSrc)
 	c.AudioPipeline.Start()
 
-	//libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! queue
+	//libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert
 	//autovideosrc ! video/x-raw, width=320, height=240 ! videoconvert ! queue
-	videoSrc := "autovideosrc ! video/x-raw, width=320, height=240 ! videoconvert ! queue" //autovideosrc videotestsrc
+	videoSrc := "libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert" //autovideosrc videotestsrc
 	c.VideoPipeline = gst.CreatePipeline("vp8", []*webrtc.TrackLocalStaticSample{c.VideoTracks[0], c.VideoTracks[1]}, videoSrc)
 	c.VideoPipeline.Start()
 }
 
 func (c *Connection) stopStreaming() {
-	fmt.Println("connection %s stopping streams...\n", c.Socket.ID())
+	fmt.Printf("connection %s stopping streams...\n", c.Socket.ID())
 	if c.AudioPipeline != nil {
 		c.AudioPipeline.Stop()
 	}
