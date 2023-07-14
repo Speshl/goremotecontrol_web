@@ -181,8 +181,9 @@ func (c *Connection) startStreaming() {
 	c.AudioPipeline = gst.CreatePipeline("opus", []*webrtc.TrackLocalStaticSample{c.AudioTracks[0]}, audioSrc)
 	c.AudioPipeline.Start()
 
-	//libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1
-	videoSrc := "videotestsrc" //autovideosrc videotestsrc
+	//libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! queue
+	//autovideosrc ! video/x-raw, width=320, height=240 ! videoconvert ! queue
+	videoSrc := "libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! queue" //autovideosrc videotestsrc
 	c.VideoPipeline = gst.CreatePipeline("vp8", []*webrtc.TrackLocalStaticSample{c.VideoTracks[0], c.VideoTracks[1]}, videoSrc)
 	c.VideoPipeline.Start()
 }
