@@ -49,6 +49,10 @@ func (s *Server) Serve() error {
 	return s.socketio.Serve()
 }
 
+func (s *Server) GetHandler() *socketio.Server {
+	return s.socketio
+}
+
 func (s *Server) NewClientConn(socketConn socketio.Conn) (*Connection, error) {
 	clientConn, err := NewConnection(socketConn)
 	if err != nil {
