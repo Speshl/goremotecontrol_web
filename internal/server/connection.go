@@ -183,7 +183,7 @@ func (c *Connection) startStreaming() {
 
 	//libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! queue
 	//autovideosrc ! video/x-raw, width=320, height=240 ! videoconvert ! queue
-	videoSrc := "libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! queue" //autovideosrc videotestsrc
+	videoSrc := "autovideosrc ! video/x-raw, width=320, height=240 ! videoconvert ! queue" //autovideosrc videotestsrc
 	c.VideoPipeline = gst.CreatePipeline("vp8", []*webrtc.TrackLocalStaticSample{c.VideoTracks[0], c.VideoTracks[1]}, videoSrc)
 	c.VideoPipeline.Start()
 }
