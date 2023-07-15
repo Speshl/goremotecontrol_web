@@ -3,6 +3,7 @@ package carcam
 
 import (
 	"context"
+	"encoding/binary"
 	"fmt"
 	"log"
 	"time"
@@ -44,9 +45,9 @@ func createPipeline(dataChannel chan []byte) (*gst.Pipeline, error) {
 	// provide the format we request.
 	// This can be set after linking the two objects, because format negotiation between
 	// both elements will happen during pre-rolling of the pipeline.
-	// sink.SetCaps(gst.NewCapsFromString(
-	// 	"audio/x-raw, format=S16LE, layout=interleaved, channels=1",
-	// ))
+	sink.SetCaps(gst.NewCapsFromString(
+		"audio/x-raw, format=S16LE, layout=interleaved, channels=1, rate=48000",
+	))
 
 	// Getting data out of the appsink is done by setting callbacks on it.
 	// The appsink will then call those handlers, as soon as data is available.
@@ -74,8 +75,14 @@ func createPipeline(dataChannel chan []byte) (*gst.Pipeline, error) {
 			//
 			// We also know what format to expect because we set it with the caps. So we convert
 			// the map directly to signed 16-bit little-endian integers.
-			//samples := buffer.Map(gst.MapRead).AsInt16LESlice()
-			sampleBytes := buffer.Map(gst.MapRead).Bytes()
+			sampleInts := buffer.Map(gst.MapRead).AsInt16LESlice()
+			sampleBytes := make([]byte, len(buffer.Bytes()))
+
+			for _, sampleInt := range sampleInts {
+				binary.LittleEndian.AppendUint16(sampleBytes, uint16(sampleInt))
+			}
+
+			//sampleBytes := buffer.Map(gst.MapRead).Bytes()
 			defer buffer.Unmap()
 			//log.Printf("got %d bytes from sample\n", len(sampleBytes))
 			dataChannel <- sampleBytes

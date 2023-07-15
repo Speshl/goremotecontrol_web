@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/Speshl/goremotecontrol_web/internal/server/gst"
+	"github.com/Speshl/goremotecontrol_web/internal/carcam/gst"
 	"github.com/pion/webrtc/v3"
 	"github.com/pion/webrtc/v3/pkg/media"
 )
@@ -80,7 +80,11 @@ func StartDataListener(ctx context.Context, dataChannel chan []byte, track *webr
 			if !ok {
 				log.Println("Data channel closed, stopping")
 			}
-			track.WriteSample(media.Sample{Data: data, Duration: time.Duration(time.Nanosecond * 48000)})
+			log.Println("writing data to track")
+			err := track.WriteSample(media.Sample{Data: data, Duration: time.Duration(time.Nanosecond * 48000)})
+			if err != nil {
+				log.Printf("error writing sample to track: %s\n", err.Error())
+			}
 		}
 	}
 }
