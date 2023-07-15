@@ -47,14 +47,14 @@ func (c *CarCam) CreateTracks() error {
 	c.AudioTracks = append(c.AudioTracks, audioTrack)
 
 	// Create a video track
-	firstVideoTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: "video/vp8"}, "video", "pion2")
+	firstVideoTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: "video/h264"}, "video", "pion2")
 	if err != nil {
 		return fmt.Errorf("error creating first video track: %w", err)
 	}
 	c.VideoTracks = append(c.VideoTracks, firstVideoTrack)
 
 	// Create a second video track
-	secondVideoTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: "video/vp8"}, "video", "pion3")
+	secondVideoTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: "video/h264"}, "video", "pion3")
 	if err != nil {
 		return fmt.Errorf("error creating second video track: %w", err)
 	}
