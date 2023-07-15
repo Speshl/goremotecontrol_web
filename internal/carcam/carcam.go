@@ -72,9 +72,9 @@ func (c *CarCam) startStreaming() {
 	//libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert
 	//autovideosrc ! video/x-raw, width=320, height=240 ! videoconvert ! queue
 
-	videoSrc := "libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert ! queue" //webcam
+	videoSrc := "libcamerasrc" //webcam
 	//videoSrc := "videotestsrc"
-	c.VideoPipeline = gst.CreatePipeline("vp9", []*webrtc.TrackLocalStaticSample{c.VideoTracks[0], c.VideoTracks[1]}, videoSrc)
+	c.VideoPipeline = gst.CreatePipeline("h264-hardware", []*webrtc.TrackLocalStaticSample{c.VideoTracks[0], c.VideoTracks[1]}, videoSrc)
 	c.VideoPipeline.Start()
 }
 
@@ -108,5 +108,81 @@ gst-launch-1.0 -v filesrc location=mjpeg.avi ! avidemux !  queue ! jpegdec ! vid
 video/x-raw, format=YUY2, width=1280, height=960
 
 gst-launch-1.0 libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert ! queue ! vp8enc error-resilient=partitions keyframe-max-dist=10 auto-alt-ref=true cpu-used=5 deadline=1 ! testsink
+
+gst-launch-1.0 libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert ! queue ! vp8enc error-resilient=partitions keyframe-max-dist=10 auto-alt-ref=true cpu-used=5 deadline=1 ! filesink location=gstreamer_capture
+
+gst-launch-1.0 libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! filesink location=gstreamer_capture
+
+gst-launch-1.0 libcamerasrc ! filesink location=gstreamer_capture
+
+gst-launch-1.0 libcamerasrc ! videoconvert ! x264enc ! flvmux  ! filesink location=gstreamer_capture.flv -e
+
+
+
+'appsrc ! "video/x-raw,framerate=25/1,format=BGR,width=640,height=480" ! ' \
+           'queue ! v4l2h264enc ! "video/x-h264,level=(string)4" ! h264parse ! ' \
+           'rtph264pay ! gdppay ! tcpserversink host=0.0.0.0 port=7000 '
+
+
+v4l2h264enc is hardware decoder
+x264enc is software decoder
+
+
+gst-launch-1.0 -vvvv libcamerasrc ! video/x-raw, format=YUY2, width=1280, height=720, framerate=30/1, colorimetry=2:4:5:1 ! videoconvert ! v4l2h264enc ! 'video/x-h264,level=(string)3' ! filesink location=gstreamer_capture.h264
+
+gst-launch-1.0 -vvvv videotestsrc ! video/x-raw, format=YUY2, width=1280, height=720, framerate=30/1 ! videoconvert ! v4l2h264enc ! 'video/x-h264,level=(string)3' ! filesink location=gstreamer_capture.h264
+
+
+gst-launch-1.0 -vvvv libcamerasrc ! video/x-raw, format=YUY2, width=320, height=240, framerate=30/1 ! v4l2h264enc ! 'video/x-h264,level=(string)4' ! filesink location=gstreamer_capture.h264
+
+gst-launch-1.0 -vvvv libcamerasrc ! video/x-raw, format=YUY2, width=320, height=240, framerate=30/1 ! videoconvert ! x264enc ! 'video/x-h264,level=(string)4' ! filesink location=gstreamer_capture.h264
+
+export GST_DEBUG=6 gst-launch-1.0 libcamerasrc ! capsfilter caps="video/x-raw,width=320,height=240,format=YUY2,framerate=1/1,interlace-mode=(string)progressive,colorimetry=bt709" ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=5000000,h264_i_frame_period=30,h264_minimum_qp_value=10" ! "video/x-h264,level=(string)4" ! testsink
+
+
+#Working recording
+gst-launch-1.0  -vvvv libcamerasrc ! videoconvert ! x264enc ! flvmux  ! filesink location=gstreamer_capture.flv -e
+
+gst-launch-1.0 -vvvv libcamerasrc ! video/x-raw, format=YUY2, width=320, height=240, framerate=30/1 ! videoconvert ! x264enc ! 'video/x-h264,level=(string)3' ! filesink location=gstreamer_capture.h264
+
+gst-launch-1.0 -vvvv videotestsrc ! videoconvert ! v4l2h264enc ! 'video/x-h264,level=(string)3' ! filesink location=gstreamer_capture.h264
+
+
+
+
+
+# Trying ONNN camera
+
+
+# Trying New Logitech
+gst-launch-1.0 -vvvv libcamerasrc ! video/x-raw, format=YUY2, height=480, width=640 ! videoconvert ! v4l2h264enc ! 'video/x-h264,level=(string)3' ! filesink location=gstreamer_capture.h264
+
+
+******
+gst-launch-1.0 -vvvv libcamerasrc ! video/x-raw, format=YUY2, height=480, width=640 ! videoconvert ! v4l2h264enc ! 'video/x-h264,level=(string)3' ! filesink location=gstreamer_capture.h264
+********
+
+gst-launch-1.0 -vvvv libcamerasrc ! video/x-raw, format=YUY2, height=1920, width=1080, colorimetry=2:4:5:1, framerate=30/1 ! v4l2h264enc ! 'video/x-h264,level=(string)3' ! filesink location=gstreamer_capture.h264
+ caps = video/x-raw, format=(string)YUY2, width=(int)1920, height=(int)1080, colorimetry=(string)2:4:5:1, framerate=(fraction)30/1
+
+
+
+
+
+
+
+
+
+
+# Video Test Src
+gst-launch-1.0 -vvvv videotestsrc ! video/x-raw, format=YUY2, height=480, width=640 ! v4l2h264enc ! 'video/x-h264,level=(string)3' ! filesink location=gstreamer_capture.h264
+
+
+
+
+
+
+
+
 
 */
