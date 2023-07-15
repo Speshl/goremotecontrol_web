@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/Speshl/goremotecontrol_web/internal/server/gst"
+	"github.com/Speshl/goremotecontrol_web/internal/carcam"
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/pion/webrtc/v3"
 )
@@ -16,12 +16,6 @@ type Connection struct {
 	PeerConnection *webrtc.PeerConnection
 	Cancel         context.CancelFunc
 	CTX            context.Context
-
-	AudioTracks []*webrtc.TrackLocalStaticSample
-	VideoTracks []*webrtc.TrackLocalStaticSample
-
-	AudioPipeline *gst.Pipeline
-	VideoPipeline *gst.Pipeline
 }
 
 func NewConnection(socketConn socketio.Conn) (*Connection, error) {
@@ -42,8 +36,6 @@ func NewConnection(socketConn socketio.Conn) (*Connection, error) {
 
 	conn := &Connection{
 		ID:             socketConn.ID(),
-		AudioTracks:    make([]*webrtc.TrackLocalStaticSample, 0),
-		VideoTracks:    make([]*webrtc.TrackLocalStaticSample, 0),
 		Socket:         socketConn,
 		PeerConnection: peerConnection,
 		Cancel:         cancelCTX,
@@ -54,12 +46,15 @@ func NewConnection(socketConn socketio.Conn) (*Connection, error) {
 
 func (c *Connection) Disconnect() {
 	c.Cancel()
-	c.startStreaming()
 	c.PeerConnection.Close()
 }
 
-func (c *Connection) RegisterHandlers() {
-	c.addTracks()
+func (c *Connection) RegisterHandlers(car *carcam.CarCam) {
+	err := c.addTracks(car.AudioTracks, car.VideoTracks)
+	if err != nil {
+		log.Printf("failed to add tracks: %w\n", err)
+		return
+	}
 
 	// Set the handler for ICE connection state
 	// This will notify you when the peer has connected/disconnected
@@ -106,12 +101,6 @@ func (c *Connection) ProcessOffer(offer webrtc.SessionDescription) {
 		return
 	}
 
-	err = c.addTracks()
-	if err != nil {
-		log.Printf("failed to add tracks: %w\n", err)
-		return
-	}
-
 	// Create answer
 	answer, err := c.PeerConnection.CreateAnswer(nil)
 	if err != nil {
@@ -126,8 +115,6 @@ func (c *Connection) ProcessOffer(offer webrtc.SessionDescription) {
 		return
 	}
 
-	c.startStreaming()
-
 	encodedAnswer, err := encode(c.PeerConnection.LocalDescription())
 	if err != nil {
 		log.Printf("Failed encoding answer: %s", err.Error())
@@ -136,87 +123,19 @@ func (c *Connection) ProcessOffer(offer webrtc.SessionDescription) {
 	c.Socket.Emit("answer", encodedAnswer)
 }
 
-func (c *Connection) addTracks() error {
-	// Create a audio track
-	audioTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: "audio/opus"}, "audio", "pion1")
-	if err != nil {
-		return fmt.Errorf("error creating audio track: %w", err)
-	}
-	_, err = c.PeerConnection.AddTrack(audioTrack)
-	if err != nil {
-		return fmt.Errorf("error adding audio track: %w", err)
+func (c *Connection) addTracks(audioTracks []*webrtc.TrackLocalStaticSample, videoTracks []*webrtc.TrackLocalStaticSample) error {
+	for _, audioTrack := range audioTracks {
+		_, err := c.PeerConnection.AddTrack(audioTrack)
+		if err != nil {
+			return fmt.Errorf("error adding audio track: %w", err)
+		}
 	}
 
-	c.AudioTracks = append(c.AudioTracks, audioTrack)
-
-	// Create a video track
-	firstVideoTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: "video/vp8"}, "video", "pion2")
-	if err != nil {
-		return fmt.Errorf("error creating first video track: %w", err)
+	for _, videoTrack := range videoTracks {
+		_, err := c.PeerConnection.AddTrack(videoTrack)
+		if err != nil {
+			return fmt.Errorf("error adding video track: %w", err)
+		}
 	}
-	_, err = c.PeerConnection.AddTrack(firstVideoTrack)
-	if err != nil {
-		return fmt.Errorf("error adding first video track: %w", err)
-	}
-
-	c.VideoTracks = append(c.VideoTracks, firstVideoTrack)
-
-	// Create a second video track
-	secondVideoTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: "video/vp8"}, "video", "pion3")
-	if err != nil {
-		return fmt.Errorf("error creating second video track: %w", err)
-	}
-	_, err = c.PeerConnection.AddTrack(secondVideoTrack)
-	if err != nil {
-		return fmt.Errorf("error adding second video track: %w", err)
-	}
-
-	c.VideoTracks = append(c.VideoTracks, secondVideoTrack)
 	return nil
 }
-
-func (c *Connection) startStreaming() {
-	fmt.Printf("connection %s starting streams...\n", c.Socket.ID())
-	audioSrc := "audiotestsrc" //audiotestsrc
-	c.AudioPipeline = gst.CreatePipeline("opus", []*webrtc.TrackLocalStaticSample{c.AudioTracks[0]}, audioSrc)
-	c.AudioPipeline.Start()
-
-	//libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert
-	//autovideosrc ! video/x-raw, width=320, height=240 ! videoconvert ! queue
-	videoSrc := "libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert ! queue" //autovideosrc videotestsrc
-	c.VideoPipeline = gst.CreatePipeline("vp8", []*webrtc.TrackLocalStaticSample{c.VideoTracks[0], c.VideoTracks[1]}, videoSrc)
-	c.VideoPipeline.Start()
-}
-
-func (c *Connection) stopStreaming() {
-	fmt.Printf("connection %s stopping streams...\n", c.Socket.ID())
-	if c.AudioPipeline != nil {
-		c.AudioPipeline.Stop()
-	}
-
-	if c.VideoPipeline != nil {
-		c.VideoPipeline.Stop()
-	}
-}
-
-//gstreamer tests
-/*
-image/jpeg, width=640, height=480
-
-gst-launch-1.0 libcamerasrc ! jpegdec ! videoconvert ! queue ! vp8enc error-resilient=partitions keyframe-max-dist=10 auto-alt-ref=true cpu-used=5 deadline=1 ! testsink
-
-gst-launch-1.0 libcamerasrc ! jpegdec ! videoconvert ! queue ! filesink location=gstreamer_capture
-
-gst-launch-1.0 libcamerasrc ! jpegdec ! videoconvert ! filesink location=gstreamer_capture
-
-gst-launch-1.0 -v filesrc location=mjpeg.avi ! avidemux !  queue ! jpegdec ! videoconvert ! videoscale ! autovideosink
-
-
-
-
-
-video/x-raw, format=YUY2, width=1280, height=960
-
-gst-launch-1.0 libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert ! queue ! vp8enc error-resilient=partitions keyframe-max-dist=10 auto-alt-ref=true cpu-used=5 deadline=1 ! testsink
-
-*/

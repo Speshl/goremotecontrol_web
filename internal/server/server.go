@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/Speshl/goremotecontrol_web/internal/carcam"
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/googollee/go-socket.io/engineio"
 	"github.com/googollee/go-socket.io/engineio/transport"
@@ -14,6 +15,7 @@ import (
 )
 
 type Server struct {
+	carCam          *carcam.CarCam
 	socketio        *socketio.Server
 	connections     map[string]*Connection
 	connectionsLock sync.RWMutex
@@ -23,7 +25,7 @@ var allowOriginFunc = func(r *http.Request) bool {
 	return true
 }
 
-func NewServer() *Server {
+func NewServer(carCam *carcam.CarCam) *Server {
 	socketioServer := socketio.NewServer(&engineio.Options{
 		Transports: []transport.Transport{
 			&polling.Transport{
@@ -38,6 +40,7 @@ func NewServer() *Server {
 	return &Server{
 		socketio:    socketioServer,
 		connections: make(map[string]*Connection),
+		carCam:      carCam,
 	}
 }
 
@@ -59,7 +62,7 @@ func (s *Server) NewClientConn(socketConn socketio.Conn) (*Connection, error) {
 		return nil, err
 	}
 
-	clientConn.RegisterHandlers()
+	clientConn.RegisterHandlers(s.carCam)
 
 	// Set the handler for Peer connection state
 	// This will notify you when the peer has connected/disconnected
