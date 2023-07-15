@@ -72,9 +72,9 @@ func (c *CarCam) startStreaming() {
 	//libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert
 	//autovideosrc ! video/x-raw, width=320, height=240 ! videoconvert ! queue
 
-	//videoSrc := "libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert ! queue" //webcam
-	videoSrc := "videotestsrc"
-	c.VideoPipeline = gst.CreatePipeline("vp8", []*webrtc.TrackLocalStaticSample{c.VideoTracks[0], c.VideoTracks[1]}, videoSrc)
+	videoSrc := "libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1 ! videoconvert ! queue" //webcam
+	//videoSrc := "videotestsrc"
+	c.VideoPipeline = gst.CreatePipeline("vp9", []*webrtc.TrackLocalStaticSample{c.VideoTracks[0], c.VideoTracks[1]}, videoSrc)
 	c.VideoPipeline.Start()
 }
 
