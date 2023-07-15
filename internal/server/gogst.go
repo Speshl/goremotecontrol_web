@@ -21,7 +21,7 @@ func createPipeline() (*gst.Pipeline, error) {
 		return nil, err
 	}
 
-	src, err := gst.NewElement("videotestsrc")
+	src, err := gst.NewElement("audiotestsrc")
 	if err != nil {
 		return nil, err
 	}
