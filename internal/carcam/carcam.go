@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/Speshl/goremotecontrol_web/internal/server/gst"
 	"github.com/pion/webrtc/v3"
+	"github.com/pion/webrtc/v3/pkg/media"
 )
 
 type CarCam struct {
@@ -34,7 +36,9 @@ func (c *CarCam) ListenAndServe(ctx context.Context) error {
 		return err
 	}
 
-	c.startStreaming(ctx)
+	go StartDataListener(ctx, c.DataChannel)
+
+	StartGoGST(ctx, c.DataChannel)
 	return nil
 }
 
@@ -66,8 +70,19 @@ func (c *CarCam) CreateTracks() error {
 	return nil
 }
 
-func (c *CarCam) startStreaming(ctx context.Context) {
-	StartGoGST(ctx, c.DataChannel)
+func StartDataListener(ctx context.Context, dataChannel chan []byte, track *webrtc.TrackLocalStaticSample) {
+	for {
+		select {
+		case <-ctx.Done():
+			log.Println("Data Listener Done due to ctx")
+			return
+		case data, ok := <-dataChannel:
+			if !ok {
+				log.Println("Data channel closed, stopping")
+			}
+			track.WriteSample(media.Sample{Data: data, Duration: time.Duration(time.Nanosecond * 48000)})
+		}
+	}
 }
 
 // func (c *CarCam) startStreaming() {
