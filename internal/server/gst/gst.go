@@ -54,12 +54,8 @@ func CreatePipeline(codecName string, tracks []*webrtc.TrackLocalStaticSample, p
 		pipelineStr = pipelineSrc + " ! vp9enc ! " + pipelineStr
 		clockRate = videoClockRate
 
-	case "h264-hardware": //raspberry pi hardware encoder
-		pipelineStr = pipelineSrc + " ! video/x-raw, format=YUY2, height=480, width=640 ! videoconvert ! v4l2h264enc ! 'video/x-h264,level=(string)3' ! " + pipelineStr
-		clockRate = videoClockRate
-
 	case "h264":
-		pipelineStr = pipelineSrc + " ! video/x-raw,format=I420 ! x264enc speed-preset=ultrafast tune=zerolatency key-int-max=20 ! video/x-h264,stream-format=byte-stream ! " + pipelineStr
+		pipelineStr = pipelineSrc + " ! videoconvert ! queue ! x264enc speed-preset=ultrafast tune=zerolatency key-int-max=20 ! video/x-h264,stream-format=byte-stream ! " + pipelineStr
 		clockRate = videoClockRate
 
 	case "opus":
@@ -77,6 +73,10 @@ func CreatePipeline(codecName string, tracks []*webrtc.TrackLocalStaticSample, p
 	case "pcma":
 		pipelineStr = pipelineSrc + " ! audio/x-raw, rate=8000 ! alawenc ! " + pipelineStr
 		clockRate = pcmClockRate
+
+	case "custom":
+		pipelineStr = pipelineSrc + " ! " + pipelineStr
+		clockRate = videoClockRate
 
 	default:
 		panic("Unhandled codec " + codecName)
