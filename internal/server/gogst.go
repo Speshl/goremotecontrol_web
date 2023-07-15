@@ -97,6 +97,7 @@ func mainLoop(ctx context.Context, pipeline *gst.Pipeline) error {
 	// Start the pipeline
 	pipeline.SetState(gst.StatePlaying)
 
+	log.Println("Get pipeline bus")
 	// Retrieve the bus from the pipeline
 	bus := pipeline.GetPipelineBus()
 
