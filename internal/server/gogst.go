@@ -26,21 +26,27 @@ func createPipeline() (*gst.Pipeline, error) {
 		return nil, err
 	}
 
+	encoder, err := gst.NewElement("opusenc")
+	if err != nil {
+
+	}
+
 	sink, err := app.NewAppSink()
 	if err != nil {
 		return nil, err
 	}
 
-	pipeline.AddMany(src, sink.Element)
-	src.Link(sink.Element)
+	pipeline.AddMany(src, encoder, sink.Element)
+	src.Link(encoder)
+	encoder.Link(sink.Element)
 
 	// Tell the appsink what format we want. It will then be the audiotestsrc's job to
 	// provide the format we request.
 	// This can be set after linking the two objects, because format negotiation between
 	// both elements will happen during pre-rolling of the pipeline.
-	sink.SetCaps(gst.NewCapsFromString(
-		"audio/x-raw, format=S16LE, layout=interleaved, channels=1",
-	))
+	// sink.SetCaps(gst.NewCapsFromString(
+	// 	"audio/x-raw, format=S16LE, layout=interleaved, channels=1",
+	// ))
 
 	// Getting data out of the appsink is done by setting callbacks on it.
 	// The appsink will then call those handlers, as soon as data is available.
