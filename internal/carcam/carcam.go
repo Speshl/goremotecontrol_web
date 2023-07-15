@@ -75,7 +75,7 @@ func (c *CarCam) startStreaming() {
 	//videoSrc := "libcamerasrc ! video/x-raw,format=YUY2,height=480,width=640,colorimetry=2:4:5:1,framerate=30/1 ! videoconvert ! v4l2h264enc ! 'video/x-h264,level=(string)3,stream-forrmat=byte-stream,alignment=au,profiile=baseline,width=640,height=480,pixel-aspect-ratio=1/1,colorimetry=bt709,interlace-mode=progressive'" //webcam
 	//videoSrc := "libcamerasrc ! video/x-raw,format=YUY2,height=480,width=640,colorimetry=2:4:5:1,framerate=30/1 ! videoconvert ! v4l2h264enc ! 'video/x-h264,level=(string)3,stream-forrmat=byte-stream,alignment=au,profiile=baseline,width=640,height=480,pixel-aspect-ratio=1/1,colorimetry=bt709,interlace-mode=progressive'"
 	//videoSrc := "libcamerasrc ! video/x-raw,format=YUY2,height=480,width=640,colorimetry=2:4:5:1,framerate=30/1 ! videoconvert ! v4l2h264enc ! 'video/x-h264,level=(string)3,stream-format=byte-stream'"
-	videoSrc := "libcamerasrc ! video/x-raw,format=YUY2,height=240,width=320,colorimetry=2:4:5:1,framerate=1/1 ! videoconvert ! v4l2h264enc ! video/x-h264, stream-format=byte-stream,level=3"
+	videoSrc := "libcamerasrc ! video/x-raw,format=YUY2,height=240,width=320,colorimetry=2:4:5:1,framerate=1/1 ! videoconvert ! v4l2h264enc ! video/x-h264, stream-format=byte-stream,level=3,alignment=au,profiile=baseline,width=640,height=480,pixel-aspect-ratio=1/1,colorimetry=bt709,interlace-mode=progressive"
 
 	//videoSrc := "libcamerasrc"
 	c.VideoPipeline = gst.CreatePipeline("custom", []*webrtc.TrackLocalStaticSample{c.VideoTracks[0], c.VideoTracks[1]}, videoSrc)
