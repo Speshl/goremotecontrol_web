@@ -31,7 +31,7 @@ func (c *CarCam) ListenAndServe() error {
 		return err
 	}
 
-	c.startStreaming()
+	//c.startStreaming()
 	return nil
 }
 
@@ -217,4 +217,17 @@ Execution ended after 0:00:48.566840652
 Setting pipeline to NULL ...
 Freeing pipeline ...
 ********
+
+
+
+
+
+
+
+
+
+
+gst-launch-1.0 -vvvv libcamerasrc ! video/x-raw,format=YUY2,height=480,width=640,colorimetry=2:4:5:1,framerate=30/1 ! videoconvert ! v4l2h264enc ! 'video/x-h264,level=(string)3,stream-format=byte-stream,alignment=au,profiile=baseline,width=640,height=480,pixel-aspect-ratio=1/1,colorimetry=bt709,interlace-mode=progressive' ! filesink location=gstreamer_capture.h264
+
+gst-launch-1.0 -vvvv libcamerasrc ! video/x-raw,format=YUY2,height=90,width=160,colorimetry=2:4:5:1,framerate=1/1 ! videoconvert ! v4l2h264enc ! 'video/x-h264,stream-format=byte-stream,alignment=au,profiile=baseline,width=160,height=90,pixel-aspect-ratio=1/1,colorimetry=bt709,interlace-mode=progressive' ! filesink location=gstreamer_capture.h264
 */

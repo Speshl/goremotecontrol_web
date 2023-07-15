@@ -15,6 +15,8 @@ func main() {
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()
 
+	server.StartGoGST()
+
 	defer socketServer.Close()
 
 	go func() {
