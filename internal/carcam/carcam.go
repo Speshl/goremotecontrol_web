@@ -36,9 +36,9 @@ func (c *CarCam) ListenAndServe(ctx context.Context) error {
 		return err
 	}
 
-	go StartDataListener(ctx, c.DataChannel, c.AudioTracks[0])
-
-	StartGoGST(ctx, c.DataChannel)
+	go StartDataListener(ctx, c.DataChannel, c.VideoTracks[0])
+	StartStreaming(ctx, c.DataChannel)
+	//StartGoGST(ctx, c.DataChannel)
 	return nil
 }
 
@@ -54,14 +54,14 @@ func (c *CarCam) CreateTracks() error {
 	c.AudioTracks = append(c.AudioTracks, audioTrack)
 
 	// Create a video track
-	firstVideoTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: "video/h264"}, "video", "pion2")
+	firstVideoTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: webrtc.MimeTypeH264}, "video", "pion")
 	if err != nil {
 		return fmt.Errorf("error creating first video track: %w", err)
 	}
 	c.VideoTracks = append(c.VideoTracks, firstVideoTrack)
 
 	// Create a second video track
-	secondVideoTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: "video/h264"}, "video", "pion3")
+	secondVideoTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: webrtc.MimeTypeH264}, "video", "pion")
 	if err != nil {
 		return fmt.Errorf("error creating second video track: %w", err)
 	}
@@ -81,7 +81,7 @@ func StartDataListener(ctx context.Context, dataChannel chan []byte, track *webr
 				log.Println("Data channel closed, stopping")
 			}
 			log.Println("writing data to track")
-			err := track.WriteSample(media.Sample{Data: data, Duration: time.Duration(time.Nanosecond * 48000)})
+			err := track.WriteSample(media.Sample{Data: data, Duration: time.Millisecond * 33})
 			if err != nil {
 				log.Printf("error writing sample to track: %s\n", err.Error())
 			}
