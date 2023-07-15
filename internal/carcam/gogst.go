@@ -53,7 +53,7 @@ func createPipeline(dataChannel chan []byte) (*gst.Pipeline, error) {
 	sink.SetCallbacks(&app.SinkCallbacks{
 		// Add a "new-sample" callback
 		NewSampleFunc: func(sink *app.Sink) gst.FlowReturn {
-			log.Println("Got Sample")
+			//log.Println("Got Sample")
 			// Pull the sample that triggered this callback
 			sample := sink.PullSample()
 			if sample == nil {
@@ -77,7 +77,7 @@ func createPipeline(dataChannel chan []byte) (*gst.Pipeline, error) {
 			//samples := buffer.Map(gst.MapRead).AsInt16LESlice()
 			sampleBytes := buffer.Map(gst.MapRead).Bytes()
 			defer buffer.Unmap()
-			log.Printf("got %d bytes from sample\n", len(sampleBytes))
+			//log.Printf("got %d bytes from sample\n", len(sampleBytes))
 			dataChannel <- sampleBytes
 
 			return gst.FlowOK
