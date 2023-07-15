@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+	log.Println("Starting server...")
 	//Temp way to connect client to server before splitting client out to separate repo
 	carCam := carcam.NewCarCam("Car-Alpha")
 	socketServer := server.NewServer(carCam)
