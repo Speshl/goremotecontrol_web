@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 
@@ -16,8 +17,9 @@ func main() {
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()
 
-	pipeline := server.StartGoGST()
-	defer server.StopGoGST(pipeline)
+	ctx, cancel := context.WithCancel(context.Background())
+	server.StartGoGST(ctx)
+	defer cancel()
 
 	defer socketServer.Close()
 

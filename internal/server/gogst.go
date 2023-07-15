@@ -2,6 +2,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
@@ -90,7 +91,7 @@ func handleMessage(msg *gst.Message) error {
 	return nil
 }
 
-func mainLoop(pipeline *gst.Pipeline) error {
+func mainLoop(ctx context.Context, pipeline *gst.Pipeline) error {
 
 	// Start the pipeline
 	pipeline.SetState(gst.StatePlaying)
@@ -100,32 +101,31 @@ func mainLoop(pipeline *gst.Pipeline) error {
 
 	// Loop over messsages from the pipeline
 	for {
-		msg := bus.TimedPop(time.Duration(-1))
-		if msg == nil {
-			break
-		}
-		if err := handleMessage(msg); err != nil {
-			return err
+		select {
+		case <-ctx.Done():
+			pipeline.SendEvent(gst.NewEOSEvent())
+			return ctx.Err()
+		default:
+			msg := bus.TimedPop(time.Duration(-1))
+			if msg == nil {
+				return nil
+			}
+			if err := handleMessage(msg); err != nil {
+				return err
+			}
 		}
 	}
-
-	return nil
 }
 
-func StopGoGST(pipeline *gst.Pipeline) {
-	pipeline.SendEvent(gst.NewEOSEvent())
-}
-
-func StartGoGST() *gst.Pipeline {
-	var pipeline *gst.Pipeline
+func StartGoGST(ctx context.Context) {
 	Run(func() error {
 		var err error
+		var pipeline *gst.Pipeline
 		if pipeline, err = createPipeline(); err != nil {
 			return err
 		}
-		return mainLoop(pipeline)
+		return mainLoop(ctx, pipeline)
 	})
-	return pipeline
 }
 
 // Run is used to wrap the given function in a main loop and print any error
