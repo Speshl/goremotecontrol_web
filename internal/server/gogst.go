@@ -4,13 +4,11 @@ package server
 import (
 	"fmt"
 	"log"
-	"math"
 	"os"
 	"os/signal"
 	"time"
 
 	"github.com/tinyzimmer/go-glib/glib"
-	"github.com/tinyzimmer/go-gst/examples"
 	"github.com/tinyzimmer/go-gst/gst"
 	"github.com/tinyzimmer/go-gst/gst/app"
 )
@@ -23,7 +21,7 @@ func createPipeline() (*gst.Pipeline, error) {
 		return nil, err
 	}
 
-	src, err := gst.NewElement("audiotestsrc")
+	src, err := gst.NewElement("videotestsrc")
 	if err != nil {
 		return nil, err
 	}
@@ -70,17 +68,10 @@ func createPipeline() (*gst.Pipeline, error) {
 			//
 			// We also know what format to expect because we set it with the caps. So we convert
 			// the map directly to signed 16-bit little-endian integers.
-			samples := buffer.Map(gst.MapRead).AsInt16LESlice()
+			//samples := buffer.Map(gst.MapRead).AsInt16LESlice()
+			sampleBytes := buffer.Map(gst.MapRead).Bytes()
 			defer buffer.Unmap()
-
-			// Calculate the root mean square for the buffer
-			// (https://en.wikipedia.org/wiki/Root_mean_square)
-			var square float64
-			for _, i := range samples {
-				square += float64(i * i)
-			}
-			rms := math.Sqrt(square / float64(len(samples)))
-			log.Printf("got a sample rms: %s\n", rms)
+			log.Printf("got %d bytes from sample: %d\n", len(sampleBytes))
 
 			return gst.FlowOK
 		},
@@ -131,7 +122,7 @@ func mainLoop(pipeline *gst.Pipeline) error {
 }
 
 func StartGoGST() {
-	examples.Run(func() error {
+	Run(func() error {
 		var pipeline *gst.Pipeline
 		var err error
 		if pipeline, err = createPipeline(); err != nil {
@@ -153,14 +144,4 @@ func Run(f func() error) {
 	}()
 
 	mainLoop.Run()
-}
-
-// RunLoop is used to wrap the given function in a main loop and print any error.
-// The main loop itself is passed to the function for more control over exiting.
-func RunLoop(f func(*glib.MainLoop) error) {
-	mainLoop := glib.NewMainLoop(glib.MainContextDefault(), false)
-
-	if err := f(mainLoop); err != nil {
-		fmt.Println("ERROR!", err)
-	}
 }
