@@ -1,5 +1,5 @@
 // This example shows how to use the appsink element.
-package server
+package carcam
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"github.com/tinyzimmer/go-gst/gst/app"
 )
 
-func createPipeline() (*gst.Pipeline, error) {
+func createPipeline(dataChannel chan []byte) (*gst.Pipeline, error) {
 	log.Println("Creating Pipeline")
 	gst.Init(nil)
 
@@ -77,7 +77,8 @@ func createPipeline() (*gst.Pipeline, error) {
 			//samples := buffer.Map(gst.MapRead).AsInt16LESlice()
 			sampleBytes := buffer.Map(gst.MapRead).Bytes()
 			defer buffer.Unmap()
-			log.Printf("got %d bytes from sample: %d\n", len(sampleBytes))
+			log.Printf("got %d bytes from sample\n", len(sampleBytes))
+			dataChannel <- sampleBytes
 
 			return gst.FlowOK
 		},
@@ -126,11 +127,11 @@ func mainLoop(ctx context.Context, pipeline *gst.Pipeline) error {
 	}
 }
 
-func StartGoGST(ctx context.Context) {
+func StartGoGST(ctx context.Context, dataChannel chan []byte) {
 	Run(func() error {
 		var err error
 		var pipeline *gst.Pipeline
-		if pipeline, err = createPipeline(); err != nil {
+		if pipeline, err = createPipeline(dataChannel); err != nil {
 			return err
 		}
 		return mainLoop(ctx, pipeline)

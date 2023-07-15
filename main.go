@@ -11,21 +11,20 @@ import (
 
 func main() {
 	log.Println("Starting server...")
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	//Temp way to connect client to server before splitting client out to separate repo
 	carCam := carcam.NewCarCam("Car-Alpha")
 	socketServer := server.NewServer(carCam)
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()
 
-	ctx, cancel := context.WithCancel(context.Background())
-	server.StartGoGST(ctx)
-	defer cancel()
-
 	defer socketServer.Close()
 
 	go func() {
 		log.Println("Starting CarCam Client...")
-		if err := carCam.ListenAndServe(); err != nil {
+		if err := carCam.ListenAndServe(ctx); err != nil {
 			log.Fatalf("socketio listen error: %s\n", err)
 		}
 	}()

@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/googollee/go-socket.io v1.7.0
 	github.com/pion/webrtc/v3 v3.2.11
+	github.com/tinyzimmer/go-glib v0.0.25
 	github.com/tinyzimmer/go-gst v0.2.33
 )
 
@@ -32,7 +33,6 @@ require (
 	github.com/pion/turn/v2 v2.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
-	github.com/tinyzimmer/go-glib v0.0.25 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
