@@ -36,7 +36,7 @@ func (c *CarCam) ListenAndServe(ctx context.Context) error {
 		return err
 	}
 
-	go StartDataListener(ctx, c.DataChannel)
+	go StartDataListener(ctx, c.DataChannel, c.AudioTracks[0])
 
 	StartGoGST(ctx, c.DataChannel)
 	return nil
