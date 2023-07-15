@@ -4,8 +4,6 @@ package server
 import (
 	"fmt"
 	"log"
-	"os"
-	"os/signal"
 	"time"
 
 	"github.com/tinyzimmer/go-glib/glib"
@@ -100,13 +98,6 @@ func mainLoop(pipeline *gst.Pipeline) error {
 	// Retrieve the bus from the pipeline
 	bus := pipeline.GetPipelineBus()
 
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	go func() {
-		<-c
-		pipeline.SendEvent(gst.NewEOSEvent())
-	}()
-
 	// Loop over messsages from the pipeline
 	for {
 		msg := bus.TimedPop(time.Duration(-1))
@@ -121,15 +112,20 @@ func mainLoop(pipeline *gst.Pipeline) error {
 	return nil
 }
 
-func StartGoGST() {
+func StopGoGST(pipeline *gst.Pipeline) {
+	pipeline.SendEvent(gst.NewEOSEvent())
+}
+
+func StartGoGST() *gst.Pipeline {
+	var pipeline *gst.Pipeline
 	Run(func() error {
-		var pipeline *gst.Pipeline
 		var err error
 		if pipeline, err = createPipeline(); err != nil {
 			return err
 		}
 		return mainLoop(pipeline)
 	})
+	return pipeline
 }
 
 // Run is used to wrap the given function in a main loop and print any error
