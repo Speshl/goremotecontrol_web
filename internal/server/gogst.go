@@ -13,6 +13,7 @@ import (
 )
 
 func createPipeline() (*gst.Pipeline, error) {
+	log.Println("Creating Pipeline")
 	gst.Init(nil)
 
 	pipeline, err := gst.NewPipeline("")
@@ -46,7 +47,7 @@ func createPipeline() (*gst.Pipeline, error) {
 	sink.SetCallbacks(&app.SinkCallbacks{
 		// Add a "new-sample" callback
 		NewSampleFunc: func(sink *app.Sink) gst.FlowReturn {
-
+			log.Println("Got Sample")
 			// Pull the sample that triggered this callback
 			sample := sink.PullSample()
 			if sample == nil {
@@ -92,7 +93,7 @@ func handleMessage(msg *gst.Message) error {
 }
 
 func mainLoop(ctx context.Context, pipeline *gst.Pipeline) error {
-
+	log.Println("Starting main loop")
 	// Start the pipeline
 	pipeline.SetState(gst.StatePlaying)
 
@@ -103,6 +104,7 @@ func mainLoop(ctx context.Context, pipeline *gst.Pipeline) error {
 	for {
 		select {
 		case <-ctx.Done():
+			log.Println("Sending EOS Event")
 			pipeline.SendEvent(gst.NewEOSEvent())
 			return ctx.Err()
 		default:
