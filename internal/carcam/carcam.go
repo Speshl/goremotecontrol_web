@@ -73,6 +73,7 @@ func (c *CarCam) startStreaming() {
 	//autovideosrc ! video/x-raw, width=320, height=240 ! videoconvert ! queue
 
 	//videoSrc := "libcamerasrc ! video/x-raw,format=YUY2,height=480,width=640,colorimetry=2:4:5:1,framerate=30/1 ! videoconvert ! v4l2h264enc ! 'video/x-h264,level=(string)3,stream-forrmat=byte-stream,alignment=au,profiile=baseline,width=640,height=480,pixel-aspect-ratio=1/1,colorimetry=bt709,interlace-mode=progressive'" //webcam
+	//videoSrc := "libcamerasrc ! video/x-raw,format=YUY2,height=480,width=640,colorimetry=2:4:5:1,framerate=30/1 ! videoconvert ! v4l2h264enc ! 'video/x-h264,level=(string)3,stream-forrmat=byte-stream,alignment=au,profiile=baseline,width=640,height=480,pixel-aspect-ratio=1/1,colorimetry=bt709,interlace-mode=progressive'"
 	videoSrc := "libcamerasrc ! video/x-raw,format=YUY2,height=480,width=640,colorimetry=2:4:5:1,framerate=30/1 ! videoconvert ! v4l2h264enc ! 'video/x-h264,level=(string)3,stream-forrmat=byte-stream,alignment=au,profiile=baseline,width=640,height=480,pixel-aspect-ratio=1/1,colorimetry=bt709,interlace-mode=progressive'"
 	c.VideoPipeline = gst.CreatePipeline("custom", []*webrtc.TrackLocalStaticSample{c.VideoTracks[0], c.VideoTracks[1]}, videoSrc)
 	c.VideoPipeline.Start()
@@ -179,6 +180,7 @@ gst-launch-1.0 -vvvv videotestsrc ! video/x-raw,format=I420 ! x264enc speed-pres
 
 
 
+gst-launch-1.0 libcamerasrc ! video/x-raw,format=YUY2,height=480,width=640,colorimetry=2:4:5:1,framerate=30/1 ! videoconvert ! v4l2h264enc ! 'video/x-h264,level=(string)3,stream-forrmat=byte-stream,alignment=au,profiile=baseline,width=640,height=480,pixel-aspect-ratio=1/1,colorimetry=bt709,interlace-mode=progressive' ! testsink
 
 
 
