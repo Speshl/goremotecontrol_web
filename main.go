@@ -16,8 +16,8 @@ func main() {
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()
 
-	server.StartGoGST()
-	defer server.StopGoGST()
+	pipeline := server.StartGoGST()
+	defer server.StopGoGST(pipeline)
 
 	defer socketServer.Close()
 
