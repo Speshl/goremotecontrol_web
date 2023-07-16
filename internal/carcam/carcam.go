@@ -71,7 +71,6 @@ func StartDataListener(ctx context.Context, dataChannel chan []byte, track *webr
 			if !ok {
 				log.Println("Data channel closed, stopping")
 			}
-			log.Println("writing data to track")
 			err := track.WriteSample(media.Sample{Data: data, Duration: time.Millisecond * 17})
 			if err != nil {
 				log.Printf("error writing sample to track: %s\n", err.Error())
