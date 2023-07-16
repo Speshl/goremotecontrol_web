@@ -33,11 +33,12 @@ func StartStreaming(ctx context.Context, dataChannel chan []byte) {
 		"--flush", // Flush output files immediately
 		"--width", strconv.Itoa(640),
 		"--height", strconv.Itoa(480),
-		"--framerate", strconv.Itoa(30),
+		"--framerate", strconv.Itoa(60),
 		"-n",                    // Do not show a preview window
-		"--profile", "baseline", // H264 profile
+		"--profile", "baseline", // H264 profile baseline, main or high
+		//"--level", "4.2",
+		//"--denoise", "cdn_off",
 	}
-
 	// if options.HorizontalFlip {
 	// 	args = append(args, "--hflip")
 	// }
