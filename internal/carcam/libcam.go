@@ -9,46 +9,38 @@ import (
 	"strconv"
 )
 
-var readBufferSize = 4096
-var bufferSizeKB = 256
+const readBufferSize = 4096
+const bufferSizeKB = 256
+
 var nalSeparator = []byte{0, 0, 0, 1} //NAL break
 
-// type CameraOptions struct {
-// 	Width               int
-// 	Height              int
-// 	Fps                 int
-// 	HorizontalFlip      bool
-// 	VerticalFlip        bool
-// 	Rotation            int
-// 	UseLibcamera        bool // Set to true to enable libcamera, otherwise use legacy raspivid stack
-// 	AutoDetectLibCamera bool // Set to true to automatically detect if libcamera is available. If true, UseLibcamera is ignored.
-// }
-
-func StartStreaming(ctx context.Context, dataChannel chan []byte) {
+func (c *CarCam) StartStreaming(ctx context.Context) {
 	log.Println("Start streaming")
 	args := []string{
 		"--inline", // H264: Force PPS/SPS header with every I frame
 		"-t", "0",  // Disable timeout
 		"-o", "-", // Output to stdout
 		"--flush", // Flush output files immediately
-		"--width", strconv.Itoa(640),
-		"--height", strconv.Itoa(480),
-		"--framerate", strconv.Itoa(60),
-		"-n",                    // Do not show a preview window
-		"--profile", "baseline", // H264 profile baseline, main or high
-		//"--level", "4.2",
-		//"--denoise", "cdn_off",
+		"--width", c.options.width,
+		"--height", c.options.height,
+		"--framerate", c.options.fps,
+		"-n",                           // Do not show a preview window
+		"--profile", c.options.profile, // H264 profile baseline, main or high
+		"--level", c.options.level,
 	}
-	// if options.HorizontalFlip {
-	// 	args = append(args, "--hflip")
-	// }
-	// if options.VerticalFlip {
-	// 	args = append(args, "--vflip")
-	// }
-	// if options.Rotation != 0 {
-	// 	args = append(args, "--rotation")
-	// 	args = append(args, strconv.Itoa(options.Rotation))
-	// }
+	if c.options.horizontalFlip {
+		args = append(args, "--hflip")
+	}
+	if c.options.verticalFlip {
+		args = append(args, "--vflip")
+	}
+	if !c.options.deNoise {
+		args = append(args, "--denoise", "cdn_off")
+	}
+	if c.options.rotation != 0 {
+		args = append(args, "--rotation")
+		args = append(args, strconv.Itoa(c.options.rotation))
+	}
 
 	cmd := exec.CommandContext(ctx, "libcamera-vid", args...)
 	defer cmd.Wait()
@@ -102,7 +94,7 @@ func StartStreaming(ctx context.Context, dataChannel chan []byte) {
 				// Boadcast before the NAL
 				broadcast := make([]byte, nalIndex)
 				copy(broadcast, buffer)
-				dataChannel <- broadcast
+				c.videoDataChannel <- broadcast
 
 				// Shift
 				copy(buffer, buffer[nalIndex:currentPos])

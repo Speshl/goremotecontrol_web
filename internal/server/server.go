@@ -62,7 +62,10 @@ func (s *Server) NewClientConn(socketConn socketio.Conn) (*Connection, error) {
 		return nil, err
 	}
 
-	clientConn.RegisterHandlers(s.carCam)
+	err = clientConn.RegisterHandlers(s.carCam)
+	if err != nil {
+		return nil, err
+	}
 
 	// Set the handler for Peer connection state
 	// This will notify you when the peer has connected/disconnected

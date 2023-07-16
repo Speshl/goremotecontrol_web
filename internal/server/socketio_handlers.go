@@ -66,7 +66,7 @@ func (s *Server) onCommand(socketConn socketio.Conn, msg []byte) {
 }
 
 func (s *Server) OnDisconnect(socketConn socketio.Conn, reason string) {
-	log.Println("connection disconnected (%s): %s ", reason, socketConn.ID())
+	log.Printf("connection disconnected (%s): %s\n", reason, socketConn.ID())
 	s.RemoveClient(socketConn.ID())
 }
 

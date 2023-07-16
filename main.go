@@ -9,25 +9,32 @@ import (
 	"github.com/Speshl/goremotecontrol_web/internal/server"
 )
 
+const carName = "Car-Alpha"
+
+const width = "1280"
+const height = "720"
+const fps = "60"
+
 func main() {
 	log.Println("Starting server...")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	//Temp way to connect client to server before splitting client out to separate repo
-	carCam := carcam.NewCarCam("Car-Alpha")
+	carCam, err := carcam.NewCarCam(carName, width, height, fps)
+	if err != nil {
+		log.Fatalf("NewCarCam error: %s\n", err)
+	}
 	socketServer := server.NewServer(carCam)
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()
 
 	defer socketServer.Close()
 
-	go func() {
-		log.Println("Starting CarCam Client...")
-		if err := carCam.ListenAndServe(ctx); err != nil {
-			log.Fatalf("socketio listen error: %s\n", err)
-		}
-	}()
+	err = carCam.Start(ctx)
+	if err != nil {
+		log.Fatalf("CarCam error: %s\n", err)
+	}
 
 	go func() {
 		log.Println("Start serving socketio...")

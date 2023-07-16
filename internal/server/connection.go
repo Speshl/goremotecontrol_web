@@ -31,7 +31,7 @@ func NewConnection(socketConn socketio.Conn) (*Connection, error) {
 		},
 	})
 	if err != nil {
-		return nil, fmt.Errorf("Failed to create Peer Connection: %s\n", err)
+		return nil, fmt.Errorf("Failed to create Peer Connection: %s", err)
 	}
 
 	conn := &Connection{
@@ -49,11 +49,15 @@ func (c *Connection) Disconnect() {
 	c.PeerConnection.Close()
 }
 
-func (c *Connection) RegisterHandlers(car *carcam.CarCam) {
-	err := c.addTracks(car.AudioTracks, car.VideoTracks)
+func (c *Connection) RegisterHandlers(car *carcam.CarCam) error {
+	_, err := c.PeerConnection.AddTrack(car.AudioTrack)
 	if err != nil {
-		log.Printf("failed to add tracks: %w\n", err)
-		return
+		return fmt.Errorf("error adding audio track: %w", err)
+	}
+
+	_, err = c.PeerConnection.AddTrack(car.VideoTrack)
+	if err != nil {
+		return fmt.Errorf("error adding video track: %w", err)
 	}
 
 	// Set the handler for ICE connection state
@@ -88,7 +92,7 @@ func (c *Connection) RegisterHandlers(car *carcam.CarCam) {
 	// dataChannel.OnMessage(func(msg webrtc.DataChannelMessage) {
 	// 	log.Println("Received data channel message:", string(msg.Data))
 	// })
-
+	return nil
 }
 
 func (c *Connection) ProcessOffer(offer webrtc.SessionDescription) {
@@ -121,21 +125,4 @@ func (c *Connection) ProcessOffer(offer webrtc.SessionDescription) {
 		return
 	}
 	c.Socket.Emit("answer", encodedAnswer)
-}
-
-func (c *Connection) addTracks(audioTracks []*webrtc.TrackLocalStaticSample, videoTracks []*webrtc.TrackLocalStaticSample) error {
-	for _, audioTrack := range audioTracks {
-		_, err := c.PeerConnection.AddTrack(audioTrack)
-		if err != nil {
-			return fmt.Errorf("error adding audio track: %w", err)
-		}
-	}
-
-	for _, videoTrack := range videoTracks {
-		_, err := c.PeerConnection.AddTrack(videoTrack)
-		if err != nil {
-			return fmt.Errorf("error adding video track: %w", err)
-		}
-	}
-	return nil
 }
