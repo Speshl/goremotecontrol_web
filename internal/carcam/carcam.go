@@ -6,7 +6,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/Speshl/goremotecontrol_web/internal/carcam/gst"
 	"github.com/pion/webrtc/v3"
 	"github.com/pion/webrtc/v3/pkg/media"
 )
@@ -16,9 +15,6 @@ type CarCam struct {
 	AudioTracks []*webrtc.TrackLocalStaticSample
 	VideoTracks []*webrtc.TrackLocalStaticSample
 	DataChannel chan []byte
-
-	AudioPipeline *gst.Pipeline
-	VideoPipeline *gst.Pipeline
 }
 
 func NewCarCam(name string) *CarCam {
