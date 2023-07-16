@@ -94,7 +94,7 @@ func (c *CarCam) StartStreaming(ctx context.Context) {
 				// Boadcast before the NAL
 				broadcast := make([]byte, nalIndex)
 				copy(broadcast, buffer)
-				c.videoDataChannel <- broadcast
+				c.videoChannel <- broadcast
 
 				// Shift
 				copy(buffer, buffer[nalIndex:currentPos])

@@ -11,11 +11,11 @@ import (
 )
 
 type CarCam struct {
-	Name             string
-	AudioTrack       *webrtc.TrackLocalStaticSample
-	VideoTrack       *webrtc.TrackLocalStaticSample
-	videoDataChannel chan []byte
-	options          CameraOptions
+	Name         string
+	AudioTrack   *webrtc.TrackLocalStaticSample
+	VideoTrack   *webrtc.TrackLocalStaticSample
+	videoChannel chan []byte
+	options      CameraOptions
 }
 
 type CameraOptions struct {
@@ -44,10 +44,10 @@ func NewCarCam(name string, width string, height string, fps string) (*CarCam, e
 	}
 
 	return &CarCam{
-		Name:             name,
-		AudioTrack:       audioTrack,
-		VideoTrack:       videoTrack,
-		videoDataChannel: make(chan []byte, 5),
+		Name:         name,
+		AudioTrack:   audioTrack,
+		VideoTrack:   videoTrack,
+		videoChannel: make(chan []byte, 5),
 		options: CameraOptions{
 			width:          width,
 			height:         height,
@@ -98,7 +98,7 @@ func (c *CarCam) StartVideoDataListener(ctx context.Context) {
 		case <-ctx.Done():
 			log.Println("Data Listener Done due to ctx")
 			return
-		case data, ok := <-c.videoDataChannel:
+		case data, ok := <-c.videoChannel:
 			if !ok {
 				log.Println("Data channel closed, stopping")
 				return

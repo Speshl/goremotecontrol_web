@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	carcam "github.com/Speshl/goremotecontrol_web/internal/carcam"
+	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	"github.com/Speshl/goremotecontrol_web/internal/server"
 )
 
@@ -14,6 +15,7 @@ const carName = "Car-Alpha"
 const width = "1280"
 const height = "720"
 const fps = "60"
+const refreshRate = 60 //command refresh rate
 
 func main() {
 	log.Println("Starting server...")
@@ -25,16 +27,20 @@ func main() {
 	if err != nil {
 		log.Fatalf("NewCarCam error: %s\n", err)
 	}
+
+	err = carCam.Start(ctx)
+	if err != nil {
+		log.Fatalf("carcam error: %s\n", err.Error())
+	}
+
+	carCommand := carcommand.NewCarCommand(carName, refreshRate)
+	carCommand.Start(ctx)
+
 	socketServer := server.NewServer(carCam)
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()
 
 	defer socketServer.Close()
-
-	err = carCam.Start(ctx)
-	if err != nil {
-		log.Fatalf("CarCam error: %s\n", err)
-	}
 
 	go func() {
 		log.Println("Start serving socketio...")
