@@ -36,7 +36,7 @@ func main() {
 			log.Fatalf("carcam error: %s\n", err.Error())
 		}
 		cancel() //stop anything else on this context because camera stopped
-		log.Println("Stopping due to carcommand stopping unexpectedly")
+		log.Println("Stopping due to carcam stopping unexpectedly")
 	}()
 
 	carCommand := carcommand.NewCarCommand(carName, refreshRate)

@@ -3,7 +3,6 @@ package carcam
 import (
 	"bytes"
 	"context"
-	"io"
 	"log"
 	"os/exec"
 	"strconv"
@@ -14,7 +13,7 @@ const bufferSizeKB = 256
 
 var nalSeparator = []byte{0, 0, 0, 1} //NAL break
 
-func (c *CarCam) StartStreaming(ctx context.Context) {
+func (c *CarCam) StartStreaming(ctx context.Context) error {
 	log.Println("Start streaming")
 	args := []string{
 		"--inline", // H264: Force PPS/SPS header with every I frame
@@ -47,14 +46,12 @@ func (c *CarCam) StartStreaming(ctx context.Context) {
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 
 	err = cmd.Start()
 	if err != nil {
-		log.Print(err)
-		return
+		return err
 	}
 
 	log.Println("Started libcamera-vid", cmd.Args)
@@ -66,16 +63,14 @@ func (c *CarCam) StartStreaming(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Println(ctx.Err())
-			return
+			return ctx.Err()
 		default:
 			n, err := stdout.Read(p)
 			if err != nil {
-				if err == io.EOF {
-					log.Println("[libcamera-vid] EOF")
-					return
-				}
-				log.Println(err)
+				// if err == io.EOF {
+				// 	return fmt.Errorf("[libcamera-vid] EOF")
+				// }
+				return err
 			}
 
 			copied := copy(buffer[currentPos:], p[:n])
