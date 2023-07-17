@@ -32,10 +32,10 @@ type CarCommand struct {
 }
 
 type Pins struct {
-	escPin   rpio.Pin
-	servoPin rpio.Pin
-	panPin   rpio.Pin
-	tiltPin  rpio.Pin
+	esc   rpio.Pin
+	servo rpio.Pin
+	pan   rpio.Pin
+	tilt  rpio.Pin
 }
 
 type LatestCommand struct {
@@ -109,7 +109,7 @@ func (c *CarCommand) Start(ctx context.Context) error {
 						log.Println("no command, sending neutral")
 					}
 					warned = true
-					c.neutralCommand()
+					c.neutral()
 				}
 				continue
 			}
@@ -133,25 +133,25 @@ func (c *CarCommand) startGPIO() error {
 		return err
 	}
 
-	c.pins.escPin = rpio.Pin(escPinID)
-	c.pins.escPin.Mode(rpio.Pwm)
-	c.pins.escPin.Freq(frequency)
-	c.pins.escPin.DutyCycleWithPwmMode(midvalue, maxvalue, rpio.Balanced) //rpio.Markspace
+	c.pins.esc = rpio.Pin(escPinID)
+	c.pins.esc.Mode(rpio.Pwm)
+	c.pins.esc.Freq(frequency)
+	c.pins.esc.DutyCycleWithPwmMode(midvalue, maxvalue, rpio.Balanced) //rpio.Markspace
 
-	c.pins.servoPin = rpio.Pin(servoPinID)
-	c.pins.servoPin.Mode(rpio.Pwm)
-	c.pins.servoPin.Freq(frequency)
-	c.pins.servoPin.DutyCycleWithPwmMode(midvalue, maxvalue, rpio.Balanced) //rpio.Markspace
+	c.pins.servo = rpio.Pin(servoPinID)
+	c.pins.servo.Mode(rpio.Pwm)
+	c.pins.servo.Freq(frequency)
+	c.pins.servo.DutyCycleWithPwmMode(midvalue, maxvalue, rpio.Balanced) //rpio.Markspace
 
-	c.pins.tiltPin = rpio.Pin(tiltPinID)
-	c.pins.tiltPin.Mode(rpio.Pwm)
-	c.pins.tiltPin.Freq(frequency)
-	c.pins.tiltPin.DutyCycleWithPwmMode(midvalue, maxvalue, rpio.Balanced) //rpio.Markspace
+	c.pins.tilt = rpio.Pin(tiltPinID)
+	c.pins.tilt.Mode(rpio.Pwm)
+	c.pins.tilt.Freq(frequency)
+	c.pins.tilt.DutyCycleWithPwmMode(midvalue, maxvalue, rpio.Balanced) //rpio.Markspace
 
-	c.pins.panPin = rpio.Pin(panPinID)
-	c.pins.panPin.Mode(rpio.Pwm)
-	c.pins.panPin.Freq(frequency)
-	c.pins.panPin.DutyCycleWithPwmMode(midvalue, maxvalue, rpio.Balanced) //rpio.Markspace
+	c.pins.pan = rpio.Pin(panPinID)
+	c.pins.pan.Mode(rpio.Pwm)
+	c.pins.pan.Freq(frequency)
+	c.pins.pan.DutyCycleWithPwmMode(midvalue, maxvalue, rpio.Balanced) //rpio.Markspace
 	return nil
 }
 
@@ -169,16 +169,18 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 	return parsedCommand, nil
 }
 
-func (c *CarCommand) sendCommand(command Command) {
-	c.pins.escPin.DutyCycleWithPwmMode(command.esc, maxvalue, rpio.Balanced)
-	c.pins.escPin.DutyCycleWithPwmMode(command.servo, maxvalue, rpio.Balanced)
-	c.pins.escPin.DutyCycleWithPwmMode(command.pan, maxvalue, rpio.Balanced)
-	c.pins.escPin.DutyCycleWithPwmMode(command.tilt, maxvalue, rpio.Balanced)
+func (c *CarCommand) neutral() {
+	c.sendCommand(Command{
+		esc:   midvalue,
+		servo: midvalue,
+		tilt:  midvalue,
+		pan:   midvalue,
+	})
 }
 
-func (c *CarCommand) neutralCommand() {
-	c.pins.escPin.DutyCycleWithPwmMode(midvalue, maxvalue, rpio.Balanced)
-	c.pins.escPin.DutyCycleWithPwmMode(midvalue, maxvalue, rpio.Balanced)
-	c.pins.escPin.DutyCycleWithPwmMode(midvalue, maxvalue, rpio.Balanced)
-	c.pins.escPin.DutyCycleWithPwmMode(midvalue, maxvalue, rpio.Balanced)
+func (c *CarCommand) sendCommand(command Command) {
+	// c.pins.esc.DutyCycleWithPwmMode(command.esc, maxvalue, rpio.Balanced)
+	// c.pins.servo.DutyCycleWithPwmMode(command.servo, maxvalue, rpio.Balanced)
+	// c.pins.pan.DutyCycleWithPwmMode(command.pan, maxvalue, rpio.Balanced)
+	// c.pins.tilt.DutyCycleWithPwmMode(command.tilt, maxvalue, rpio.Balanced)
 }
