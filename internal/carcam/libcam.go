@@ -42,6 +42,7 @@ func (c *CarCam) StartStreaming(ctx context.Context) error {
 
 	cmd := exec.CommandContext(ctx, "libcamera-vid", args...)
 	defer cmd.Wait()
+	defer cmd.Process.Kill()
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
