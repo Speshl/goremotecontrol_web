@@ -69,7 +69,7 @@ func (c *CarCam) Start(ctx context.Context) error {
 	}
 
 	go c.StartVideoDataListener(ctx)
-	go c.StartStreaming(ctx)
+	c.StartStreaming(ctx)
 	return nil
 }
 
