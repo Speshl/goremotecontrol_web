@@ -40,14 +40,14 @@ func main() {
 	}()
 
 	carCommand := carcommand.NewCarCommand(carName, refreshRate)
-	// go func() {
-	// 	err := carCommand.Start(ctx)
-	// 	if err != nil {
-	// 		log.Fatalf("carcommand error: %s\n", err.Error())
-	// 	}
-	// 	cancel() //stop anything else on this context because the gpio output stopped
-	// 	log.Println("Stopping due to carcommand stopping unexpectedly")
-	// }()
+	go func() {
+		err := carCommand.Start(ctx)
+		if err != nil {
+			log.Fatalf("carcommand error: %s\n", err.Error())
+		}
+		cancel() //stop anything else on this context because the gpio output stopped
+		log.Println("Stopping due to carcommand stopping unexpectedly")
+	}()
 
 	socketServer := server.NewServer(carCam, carCommand)
 	socketServer.RegisterHTTPHandlers()
