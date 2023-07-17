@@ -5,7 +5,6 @@ import (
 	"log"
 
 	carcam "github.com/Speshl/goremotecontrol_web/internal/carcam"
-	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	"github.com/Speshl/goremotecontrol_web/internal/server"
 )
 
@@ -30,24 +29,24 @@ func main() {
 		log.Fatalf("NewCarCam error: %s\n", err)
 	}
 
-	// go func() {
-	// 	err = carCam.Start(ctx)
-	// 	if err != nil {
-	// 		log.Fatalf("carcam error: %s\n", err.Error())
-	// 	}
-	// 	cancel() //stop anything else on this context because camera stopped
-	// 	log.Println("Stopping due to carcommand stopping unexpectedly")
-	// }()
-
-	carCommand := carcommand.NewCarCommand(carName, refreshRate)
 	go func() {
-		err := carCommand.Start(ctx)
+		err = carCam.Start(ctx)
 		if err != nil {
-			log.Fatalf("carcommand error: %s\n", err.Error())
+			log.Fatalf("carcam error: %s\n", err.Error())
 		}
-		cancel() //stop anything else on this context because the gpio output stopped
+		cancel() //stop anything else on this context because camera stopped
 		log.Println("Stopping due to carcommand stopping unexpectedly")
 	}()
+
+	// carCommand := carcommand.NewCarCommand(carName, refreshRate)
+	// go func() {
+	// 	err := carCommand.Start(ctx)
+	// 	if err != nil {
+	// 		log.Fatalf("carcommand error: %s\n", err.Error())
+	// 	}
+	// 	cancel() //stop anything else on this context because the gpio output stopped
+	// 	log.Println("Stopping due to carcommand stopping unexpectedly")
+	// }()
 
 	socketServer := server.NewServer(carCam, carCommand)
 	socketServer.RegisterHTTPHandlers()
