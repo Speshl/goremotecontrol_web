@@ -109,7 +109,7 @@ func (c *CarCommand) Start(ctx context.Context) error {
 						log.Println("no command, sending neutral")
 					}
 					warned = true
-					c.neutral()
+					c.sendNeutral()
 				}
 				continue
 			}
@@ -136,22 +136,19 @@ func (c *CarCommand) startGPIO() error {
 	c.pins.esc = rpio.Pin(escPinID)
 	c.pins.esc.Mode(rpio.Pwm)
 	c.pins.esc.Freq(frequency)
-	c.pins.esc.DutyCycleWithPwmMode(midvalue, maxvalue, rpio.Balanced) //rpio.Markspace
 
 	c.pins.servo = rpio.Pin(servoPinID)
 	c.pins.servo.Mode(rpio.Pwm)
 	c.pins.servo.Freq(frequency)
-	c.pins.servo.DutyCycleWithPwmMode(midvalue, maxvalue, rpio.Balanced) //rpio.Markspace
 
 	c.pins.tilt = rpio.Pin(tiltPinID)
 	c.pins.tilt.Mode(rpio.Pwm)
 	c.pins.tilt.Freq(frequency)
-	c.pins.tilt.DutyCycleWithPwmMode(midvalue, maxvalue, rpio.Balanced) //rpio.Markspace
 
 	c.pins.pan = rpio.Pin(panPinID)
 	c.pins.pan.Mode(rpio.Pwm)
 	c.pins.pan.Freq(frequency)
-	c.pins.pan.DutyCycleWithPwmMode(midvalue, maxvalue, rpio.Balanced) //rpio.Markspace
+	c.sendNeutral()
 	return nil
 }
 
@@ -169,7 +166,7 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 	return parsedCommand, nil
 }
 
-func (c *CarCommand) neutral() {
+func (c *CarCommand) sendNeutral() {
 	c.sendCommand(Command{
 		esc:   midvalue,
 		servo: midvalue,
