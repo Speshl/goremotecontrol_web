@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
 
 	carcam "github.com/Speshl/goremotecontrol_web/internal/carcam"
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
@@ -40,14 +41,14 @@ func main() {
 	}()
 
 	carCommand := carcommand.NewCarCommand(carName, refreshRate)
-	// go func() {
-	// 	err := carCommand.Start(ctx)
-	// 	if err != nil {
-	// 		log.Fatalf("carcommand error: %s\n", err.Error())
-	// 	}
-	// 	cancel() //stop anything else on this context because the gpio output stopped
-	// 	log.Println("Stopping due to carcommand stopping unexpectedly")
-	// }()
+	go func() {
+		err := carCommand.Start(ctx)
+		if err != nil {
+			log.Fatalf("carcommand error: %s\n", err.Error())
+		}
+		cancel() //stop anything else on this context because the gpio output stopped
+		log.Println("Stopping due to carcommand stopping unexpectedly")
+	}()
 
 	socketServer := server.NewServer(carCam, carCommand)
 	socketServer.RegisterHTTPHandlers()
@@ -55,15 +56,13 @@ func main() {
 
 	defer socketServer.Close()
 
-	// go func() {
-	// 	log.Println("Start serving socketio...")
-	// 	if err := socketServer.Serve(); err != nil {
-	// 		log.Fatalf("socketio listen error: %s\n", err)
-	// 	}
-	// }()
-	for {
-	}
+	go func() {
+		log.Println("Start serving socketio...")
+		if err := socketServer.Serve(); err != nil {
+			log.Fatalf("socketio listen error: %s\n", err)
+		}
+	}()
 
 	log.Println("Start serving http...")
-	//log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
