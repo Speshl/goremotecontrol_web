@@ -20,7 +20,10 @@ const refreshRate = 60 //command refresh rate
 func main() {
 	log.Println("Starting server...")
 	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	defer func() {
+		log.Println("Stopping server...")
+		cancel()
+	}()
 
 	//Temp way to connect client to server before splitting client out to separate repo
 	carCam, err := carcam.NewCarCam(carName, width, height, fps)
@@ -34,6 +37,7 @@ func main() {
 			log.Fatalf("carcam error: %s\n", err.Error())
 		}
 		cancel() //stop anything else on this context because camera stopped
+		log.Println("Stopping due to carcommand stopping unexpectedly")
 	}()
 
 	carCommand := carcommand.NewCarCommand(carName, refreshRate)
@@ -43,6 +47,7 @@ func main() {
 			log.Fatalf("carcommand error: %s\n", err.Error())
 		}
 		cancel() //stop anything else on this context because the gpio output stopped
+		log.Println("Stopping due to carcommand stopping unexpectedly")
 	}()
 
 	socketServer := server.NewServer(carCam, carCommand)
