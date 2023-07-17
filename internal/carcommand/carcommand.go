@@ -78,6 +78,7 @@ func (c *CarCommand) Start(ctx context.Context) error {
 	commandDuration := time.Duration(int64(time.Millisecond) * int64(commandRate))
 	commandTicker := time.NewTicker(commandDuration)
 	seenSameCommand := 0
+	warned := false
 	for {
 		select {
 		case <-ctx.Done():
@@ -99,15 +100,19 @@ func (c *CarCommand) Start(ctx context.Context) error {
 			c.LatestCommand.lock.RLock()
 			if c.LatestCommand.used {
 				c.LatestCommand.lock.RUnlock()
-				log.Printf("command was already used, skipping")
+				if !warned {
+					log.Printf("command was already used, skipping")
+				}
 				seenSameCommand++
 				if seenSameCommand >= 5 {
 					log.Println("no command, sending neutral")
+					warned = true
 					c.neutralCommand()
 				}
 				continue
 			}
 			seenSameCommand = 0
+			warned = false
 			c.LatestCommand.lock.RUnlock()
 
 			c.LatestCommand.lock.Lock()
