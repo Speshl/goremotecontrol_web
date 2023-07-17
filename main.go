@@ -28,15 +28,24 @@ func main() {
 		log.Fatalf("NewCarCam error: %s\n", err)
 	}
 
-	err = carCam.Start(ctx)
-	if err != nil {
-		log.Fatalf("carcam error: %s\n", err.Error())
-	}
+	go func() {
+		err = carCam.Start(ctx)
+		if err != nil {
+			log.Fatalf("carcam error: %s\n", err.Error())
+		}
+		cancel() //stop anything else on this context because camera stopped
+	}()
 
 	carCommand := carcommand.NewCarCommand(carName, refreshRate)
-	carCommand.Start(ctx)
+	go func() {
+		err := carCommand.Start(ctx)
+		if err != nil {
+			log.Fatalf("carcommand error: %s\n", err.Error())
+		}
+		cancel() //stop anything else on this context because the gpio output stopped
+	}()
 
-	socketServer := server.NewServer(carCam)
+	socketServer := server.NewServer(carCam, carCommand)
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()
 

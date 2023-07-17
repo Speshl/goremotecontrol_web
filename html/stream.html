@@ -5,10 +5,10 @@
     <script src="https://unpkg.com/htmx.org@1.9.2" integrity="sha384-L6OqL9pRWyyFU3+/bjdSri+iIphTN/bvYyM37tICVyOJkWZLpP2vGn6VUEXgzg6h" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
 
-    <title>WebRTC Stream Player</title>
+    <title>Go Remote Control</title>
     <style>
         video {
-            width: 100%;
+            width: 90%;
             height: auto;
         }
     </style>
@@ -81,28 +81,27 @@
     pc.ontrack = (event) => {
         console.log("Track Added");
         log("Track Added");
-        const el = document.createElement(event.track.kind);
-        el.srcObject = event.streams[0];
-        el.autoplay = true;
-        el.controls = true;
-    
-        document.getElementById('remoteVideos').appendChild(el);
+        // const el = document.createElement(event.track.kind);
+        // el.srcObject = event.streams[0];
+        // el.autoplay = true;
+        // el.controls = true;
+        //document.getElementById('remoteVideos').appendChild(el);
 
         
         // const audioElement = document.getElementById('audioElement');
         // audioElement.srcObject = event.streams[0];
 
-        // const videoElement = document.getElementById('videoElement');
-        // audioElement.srcObject = event.streams[0];
+        const videoElement = document.getElementById('videoElement');
+        audioElement.srcObject = event.streams[0];
     }
 
     //Offer to receive 1 audio, and 1 video track
     pc.addTransceiver('video', {
         direction: 'recvonly'
     })
-    pc.addTransceiver('audio', {
-        direction: 'recvonly'
-    })
+    // pc.addTransceiver('audio', {
+    //     direction: 'recvonly'
+    // })
 
     pc.createOffer().then(d => pc.setLocalDescription(d)).catch(log)
 

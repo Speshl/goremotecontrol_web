@@ -62,7 +62,7 @@ func (s *Server) onICECandidate(socketConn socketio.Conn, msg []byte) {
 }
 
 func (s *Server) onCommand(socketConn socketio.Conn, msg []byte) {
-	log.Printf("command: %+v\n", msg)
+	s.carCommand.CommandChannel <- msg
 }
 
 func (s *Server) OnDisconnect(socketConn socketio.Conn, reason string) {

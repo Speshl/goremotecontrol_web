@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/Speshl/goremotecontrol_web/internal/carcam"
+	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/googollee/go-socket.io/engineio"
 	"github.com/googollee/go-socket.io/engineio/transport"
@@ -16,6 +17,7 @@ import (
 
 type Server struct {
 	carCam          *carcam.CarCam
+	carCommand      *carcommand.CarCommand
 	socketio        *socketio.Server
 	connections     map[string]*Connection
 	connectionsLock sync.RWMutex
@@ -25,7 +27,7 @@ var allowOriginFunc = func(r *http.Request) bool {
 	return true
 }
 
-func NewServer(carCam *carcam.CarCam) *Server {
+func NewServer(carCam *carcam.CarCam, carCommand *carcommand.CarCommand) *Server {
 	socketioServer := socketio.NewServer(&engineio.Options{
 		Transports: []transport.Transport{
 			&polling.Transport{
@@ -41,6 +43,7 @@ func NewServer(carCam *carcam.CarCam) *Server {
 		socketio:    socketioServer,
 		connections: make(map[string]*Connection),
 		carCam:      carCam,
+		carCommand:  carCommand,
 	}
 }
 
