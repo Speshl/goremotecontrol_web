@@ -5,7 +5,6 @@ import (
 	"context"
 	"log"
 	"os/exec"
-	"strconv"
 )
 
 const readBufferSize = 4096
@@ -23,23 +22,23 @@ func (c *CarCam) StartStreaming(ctx context.Context) error {
 		"--width", c.options.width,
 		"--height", c.options.height,
 		"--framerate", c.options.fps,
-		"-n",                           // Do not show a preview window
-		"--profile", c.options.profile, // H264 profile baseline, main or high
-		"--level", c.options.level,
+		"-n", // Do not show a preview window
+		//"--profile", c.options.profile, // H264 profile baseline, main or high
+		//"--level", c.options.level,
 	}
-	if c.options.horizontalFlip {
-		args = append(args, "--hflip")
-	}
-	if c.options.verticalFlip {
-		args = append(args, "--vflip")
-	}
-	if !c.options.deNoise {
-		args = append(args, "--denoise", "cdn_off")
-	}
-	if c.options.rotation != 0 {
-		args = append(args, "--rotation")
-		args = append(args, strconv.Itoa(c.options.rotation))
-	}
+	// if c.options.horizontalFlip {
+	// 	args = append(args, "--hflip")
+	// }
+	// if c.options.verticalFlip {
+	// 	args = append(args, "--vflip")
+	// }
+	// if !c.options.deNoise {
+	// 	args = append(args, "--denoise", "cdn_off")
+	// }
+	// if c.options.rotation != 0 {
+	// 	args = append(args, "--rotation")
+	// 	args = append(args, strconv.Itoa(c.options.rotation))
+	// }
 
 	cmd := exec.CommandContext(ctx, "libcamera-vid", args...)
 	defer cmd.Wait()
