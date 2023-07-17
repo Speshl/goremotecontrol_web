@@ -40,6 +40,8 @@ func (c *CarCam) StartStreaming(ctx context.Context) error {
 	// 	args = append(args, strconv.Itoa(c.options.rotation))
 	// }
 
+	log.Println("ARGS: %+v", args)
+
 	cmd := exec.CommandContext(ctx, "libcamera-vid", args...)
 	defer cmd.Wait()
 
