@@ -15,7 +15,7 @@ const carName = "Car-Alpha"
 
 const width = "640"
 const height = "480"
-const fps = "30"
+const fps = "60"
 const refreshRate = 60 //command refresh rate
 
 func main() {
