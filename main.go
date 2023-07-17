@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	carcam "github.com/Speshl/goremotecontrol_web/internal/carcam"
+	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	"github.com/Speshl/goremotecontrol_web/internal/server"
 )
 
@@ -39,7 +40,7 @@ func main() {
 		log.Println("Stopping due to carcam stopping unexpectedly")
 	}()
 
-	// carCommand := carcommand.NewCarCommand(carName, refreshRate)
+	carCommand := carcommand.NewCarCommand(carName, refreshRate)
 	// go func() {
 	// 	err := carCommand.Start(ctx)
 	// 	if err != nil {
