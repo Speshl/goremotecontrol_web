@@ -105,7 +105,9 @@ func (c *CarCommand) Start(ctx context.Context) error {
 				}
 				seenSameCommand++
 				if seenSameCommand >= 5 {
-					log.Println("no command, sending neutral")
+					if !warned {
+						log.Println("no command, sending neutral")
+					}
 					warned = true
 					c.neutralCommand()
 				}
