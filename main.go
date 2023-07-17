@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"time"
 
 	carcam "github.com/Speshl/goremotecontrol_web/internal/carcam"
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
@@ -42,6 +43,7 @@ func main() {
 
 	carCommand := carcommand.NewCarCommand(carName, refreshRate)
 	go func() {
+		time.Sleep(time.Second * 30)
 		err := carCommand.Start(ctx)
 		if err != nil {
 			log.Fatalf("carcommand error: %s\n", err.Error())
