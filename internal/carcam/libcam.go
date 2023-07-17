@@ -13,7 +13,7 @@ const bufferSizeKB = 256
 var nalSeparator = []byte{0, 0, 0, 1} //NAL break
 
 func (c *CarCam) StartStreaming(ctx context.Context) error {
-	log.Println("Start streaming")
+	log.Println("start streaming...")
 	args := []string{
 		"--inline", // H264: Force PPS/SPS header with every I frame
 		"-t", "0",  // Disable timeout
@@ -41,8 +41,15 @@ func (c *CarCam) StartStreaming(ctx context.Context) error {
 	// }
 
 	cmd := exec.CommandContext(ctx, "libcamera-vid", args...)
-	defer cmd.Wait()
-	defer cmd.Process.Kill()
+	defer func() {
+		log.Printf("killing cam streaming cmd...")
+		if cmd.Process != nil {
+			cmd.Process.Kill()
+		} else {
+			log.Printf("process was null")
+		}
+		cmd.Wait()
+	}()
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -54,7 +61,7 @@ func (c *CarCam) StartStreaming(ctx context.Context) error {
 		return err
 	}
 
-	log.Println("Started libcamera-vid", cmd.Args)
+	log.Println("started libcamera-vid", cmd.Args)
 	p := make([]byte, readBufferSize)
 	buffer := make([]byte, bufferSizeKB*1024)
 	currentPos := 0
