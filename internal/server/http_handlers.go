@@ -10,18 +10,19 @@ func (s *Server) RegisterHTTPHandlers() {
 	http.HandleFunc("/login", s.loginHandler)
 	http.HandleFunc("/gpt", s.gptHandler)
 	http.HandleFunc("/stream", s.streamHandler)
+	http.HandleFunc("/video_test", s.streamHandler)
 
 	http.Handle("/socket.io/", s.socketio)
 }
 
 func (s *Server) driveHandler(w http.ResponseWriter, req *http.Request) {
-	user := req.PostFormValue("user")
-	password := req.PostFormValue("password")
+	// user := req.PostFormValue("user")
+	// password := req.PostFormValue("password")
 
-	if user != "user" || password != "password" {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-		return
-	}
+	// if user != "user" || password != "password" {
+	// 	http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+	// 	return
+	// }
 
 	template := template.Must(template.ParseFiles("html/drive.html"))
 	template.Execute(w, nil) //Can pass map[string]any here and use go templates to dynamically build the html page
@@ -39,5 +40,10 @@ func (s *Server) gptHandler(w http.ResponseWriter, req *http.Request) {
 
 func (s *Server) streamHandler(w http.ResponseWriter, req *http.Request) {
 	template := template.Must(template.ParseFiles("html/stream.html"))
+	template.Execute(w, nil)
+}
+
+func (s *Server) videoTestHandler(w http.ResponseWriter, req *http.Request) {
+	template := template.Must(template.ParseFiles("html/video_test.html"))
 	template.Execute(w, nil)
 }

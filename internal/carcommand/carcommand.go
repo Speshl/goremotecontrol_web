@@ -153,7 +153,7 @@ func (c *CarCommand) startGPIO() error {
 }
 
 func (c *CarCommand) parseCommand(command []byte) (Command, error) {
-	log.Printf("Command contained %d bytes", len(command))
+	//log.Printf("Command contained %d bytes", len(command))
 
 	parsedCommand := Command{
 		esc:   uint32(command[0]),

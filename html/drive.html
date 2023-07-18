@@ -7,67 +7,185 @@
         <title>Go Remote Control</title>
     </head>
 <body>
-	<h1>No Controller Connected</h1>
+     <!--Video-->
+	<div>
+        <video id="camVideo" width=640 height=480 autoplay playsinline></video>
+    </div>
+    <div>
+        <div>Controller Type</div>
+        <div id="controllerType">Keyboard</div>
+        <div>Current Command</div>
+        <div id="currentCommand"></div>
+    </div>
+    <br /><br />Logs<br />
+    <div id="div"></div>
 </body>
 
 <script type="text/javascript">
+const socket = io();
 
-if (window["WebSocket"]) {
-    var socket = io()
+const pc = new RTCPeerConnection({
+    iceServers: [{
+    urls: 'stun:stun.l.google.com:19302'
+    }]
+})
 
-    // global gamepad object
-    let gamepadIndex;
-    window.addEventListener('gamepadconnected', (event) => {
-        gamepadIndex = event.gamepad.index;
-    });
+const log = msg => {
+    document.getElementById('div').innerHTML += msg + '<br>'
+}
 
-    setInterval(() => {
-        if(gamepadIndex !== undefined) {
-            // a gamepad is connected and has an index
-            const myGamepad = navigator.getGamepads()[gamepadIndex];
-            document.body.innerHTML = ""; // reset page
+pc.onicecandidateerror = e => {
+    log("ICE Candidate Error: "+JSON.stringify(e))
+    console.log("Connection State: "+JSON.stringify(e))
+}
 
-            myGamepad.buttons.forEach((button, buttonIndex) => {
-                if(button.pressed){
-                    document.body.innerHTML += `<h1>Button ${buttonIndex} is pressed. Value: ${button.value}</h1>`;
-                }
-            })
+pc.onconnectionstatechange = e => {
+    log("Connection State: "+pc.iceConnectionState)
+    console.log("Connection State: "+pc.iceGatheringState)
+}
 
-            document.body.innerHTML += `<h1>Left Stick X: ${myGamepad.axes[0]} Y:${myGamepad.axes[1]}</h1>`;
+pc.onicegatheringstatechange = e => {
+    log("Ice Gathering State: "+pc.iceConnectionState)
+    console.log("Ice Gathering State: "+pc.iceGatheringState)
+}
 
-            document.body.innerHTML += `<h1>Right Stick X: ${myGamepad.axes[2]} Y:${myGamepad.axes[3]}</h1>`;
+pc.oniceconnectionstatechange = e => {
+    log("Ice Connection State: "+pc.iceConnectionState)
+    console.log("Ice Connection State: "+pc.iceConnectionState)
+}
 
-            //esc value
+// pc.onnegotiationneeded = async () => {
+//     try {
+//         const offer = await pc.createOffer();
+//         await pc.setLocalDescription(offer);
 
-            //xbox controller
-            //button 6 is brake
-            //button 7 is gas
-            let command = [127,127]
+//         socket.emit('offer', btoa(JSON.stringify(pc.localDescription)));
+//     } catch (error) {
+//         console.error('Error creating offer:', error);
+//     }
+// };
 
-            if(myGamepad.axes[0] > .1){
-                command[0] = 255
-            }else if(myGamepad.axes[0] < -.1){
-                command[0] = 0
+pc.onicecandidate = event => {
+    if (event.candidate === null) {
+        console.log("Emmiting offer");
+        socket.emit('offer', btoa(JSON.stringify(pc.localDescription)));
+    }else{
+        console.log("Found Candidate");
+        socket.emit('candidate', btoa(JSON.stringify(event.candidate)));
+    }
+}
+
+pc.ontrack = (event) => {
+    console.log("Track Added");
+    log("Track Added");
+    const el = document.getElementById('camVideo')
+    el.srcObject = event.streams[0];
+}
+
+//Offer to receive 1 audio, and 1 video track
+pc.addTransceiver('video', {
+    direction: 'recvonly'
+})
+// pc.addTransceiver('audio', {
+//     direction: 'recvonly'
+// })
+
+pc.createOffer().then(d => pc.setLocalDescription(d)).catch(log)
+
+socket.on('answer', (answer) => {
+    let decodedAnswer = JSON.parse(atob(answer));
+    log("Setting remote Description");
+    console.log("Setting Remote Description");
+    console.log(JSON.stringify(decodedAnswer));
+
+    pc.setRemoteDescription(decodedAnswer)
+        .then(() => {
+            console.log("Set Remote Description");
+            console.log(JSON.stringify(pc.remoteDescription));
+            log("Set remote Description");
+        })
+        .catch((error) => {
+            console.error("Error setting remote description:", error);
+            alert("Error setting remote description: " + error.message);
+        });
+});
+
+socket.on('candidate', async(candidate) => {
+    try {
+        setTimeout(async() => {
+            const decodedCandidate = JSON.parse(atob(candidate));
+            console.log(JSON.stringify(decodedCandidate))
+            await pc.addIceCandidate(decodedCandidate);
+            log('Added ICE candidate');
+            console.log("Added ICE candidate");
+        }, 1000);
+    } catch (e) {
+        alert(e);
+    }
+});
+
+// global gamepad object
+let gamepadIndex;
+window.addEventListener('gamepadconnected', (event) => {
+    gamepadIndex = event.gamepad.index;
+});
+
+function mapToRange(value, min, max, minReturn, maxReturn) {
+  return Math.floor((maxReturn-minReturn) * (value-min)/(max-min) + minReturn)
+}
+
+setInterval(() => {
+    if(gamepadIndex !== undefined) {
+        // a gamepad is connected and has an index
+        const myGamepad = navigator.getGamepads()[gamepadIndex];
+
+        let command = [127,127,127,127]
+
+        document.getElementById('controllerType').innerHTML = myGamepad.id;
+        if(myGamepad.id.toLowerCase().includes("xbox")){
+            //esc
+            if(myGamepad.buttons[6].value > .1 &&  myGamepad.buttons[6].value >= myGamepad.buttons[7].value){
+            command[0] = 127 - mapToRange(myGamepad.buttons[6].value, .1, 1, 0, 127)
+            }else if(myGamepad.buttons[7].value > .1){
+                //gas
+                command[0] = mapToRange(myGamepad.buttons[7].value, .1, 1, 127, 255)
             }else{
+                //neutral
                 command[0] = 127
             }
-
-            if(myGamepad.buttons[6].value > .1 &&  myGamepad.buttons[6].value > myGamepad.buttons[7].value){
-                //brake
-                command[1] = 0
-            }else if(myGamepad.buttons[7].value > .1){
-                command[1] = 255
+            //servo
+            if(myGamepad.axes[0] > .1){
+                command[1] = mapToRange(myGamepad.axes[0], .1, 1, 127, 255)
+            }else if(myGamepad.axes[0] < -.1){
+                command[1] = mapToRange(myGamepad.axes[0], -1, -.1, 0, 127)
             }else{
                 command[1] = 127
             }
-            
+
+            //pan
+            if(myGamepad.axes[2] > .1){
+                command[2] = mapToRange(myGamepad.axes[2], .1, 1, 127, 255)
+            }else if(myGamepad.axes[2] < -.1){
+                command[2] = mapToRange(myGamepad.axes[2], -1, -.1, 0, 127)
+            }else{
+                command[2] = 127
+            }
+
+            //tilt
+            if(myGamepad.axes[3] > .1){
+                command[3] = mapToRange(myGamepad.axes[3], .1, 1, 127, 255)
+            }else if(myGamepad.axes[3] < -.1){
+                command[3] = mapToRange(myGamepad.axes[3], -1, -.1, 0, 127)
+            }else{
+                command[3] = 127
+            }
             socket.emit('command', command);
+            document.getElementById('currentCommand').innerHTML = 'Esc: '+command[0] + ' Servo: '+command[1] + ' Pan: ' + command[2] + ' Tilt: ' + command[3];
+        }else{
+            document.getElementById('controllerType').innerHTML = "Unsupported - " + myGamepad.id;
         }
-    }, 10) // print buttons that are pressed 10 times per second
-} else {
-    var item = document.createElement("div");
-    item.innerHTML = "<b>Your browser does not support WebSockets.</b>";
-    appendLog(item);
-}
+    }
+}, 10); // print buttons that are pressed 10 times per second
+
 </script>
 </html>
