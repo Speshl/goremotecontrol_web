@@ -102,6 +102,7 @@ func (c *CarCommand) Start(ctx context.Context) error {
 				c.LatestCommand.lock.RUnlock()
 				if !warned {
 					log.Printf("command was already used, skipping")
+					continue
 				}
 				seenSameCommand++
 				if seenSameCommand >= 5 {
