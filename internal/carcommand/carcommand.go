@@ -153,16 +153,16 @@ func (c *CarCommand) startGPIO() error {
 }
 
 func (c *CarCommand) parseCommand(command []byte) (Command, error) {
-	//log.Printf("Command contained %d bytes", len(command))
-
 	parsedCommand := Command{
 		esc:   uint32(command[0]),
 		servo: uint32(command[1]),
 		pan:   uint32(command[2]),
 		tilt:  uint32(command[3]),
 	}
-
-	log.Printf("Parsed Command: %+v", parsedCommand)
+	if parsedCommand.esc != midvalue || parsedCommand.servo != midvalue ||
+		parsedCommand.pan != midvalue || parsedCommand.tilt != midvalue {
+		log.Printf("Parsed Command: %+v", parsedCommand)
+	}
 	return parsedCommand, nil
 }
 
