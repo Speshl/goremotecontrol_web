@@ -62,6 +62,7 @@ func (s *Server) onICECandidate(socketConn socketio.Conn, msg []byte) {
 }
 
 func (s *Server) onCommand(socketConn socketio.Conn, msg []byte) {
+	log.Println("Command recieved")
 	s.carCommand.CommandChannel <- msg
 }
 
