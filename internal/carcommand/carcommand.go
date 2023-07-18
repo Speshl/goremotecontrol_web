@@ -102,7 +102,6 @@ func (c *CarCommand) Start(ctx context.Context) error {
 				c.LatestCommand.lock.RUnlock()
 				if !warned {
 					log.Printf("command was already used, skipping")
-					continue
 				}
 				seenSameCommand++
 				if seenSameCommand >= 5 {
@@ -112,18 +111,19 @@ func (c *CarCommand) Start(ctx context.Context) error {
 					warned = true
 					c.sendNeutral()
 				}
-				continue
+			} else {
+				log.Printf("Got new command")
+				seenSameCommand = 0
+				warned = false
+				c.LatestCommand.lock.RUnlock()
+
+				c.LatestCommand.lock.Lock()
+				c.LatestCommand.used = true
+				command := c.LatestCommand.command
+				c.LatestCommand.lock.Unlock()
+
+				c.sendCommand(command)
 			}
-			seenSameCommand = 0
-			warned = false
-			c.LatestCommand.lock.RUnlock()
-
-			c.LatestCommand.lock.Lock()
-			c.LatestCommand.used = true
-			command := c.LatestCommand.command
-			c.LatestCommand.lock.Unlock()
-
-			c.sendCommand(command)
 		}
 	}
 }
