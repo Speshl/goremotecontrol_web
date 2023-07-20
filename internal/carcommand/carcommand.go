@@ -182,6 +182,7 @@ func (c *CarCommand) sendNeutral() {
 func (c *CarCommand) sendCommand(command Command) {
 	//c.pins.esc.DutyCycleWithPwmMode(command.esc, maxvalue, rpio.Balanced)
 	//c.pins.esc.DutyCycle(1, 32)
+	log.Println("Sending a command gpio")
 	c.pins.esc.Toggle()
 	// c.pins.servo.DutyCycleWithPwmMode(command.servo, maxvalue, rpio.Balanced)
 	// c.pins.pan.DutyCycleWithPwmMode(command.pan, maxvalue, rpio.Balanced)
