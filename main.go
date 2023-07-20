@@ -87,7 +87,7 @@ func main() {
 			log.Printf("Shutting down server... %s\n", msg.String())
 			cancel()
 			//give some time for everything to close
-			time.Sleep(5 * time.Second)
+			time.Sleep(2 * time.Second)
 			return
 		}
 	}

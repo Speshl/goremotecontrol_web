@@ -44,11 +44,15 @@ func (c *CarCam) StartStreaming(ctx context.Context) error {
 	defer func() {
 		log.Println("killing cam streaming cmd...")
 		if cmd.Process != nil {
-			cmd.Process.Kill()
+			err := cmd.Process.Kill()
+			if err != nil {
+				log.Printf("Error killing cam process: %s", err.Error())
+			}
 		} else {
 			log.Println("process was null")
 		}
 		cmd.Wait()
+		log.Println("killed cam streaming cmd")
 	}()
 
 	stdout, err := cmd.StdoutPipe()
