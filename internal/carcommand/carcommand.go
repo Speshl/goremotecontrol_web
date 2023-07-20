@@ -183,13 +183,14 @@ func (c *CarCommand) sendNeutral() {
 }
 
 func (c *CarCommand) sendCommand(command Command) {
-	if command.esc != 127 {
-		log.Println("SENDING PLOX NO BREAK")
-		c.pins.esc.DutyCycle(command.esc, maxvalue)
-	}
-	// c.pins.servo.DutyCycle(command.servo, maxvalue)
-	// c.pins.pan.DutyCycle(command.pan, maxvalue)
-	// c.pins.tilt.DutyCycle(command.tilt, maxvalue)
+	// if command.esc != 127 {
+	// 	log.Println("SENDING PLOX NO BREAK")
+	// 	c.pins.esc.DutyCycle(command.esc, maxvalue)
+	// }
+	c.pins.esc.DutyCycle(command.esc, maxvalue)
+	c.pins.servo.DutyCycle(command.servo, maxvalue)
+	c.pins.pan.DutyCycle(command.pan, maxvalue)
+	c.pins.tilt.DutyCycle(command.tilt, maxvalue)
 
 	// if command.esc == 255 {
 	// 	log.Println("Sending a command gpio")
