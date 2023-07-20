@@ -74,7 +74,9 @@ func (c *CarCommand) Start(ctx context.Context) error {
 	}
 	defer func() {
 		err := rpio.Close()
-		log.Printf("Error closing rpio: %s\n", err)
+		if err != nil {
+			log.Printf("Error closing rpio: %s\n", err.Error())
+		}
 	}()
 
 	commandRate := 1000 / c.refreshRate
