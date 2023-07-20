@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	carcam "github.com/Speshl/goremotecontrol_web/internal/carcam"
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
@@ -75,16 +76,18 @@ func main() {
 		log.Println("Stopping due to http server stopping unexpectedly")
 	}()
 
+	//Handle shutdown signals
 	signal.Ignore(os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	done := make(chan os.Signal, 1)
 	defer close(done)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	defer log.Println("Starting close process")
 	for {
 		select {
 		case msg := <-done:
 			log.Printf("Shutting down server... %s\n", msg.String())
 			cancel()
+			//give some time for everything to close
+			time.Sleep(5 * time.Second)
 			return
 		}
 	}
