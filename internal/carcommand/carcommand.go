@@ -134,20 +134,24 @@ func (c *CarCommand) startGPIO() error {
 	}
 
 	c.pins.esc = rpio.Pin(escPinID)
-	c.pins.esc.Mode(rpio.Pwm)
-	c.pins.esc.Freq(frequency)
+	c.pins.esc.Output()
+	//c.pins.esc.Freq(frequency)
 
-	c.pins.servo = rpio.Pin(servoPinID)
-	c.pins.servo.Mode(rpio.Pwm)
-	c.pins.servo.Freq(frequency)
+	// c.pins.esc = rpio.Pin(escPinID)
+	// c.pins.esc.Mode(rpio.Pwm)
+	// c.pins.esc.Freq(frequency)
 
-	c.pins.tilt = rpio.Pin(tiltPinID)
-	c.pins.tilt.Mode(rpio.Pwm)
-	c.pins.tilt.Freq(frequency)
+	// c.pins.servo = rpio.Pin(servoPinID)
+	// c.pins.servo.Mode(rpio.Pwm)
+	// c.pins.servo.Freq(frequency)
 
-	c.pins.pan = rpio.Pin(panPinID)
-	c.pins.pan.Mode(rpio.Pwm)
-	c.pins.pan.Freq(frequency)
+	// c.pins.tilt = rpio.Pin(tiltPinID)
+	// c.pins.tilt.Mode(rpio.Pwm)
+	// c.pins.tilt.Freq(frequency)
+
+	// c.pins.pan = rpio.Pin(panPinID)
+	// c.pins.pan.Mode(rpio.Pwm)
+	// c.pins.pan.Freq(frequency)
 	c.sendNeutral()
 	return nil
 }
@@ -177,7 +181,8 @@ func (c *CarCommand) sendNeutral() {
 
 func (c *CarCommand) sendCommand(command Command) {
 	//c.pins.esc.DutyCycleWithPwmMode(command.esc, maxvalue, rpio.Balanced)
-	c.pins.esc.DutyCycle(1, 32)
+	//c.pins.esc.DutyCycle(1, 32)
+	c.pins.esc.Toggle()
 	// c.pins.servo.DutyCycleWithPwmMode(command.servo, maxvalue, rpio.Balanced)
 	// c.pins.pan.DutyCycleWithPwmMode(command.pan, maxvalue, rpio.Balanced)
 	// c.pins.tilt.DutyCycleWithPwmMode(command.tilt, maxvalue, rpio.Balanced)
