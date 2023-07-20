@@ -133,7 +133,7 @@ func (c *CarCommand) startGPIO() error {
 		return err
 	}
 
-	c.pins.esc = rpio.Pin(escPinID)
+	c.pins.esc = rpio.Pin(servoPinID)
 	c.pins.esc.Output()
 	//c.pins.esc.Freq(frequency)
 
