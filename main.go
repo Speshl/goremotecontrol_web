@@ -42,6 +42,9 @@ func main() {
 		log.Println("Stopping due to carcam stopping unexpectedly")
 	}()
 
+	//give time for camera to start before commands start
+	time.Sleep(2 * time.Second)
+
 	carCommand := carcommand.NewCarCommand(carName, refreshRate)
 	go func() {
 		err := carCommand.Start(ctx)
