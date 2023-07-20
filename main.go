@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	carcam "github.com/Speshl/goremotecontrol_web/internal/carcam"
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
@@ -26,20 +28,7 @@ func main() {
 	defer func() {
 		log.Println("Stopping server...")
 		cancel()
-	}()
-
-	signal.Ignore(os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	done := make(chan os.Signal, 1)
-	defer close(done)
-	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		for {
-			select {
-			case msg := <-done:
-				log.Printf("Shutting down server... %s\n", msg.String())
-				cancel()
-			}
-		}
+		time.Sleep(5 * time.Second)
 	}()
 
 	//Temp way to connect client to server before splitting client out to separate repo
@@ -80,6 +69,25 @@ func main() {
 		}
 	}()
 
-	log.Println("Start serving http...")
-	log.Fatal(http.ListenAndServe(":8181", nil))
+	go func() {
+		log.Println("Start serving http...")
+		err = http.ListenAndServe(":8181", nil)
+		if !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("HTTP server error: %v", err)
+		}
+	}()
+
+	signal.Ignore(os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	done := make(chan os.Signal, 1)
+	defer close(done)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	defer log.Println("Starting close process")
+	for {
+		select {
+		case msg := <-done:
+			log.Printf("Shutting down server... %s\n", msg.String())
+			cancel()
+			return
+		}
+	}
 }
