@@ -184,7 +184,7 @@ func (c *CarCommand) sendCommand(command Command) {
 	//c.pins.esc.DutyCycle(1, 32)
 	if command.esc == 255 {
 		log.Println("Sending a command gpio")
-		c.pins.esc.Toggle()
+		//c.pins.esc.Toggle()
 	}
 	// c.pins.servo.DutyCycleWithPwmMode(command.servo, maxvalue, rpio.Balanced)
 	// c.pins.pan.DutyCycleWithPwmMode(command.pan, maxvalue, rpio.Balanced)
