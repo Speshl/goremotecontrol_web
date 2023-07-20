@@ -177,7 +177,7 @@ func (c *CarCommand) sendNeutral() {
 
 func (c *CarCommand) sendCommand(command Command) {
 	//c.pins.esc.DutyCycleWithPwmMode(command.esc, maxvalue, rpio.Balanced)
-	c.pins.esc.DutyCycle(command.esc, maxvalue)
+	c.pins.esc.DutyCycle(1, 32)
 	// c.pins.servo.DutyCycleWithPwmMode(command.servo, maxvalue, rpio.Balanced)
 	// c.pins.pan.DutyCycleWithPwmMode(command.pan, maxvalue, rpio.Balanced)
 	// c.pins.tilt.DutyCycleWithPwmMode(command.tilt, maxvalue, rpio.Balanced)
