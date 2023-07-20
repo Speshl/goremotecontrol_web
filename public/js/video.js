@@ -89,14 +89,3 @@ class CamPlayer {
         return this.socket
     }
 }
-
-// pc.onnegotiationneeded = async () => {
-//     try {
-//         const offer = await pc.createOffer();
-//         await pc.setLocalDescription(offer);
-
-//         socket.emit('offer', btoa(JSON.stringify(pc.localDescription)));
-//     } catch (error) {
-//         console.error('Error creating offer:', error);
-//     }
-// };
