@@ -76,7 +76,7 @@ class CamPlayer {
                 setTimeout(async() => {
                     const decodedCandidate = JSON.parse(atob(candidate));
                     console.log(JSON.stringify(decodedCandidate))
-                    await pc.addIceCandidate(decodedCandidate);
+                    await this.pc.addIceCandidate(decodedCandidate);
                     console.log("Added ICE candidate");
                 }, 1000);
             } catch (e) {
