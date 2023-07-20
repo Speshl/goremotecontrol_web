@@ -72,7 +72,10 @@ func (c *CarCommand) Start(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	defer rpio.Close()
+	defer func() {
+		err := rpio.Close()
+		log.Printf("Error closing rpio: %s\n", err)
+	}()
 
 	commandRate := 1000 / c.refreshRate
 	commandDuration := time.Duration(int64(time.Millisecond) * int64(commandRate))
@@ -180,10 +183,8 @@ func (c *CarCommand) sendNeutral() {
 
 func (c *CarCommand) sendCommand(command Command) {
 	//c.pins.esc.DutyCycleWithPwmMode(command.esc, maxvalue, rpio.Balanced)
-	//c.pins.esc.DutyCycle(1, 32)
 	if command.esc == 255 {
 		log.Println("Sending a command gpio")
-		//c.pins.esc.Toggle()
 		c.pins.esc.DutyCycle(1, 32)
 	}
 	// c.pins.servo.DutyCycleWithPwmMode(command.servo, maxvalue, rpio.Balanced)
