@@ -133,12 +133,12 @@ func (c *CarCommand) startGPIO() error {
 		return err
 	}
 
-	c.pins.esc = rpio.Pin(escPinID)
-	c.pins.esc.Output()
-
 	// c.pins.esc = rpio.Pin(escPinID)
-	// c.pins.esc.Mode(rpio.Pwm)
-	// c.pins.esc.Freq(frequency)
+	// c.pins.esc.Output()
+
+	c.pins.esc = rpio.Pin(escPinID)
+	c.pins.esc.Pwm()
+	c.pins.esc.Freq(frequency)
 
 	// c.pins.servo = rpio.Pin(servoPinID)
 	// c.pins.servo.Mode(rpio.Pwm)
@@ -183,7 +183,8 @@ func (c *CarCommand) sendCommand(command Command) {
 	//c.pins.esc.DutyCycle(1, 32)
 	if command.esc == 255 {
 		log.Println("Sending a command gpio")
-		c.pins.esc.Toggle()
+		//c.pins.esc.Toggle()
+		c.pins.esc.DutyCycle(1, 32)
 	}
 	// c.pins.servo.DutyCycleWithPwmMode(command.servo, maxvalue, rpio.Balanced)
 	// c.pins.pan.DutyCycleWithPwmMode(command.pan, maxvalue, rpio.Balanced)
