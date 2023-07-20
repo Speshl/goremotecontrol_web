@@ -4,6 +4,9 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
 	carcam "github.com/Speshl/goremotecontrol_web/internal/carcam"
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
@@ -23,6 +26,19 @@ func main() {
 	defer func() {
 		log.Println("Stopping server...")
 		cancel()
+	}()
+
+	done := make(chan os.Signal, 1)
+	defer close(done)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		for {
+			select {
+			case msg := <-done:
+				log.Printf("Shutting down server... %s\n", msg.String())
+				cancel()
+			}
+		}
 	}()
 
 	//Temp way to connect client to server before splitting client out to separate repo
