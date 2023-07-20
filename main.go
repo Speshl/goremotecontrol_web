@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	carcam "github.com/Speshl/goremotecontrol_web/internal/carcam"
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
@@ -37,6 +38,7 @@ func main() {
 			case msg := <-done:
 				log.Printf("Shutting down server... %s\n", msg.String())
 				cancel()
+				time.Sleep(5 * time.Second)
 			}
 		}
 	}()

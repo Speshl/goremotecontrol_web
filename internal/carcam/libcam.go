@@ -42,11 +42,11 @@ func (c *CarCam) StartStreaming(ctx context.Context) error {
 
 	cmd := exec.CommandContext(ctx, "libcamera-vid", args...)
 	defer func() {
-		log.Printf("killing cam streaming cmd...")
+		log.Println("killing cam streaming cmd...")
 		if cmd.Process != nil {
 			cmd.Process.Kill()
 		} else {
-			log.Printf("process was null")
+			log.Println("process was null")
 		}
 		cmd.Wait()
 	}()
@@ -70,6 +70,7 @@ func (c *CarCam) StartStreaming(ctx context.Context) error {
 	for {
 		select {
 		case <-ctx.Done():
+			log.Printf("Stopping cam due to context")
 			return ctx.Err()
 		default:
 			n, err := stdout.Read(p)
