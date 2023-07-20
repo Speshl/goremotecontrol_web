@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	carcam "github.com/Speshl/goremotecontrol_web/internal/carcam"
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
@@ -25,22 +24,17 @@ const refreshRate = 60 //command refresh rate
 func main() {
 	log.Println("Starting server...")
 	ctx, cancel := context.WithCancel(context.Background())
-	defer func() {
-		log.Println("Stopping server...")
-		cancel()
-		time.Sleep(5 * time.Second)
-	}()
 
 	//Temp way to connect client to server before splitting client out to separate repo
 	carCam, err := carcam.NewCarCam(carName, width, height, fps)
 	if err != nil {
-		log.Fatalf("NewCarCam error: %s\n", err)
+		log.Printf("NewCarCam error: %s\n", err)
 	}
 
 	go func() {
 		err = carCam.Start(ctx)
 		if err != nil {
-			log.Fatalf("carcam error: %s\n", err.Error())
+			log.Printf("carcam error: %s\n", err.Error())
 		}
 		cancel() //stop anything else on this context because camera stopped
 		log.Println("Stopping due to carcam stopping unexpectedly")
@@ -50,7 +44,7 @@ func main() {
 	go func() {
 		err := carCommand.Start(ctx)
 		if err != nil {
-			log.Fatalf("carcommand error: %s\n", err.Error())
+			log.Printf("carcommand error: %s\n", err.Error())
 		}
 		cancel() //stop anything else on this context because the gpio output stopped
 		log.Println("Stopping due to carcommand stopping unexpectedly")
@@ -65,16 +59,20 @@ func main() {
 	go func() {
 		log.Println("Start serving socketio...")
 		if err := socketServer.Serve(); err != nil {
-			log.Fatalf("socketio listen error: %s\n", err)
+			log.Printf("socketio listen error: %s\n", err)
 		}
+		cancel() //stop anything else on this context because the socker server stopped
+		log.Println("Stopping due to socker server stopping unexpectedly")
 	}()
 
 	go func() {
 		log.Println("Start serving http...")
 		err = http.ListenAndServe(":8181", nil)
 		if !errors.Is(err, http.ErrServerClosed) {
-			log.Fatalf("HTTP server error: %v", err)
+			log.Printf("HTTP server error: %v", err)
 		}
+		cancel() //stop anything else on this context because the http server stopped
+		log.Println("Stopping due to http server stopping unexpectedly")
 	}()
 
 	signal.Ignore(os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
