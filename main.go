@@ -23,6 +23,7 @@ const fps = "60"
 const refreshRate = 60 //command refresh rate
 
 func main() {
+	defer log.Println("server stopped")
 	log.Println("Starting server...")
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -87,7 +88,7 @@ func main() {
 			log.Printf("Shutting down server... %s\n", msg.String())
 			cancel()
 			//give some time for everything to close
-			time.Sleep(2 * time.Second)
+			time.Sleep(5 * time.Second)
 			return
 		}
 	}
