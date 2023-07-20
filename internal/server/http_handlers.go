@@ -24,26 +24,26 @@ func (s *Server) driveHandler(w http.ResponseWriter, req *http.Request) {
 	// 	return
 	// }
 
-	template := template.Must(template.ParseFiles("/static/html/drive.html"))
+	template := template.Must(template.ParseFiles("static/html/drive.html"))
 	template.Execute(w, nil) //Can pass map[string]any here and use go templates to dynamically build the html page
 }
 
 func (s *Server) loginHandler(w http.ResponseWriter, req *http.Request) {
-	template := template.Must(template.ParseFiles("/static/html/login.html"))
+	template := template.Must(template.ParseFiles("static/html/login.html"))
 	template.Execute(w, nil)
 }
 
 func (s *Server) gptHandler(w http.ResponseWriter, req *http.Request) {
-	template := template.Must(template.ParseFiles("/static/html/gpt.html"))
+	template := template.Must(template.ParseFiles("static/html/gpt.html"))
 	template.Execute(w, nil)
 }
 
 func (s *Server) streamHandler(w http.ResponseWriter, req *http.Request) {
-	template := template.Must(template.ParseFiles("/static/html/stream.html"))
+	template := template.Must(template.ParseFiles("static/html/stream.html"))
 	template.Execute(w, nil)
 }
 
 func (s *Server) videoTestHandler(w http.ResponseWriter, req *http.Request) {
-	template := template.Must(template.ParseFiles("/static/html/video_test.html"))
+	template := template.Must(template.ParseFiles("static/html/video_test.html"))
 	template.Execute(w, nil)
 }
