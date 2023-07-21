@@ -12,6 +12,11 @@ import (
 
 var sampleSecretKey = []byte("SecretYouShouldHide") //TODO: Load from env variable
 
+type Claims struct {
+	Username string `json:"username"`
+	jwt.RegisteredClaims
+}
+
 func (s *Server) RegisterHTTPHandlers() {
 	http.HandleFunc("/authed", s.verifyJWT(s.authedHandler))
 	http.HandleFunc("/login", s.loginHandler)
@@ -22,25 +27,36 @@ func (s *Server) RegisterHTTPHandlers() {
 
 func (s *Server) loginHandler(w http.ResponseWriter, req *http.Request) {
 
-	_, err := s.generateJWT()
+	tokenString, err := s.generateJWT()
 	if err != nil {
-		log.Fatalln("Error generating JWT", err)
+		log.Println("Error generating JWT", err)
+		return
 	}
 
-	w.Header().Set("Token", "%v")
+	w.Header().Set("Token", tokenString)
+	http.SetCookie(w, &http.Cookie{
+		Name:    "token",
+		Value:   tokenString,
+		Expires: time.Now().Add(5 * time.Minute),
+	})
 	template := template.Must(template.ParseFiles("public/login.html"))
 	template.Execute(w, nil) //Can pass map[string]any here and use go templates to dynamically build the html page
 }
 
 func (s *Server) authedHandler(w http.ResponseWriter, req *http.Request) {
 
-	_, err := s.generateJWT()
+	tokenString, err := s.generateJWT()
 	if err != nil {
 		log.Println("Error generating JWT", err)
 		return
 	}
 
-	w.Header().Set("Token", "%v")
+	w.Header().Set("Token", tokenString)
+	http.SetCookie(w, &http.Cookie{
+		Name:    "token",
+		Value:   tokenString,
+		Expires: time.Now().Add(5 * time.Minute),
+	})
 	template := template.Must(template.ParseFiles("public/login.html"))
 	template.Execute(w, nil) //Can pass map[string]any here and use go templates to dynamically build the html page
 }
@@ -48,12 +64,16 @@ func (s *Server) authedHandler(w http.ResponseWriter, req *http.Request) {
 /*********************************JWT******************************/
 
 func (s *Server) generateJWT() (string, error) {
-	token := jwt.New(jwt.SigningMethodES256)
 
-	claims := token.Claims.(jwt.MapClaims)
-	claims["exp"] = time.Now().Add(10 * time.Minute) //expiration 10 minutes
-	claims["authorized"] = true
-	claims["user"] = "username"
+	expirationTime := time.Now().Add(5 * time.Minute)
+	claims := &Claims{
+		Username: "testuser", //creds.Username,
+		RegisteredClaims: jwt.RegisteredClaims{
+			// In JWT, the expiry time is expressed as unix milliseconds
+			ExpiresAt: jwt.NewNumericDate(expirationTime),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	tokenString, err := token.SignedString(sampleSecretKey)
 	if err != nil {
