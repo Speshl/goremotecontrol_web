@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -35,7 +36,8 @@ func (s *Server) authedHandler(w http.ResponseWriter, req *http.Request) {
 
 	_, err := s.generateJWT()
 	if err != nil {
-		log.Fatalln("Error generating JWT", err)
+		log.Println("Error generating JWT", err)
+		return
 	}
 
 	w.Header().Set("Token", "%v")
@@ -46,7 +48,7 @@ func (s *Server) authedHandler(w http.ResponseWriter, req *http.Request) {
 /*********************************JWT******************************/
 
 func (s *Server) generateJWT() (string, error) {
-	token := jwt.New(jwt.SigningMethodEdDSA)
+	token := jwt.New(jwt.SigningMethodES256)
 
 	claims := token.Claims.(jwt.MapClaims)
 	claims["exp"] = time.Now().Add(10 * time.Minute) //expiration 10 minutes
@@ -55,7 +57,7 @@ func (s *Server) generateJWT() (string, error) {
 
 	tokenString, err := token.SignedString(sampleSecretKey)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed using secret key: %w", err)
 	}
 	return tokenString, nil
 }
