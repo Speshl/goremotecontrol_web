@@ -31,7 +31,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	//Temp way to connect client to server before splitting client out to separate repo
-	carCam, err := carcam.NewCarCam(carName, width, height, fps)
+	carCam, err := carcam.NewCarCam(carName, width, height, fps, disableVideo)
 	if err != nil {
 		log.Printf("NewCarCam error: %s\n", err)
 	}
