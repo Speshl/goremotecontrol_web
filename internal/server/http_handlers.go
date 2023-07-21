@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 var sampleSecretKey = []byte("SecretYouShouldHide") //TODO: Load from env variable
