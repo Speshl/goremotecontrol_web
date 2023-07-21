@@ -40,6 +40,10 @@ func (c *CarCam) StartStreaming(ctx context.Context) error {
 	// 	args = append(args, strconv.Itoa(c.options.rotation))
 	// }
 
+	if c.options.disableVideo {
+		return c.noVideoLoop(ctx)
+	}
+
 	cmd := exec.CommandContext(ctx, "libcamera-vid", args...)
 	defer func() {
 		log.Println("killing cam streaming cmd...")
@@ -107,6 +111,16 @@ func (c *CarCam) StartStreaming(ctx context.Context) error {
 				copy(buffer, buffer[nalIndex:currentPos])
 				currentPos = currentPos - nalIndex
 			}
+		}
+	}
+}
+
+func (c *CarCam) noVideoLoop(ctx context.Context) error {
+	for {
+		select {
+		case <-ctx.Done():
+			log.Printf("Stopping cam due to context")
+			return ctx.Err()
 		}
 	}
 }

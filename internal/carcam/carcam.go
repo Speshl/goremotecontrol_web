@@ -22,6 +22,7 @@ type CameraOptions struct {
 	width          string
 	height         string
 	fps            string
+	disableVideo   bool
 	horizontalFlip bool
 	verticalFlip   bool
 	deNoise        bool
@@ -30,7 +31,7 @@ type CameraOptions struct {
 	profile        string
 }
 
-func NewCarCam(name string, width string, height string, fps string) (*CarCam, error) {
+func NewCarCam(name string, width string, height string, fps string, disableVideo bool) (*CarCam, error) {
 	// Create a audio track
 	audioTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: "audio/opus"}, "audio", "pion1")
 	if err != nil {

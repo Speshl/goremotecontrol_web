@@ -23,6 +23,7 @@ const fps = "60"
 const refreshRate = 60 //command refresh rate
 
 const disableCommands = true //used for debug, when commands are sent pi needs to be restarted after each app start/stop cycle
+const disableVideo = true    //used for debug, starting cam can fail without a restart
 
 func main() {
 	defer log.Println("server stopped")
