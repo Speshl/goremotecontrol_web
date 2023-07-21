@@ -44,12 +44,14 @@ func (s *Server) loginHandler(w http.ResponseWriter, req *http.Request) {
 	err := json.NewDecoder(req.Body).Decode(&creds)
 	if err != nil {
 		// If the structure of the body is wrong, return an HTTP error
+		log.Println("error decoding json body: %w", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	err = s.validateCredentials(creds)
 	if err != nil {
+		log.Println("error decoding credentials: %w", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
