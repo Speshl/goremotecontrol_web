@@ -22,6 +22,8 @@ const height = "480"
 const fps = "60"
 const refreshRate = 60 //command refresh rate
 
+const disableCommands = true //used for debug, when commands are sent pi needs to be restarted after each app start/stop cycle
+
 func main() {
 	defer log.Println("server stopped")
 	log.Println("Starting server...")
@@ -45,7 +47,7 @@ func main() {
 	//give time for camera to start before commands start
 	time.Sleep(2 * time.Second)
 
-	carCommand := carcommand.NewCarCommand(carName, refreshRate)
+	carCommand := carcommand.NewCarCommand(carName, refreshRate, disableCommands)
 	go func() {
 		err := carCommand.Start(ctx)
 		if err != nil {

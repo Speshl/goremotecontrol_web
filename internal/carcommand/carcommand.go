@@ -24,11 +24,12 @@ const midvalue = uint32(127)
 const minvalue = uint32(0)
 
 type CarCommand struct {
-	name           string
-	refreshRate    int
-	CommandChannel chan []byte
-	LatestCommand  LatestCommand
-	pins           Pins
+	name            string
+	refreshRate     int
+	disableCommands bool
+	CommandChannel  chan []byte
+	LatestCommand   LatestCommand
+	pins            Pins
 }
 
 type Pins struct {
@@ -51,7 +52,10 @@ type Command struct {
 	tilt  uint32
 }
 
-func NewCarCommand(name string, refreshRate int) *CarCommand {
+func NewCarCommand(name string, refreshRate int, disableCommands bool) *CarCommand {
+	if disableCommands {
+		log.Println("Warning! GPIO commands are currently disabled")
+	}
 	return &CarCommand{
 		name:           name,
 		refreshRate:    refreshRate,
@@ -183,17 +187,10 @@ func (c *CarCommand) sendNeutral() {
 }
 
 func (c *CarCommand) sendCommand(command Command) {
-	// if command.esc != 127 {
-	// 	log.Println("SENDING PLOX NO BREAK")
-	// 	c.pins.esc.DutyCycle(command.esc, maxvalue)
-	// }
-	c.pins.esc.DutyCycle(command.esc, maxvalue)
-	c.pins.servo.DutyCycle(command.servo, maxvalue)
-	c.pins.pan.DutyCycle(command.pan, maxvalue)
-	c.pins.tilt.DutyCycle(command.tilt, maxvalue)
-
-	// if command.esc == 255 {
-	// 	log.Println("Sending a command gpio")
-	// 	c.pins.esc.DutyCycle(127, 255)
-	// }
+	if !c.disableCommands {
+		c.pins.esc.DutyCycle(command.esc, maxvalue)
+		c.pins.servo.DutyCycle(command.servo, maxvalue)
+		c.pins.pan.DutyCycle(command.pan, maxvalue)
+		c.pins.tilt.DutyCycle(command.tilt, maxvalue)
+	}
 }
