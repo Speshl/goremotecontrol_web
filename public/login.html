@@ -7,7 +7,7 @@
     </head>
 
 <body>
-    <form action="/login" method="post">
+    <form hx-post="/login" hx-target="this" hx-swap="outerHTML">
         <div>
             <h1>Login</h1>
         </div>
@@ -21,7 +21,6 @@
             <button type="submit">Login</button>
         </div>
     </form>
-	
 </body>
 
 <script type="text/javascript">
