@@ -18,6 +18,8 @@ const servoPinID = 13
 const panPinID = 14
 const tiltPinID = 15
 
+const deadZone = uint32(2)
+
 const frequency = 100000
 const cycleLen = uint32(2000)
 
@@ -180,6 +182,9 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 		pan:   c.mapToRange(uint32(command[2]), 0, 255, minvalue_limited, maxvalue_limited),
 		tilt:  c.mapToRange(uint32(command[3]), 0, 255, minvalue_limited, maxvalue_limited),
 	}
+
+	parsedCommand = c.applyDeadZone(parsedCommand)
+
 	if parsedCommand.esc != midvalue || parsedCommand.servo != midvalue ||
 		parsedCommand.pan != midvalue || parsedCommand.tilt != midvalue {
 		log.Printf("Parsed Command: %+v", parsedCommand)
@@ -207,4 +212,42 @@ func (c *CarCommand) sendCommand(command Command) {
 
 func (c *CarCommand) mapToRange(value, min, max, minReturn, maxReturn uint32) uint32 {
 	return (maxReturn-minReturn)*(value-min)/(max-min) + minReturn
+}
+
+func (c *CarCommand) applyDeadZone(command Command) Command {
+	returnCommand := command
+
+	if command.esc > midvalue && midvalue+deadZone > command.esc {
+		returnCommand.esc = midvalue
+	}
+
+	if command.esc < midvalue && midvalue-deadZone < command.esc {
+		returnCommand.esc = midvalue
+	}
+
+	if command.servo > midvalue && midvalue+deadZone > command.servo {
+		returnCommand.servo = midvalue
+	}
+
+	if command.servo < midvalue && midvalue-deadZone < command.servo {
+		returnCommand.servo = midvalue
+	}
+
+	if command.pan > midvalue && midvalue+deadZone > command.pan {
+		returnCommand.pan = midvalue
+	}
+
+	if command.pan < midvalue && midvalue-deadZone < command.pan {
+		returnCommand.pan = midvalue
+	}
+
+	if command.tilt > midvalue && midvalue+deadZone > command.tilt {
+		returnCommand.tilt = midvalue
+	}
+
+	if command.tilt < midvalue && midvalue-deadZone < command.tilt {
+		returnCommand.tilt = midvalue
+	}
+
+	return returnCommand
 }
