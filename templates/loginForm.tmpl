@@ -5,7 +5,10 @@
         <button type="submit">Logout</button>
     </div>
 {{ else }}
-    <form hx-post="/login" hx-ext='json-enc' hx-target="#wholePageDiv" hx-swap="outerHTML">
+    <form hx-post="/signin" hx-ext='json-enc' hx-target="this" hx-swap="outerHTML">
+        <div>
+            <h1>Login</h1>
+        </div>
         <div>
             <label for="username"><b>Username</b></label>
             <input type="text" placeholder="Enter Username" name="username" required>
