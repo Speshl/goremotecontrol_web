@@ -43,7 +43,7 @@ func (s *Server) buildIndex(w http.ResponseWriter, req *http.Request) {
 
 	//Build overall index page
 	indexData := IndexPageData{
-		HeaderHTML: loginFormBuffer.String(),
+		HeaderHTML: template.HTML(loginFormBuffer.String()),
 	}
 	indexTmpl := template.Must(template.ParseFiles("templates/index.tmpl"))
 
