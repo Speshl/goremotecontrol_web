@@ -18,10 +18,16 @@ const servoPinID = 13
 const panPinID = 14
 const tiltPinID = 15
 
-const frequency = 64000
-const maxvalue = uint32(255)
-const midvalue = uint32(127)
-const minvalue = uint32(0)
+const frequency = 100000
+const cycleLen = uint32(2000)
+
+const maxvalue_limited = uint32(200)
+const maxvalue = uint32(250)
+
+const midvalue = uint32(150)
+
+const minvalue_limited = uint32(100)
+const minvalue = uint32(50)
 
 type CarCommand struct {
 	name            string
@@ -145,19 +151,23 @@ func (c *CarCommand) startGPIO() error {
 	}
 
 	c.pins.esc = rpio.Pin(escPinID)
-	c.pins.esc.Pwm()
+	//c.pins.esc.Pwm()
+	c.pins.esc.Mode(rpio.Pwm)
 	c.pins.esc.Freq(frequency)
 
 	c.pins.servo = rpio.Pin(servoPinID)
-	c.pins.servo.Pwm()
+	// c.pins.servo.Pwm()
+	c.pins.servo.Mode(rpio.Pwm)
 	c.pins.servo.Freq(frequency)
 
 	c.pins.tilt = rpio.Pin(tiltPinID)
-	c.pins.tilt.Pwm()
+	// c.pins.tilt.Pwm()
+	c.pins.tilt.Mode(rpio.Pwm)
 	c.pins.tilt.Freq(frequency)
 
 	c.pins.pan = rpio.Pin(panPinID)
-	c.pins.pan.Pwm()
+	// c.pins.pan.Pwm()
+	c.pins.pan.Mode(rpio.Pwm)
 	c.pins.pan.Freq(frequency)
 	c.sendNeutral()
 	return nil
@@ -165,10 +175,10 @@ func (c *CarCommand) startGPIO() error {
 
 func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 	parsedCommand := Command{
-		esc:   uint32(command[0]),
-		servo: uint32(command[1]),
-		pan:   uint32(command[2]),
-		tilt:  uint32(command[3]),
+		esc:   c.mapToRange(uint32(command[0]), 0, 255, minvalue_limited, maxvalue_limited),
+		servo: c.mapToRange(uint32(command[1]), 0, 255, minvalue_limited, maxvalue_limited),
+		pan:   c.mapToRange(uint32(command[2]), 0, 255, minvalue_limited, maxvalue_limited),
+		tilt:  c.mapToRange(uint32(command[3]), 0, 255, minvalue_limited, maxvalue_limited),
 	}
 	if parsedCommand.esc != midvalue || parsedCommand.servo != midvalue ||
 		parsedCommand.pan != midvalue || parsedCommand.tilt != midvalue {
@@ -193,4 +203,8 @@ func (c *CarCommand) sendCommand(command Command) {
 		c.pins.pan.DutyCycle(command.pan, maxvalue)
 		c.pins.tilt.DutyCycle(command.tilt, maxvalue)
 	}
+}
+
+func (c *CarCommand) mapToRange(value, min, max, minReturn, maxReturn uint32) uint32 {
+	return (maxReturn-minReturn)*(value-min)/(max-min) + minReturn
 }
