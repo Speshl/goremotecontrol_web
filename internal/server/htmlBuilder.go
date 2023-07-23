@@ -58,7 +58,7 @@ func (s *Server) buildIndex(w http.ResponseWriter, options IndexBuildOptions) {
 	indexBodyData := IndexBodyData{
 		HeaderHTML: template.HTML(loginFormBuffer.String()),
 	}
-	indexBodyTmpl := template.Must(template.ParseFiles("templates/index.tmpl"))
+	indexBodyTmpl := template.Must(template.ParseFiles("templates/index_body.tmpl"))
 
 	if !options.includeShell {
 		err = indexBodyTmpl.Execute(w, indexBodyData)
@@ -81,7 +81,7 @@ func (s *Server) buildIndex(w http.ResponseWriter, options IndexBuildOptions) {
 	indexShellData := PageShellData{
 		Body: template.HTML(indexBodyBuffer.String()),
 	}
-	indexTmpl := template.Must(template.ParseFiles("templates/index.tmpl"))
+	indexTmpl := template.Must(template.ParseFiles("templates/index_shell.tmpl"))
 
 	var indexBuffer bytes.Buffer
 	err = indexTmpl.Execute(&indexBuffer, indexShellData)
