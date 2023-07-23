@@ -12,22 +12,6 @@
         <title>Go Remote Control</title>
     </head>
 <body>
-    <div id="wholePageDiv">
-        <header id="header">
-           {{ .HeaderHTML }}
-        </header>
-
-        <nav id="nav">
-            {{ .NavHTML }}
-        </nav>
-
-        <section id="mainSection">
-            {{ .MainHTML }}
-        </section>
-
-        <footer id="footer">
-            {{ .FooterHTML }}
-        </footer>
-    </div>
+    {{ .Body }}
 </body>
 </html>

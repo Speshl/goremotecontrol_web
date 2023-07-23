@@ -7,7 +7,11 @@ import (
 	"net/http"
 )
 
-type IndexPageData struct {
+type PageShellData struct {
+	Body template.HTML
+}
+
+type IndexBodyData struct {
 	HeaderHTML template.HTML
 	NavHTML    template.HTML
 	MainHTML   template.HTML
@@ -20,10 +24,8 @@ type LoginFormData struct {
 	Rank       string
 }
 
-func (s *Server) buildIndex(w http.ResponseWriter, req *http.Request) {
-	loginFormData := LoginFormData{
-		IsLoggedIn: false,
-	}
+func (s *Server) buildIndex(w http.ResponseWriter, user *LoginFormData) {
+	loginFormData := user
 
 	//Build index header
 	loginFormTmpl := template.Must(template.ParseFiles("templates/loginForm.tmpl"))
@@ -41,15 +43,29 @@ func (s *Server) buildIndex(w http.ResponseWriter, req *http.Request) {
 
 	//Build index footer
 
-	//Build overall index page
-	indexData := IndexPageData{
+	//Build overall index body
+	indexBodyData := IndexBodyData{
 		HeaderHTML: template.HTML(loginFormBuffer.String()),
+	}
+	indexBodyTmpl := template.Must(template.ParseFiles("templates/index.tmpl"))
+
+	var indexBodyBuffer bytes.Buffer
+	err = indexBodyTmpl.Execute(&indexBodyBuffer, indexBodyData)
+	if err != nil {
+		log.Printf("failed executing index body: %s\n", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	//Apply body to page shell
+	indexShellData := PageShellData{
+		Body: template.HTML(indexBodyBuffer.String()),
 	}
 	indexTmpl := template.Must(template.ParseFiles("templates/index.tmpl"))
 
-	err = indexTmpl.Execute(w, indexData)
+	var indexBuffer bytes.Buffer
+	err = indexTmpl.Execute(&indexBuffer, indexShellData)
 	if err != nil {
-		log.Printf("failed executing index template: %s\n", err.Error())
+		log.Printf("failed executing index shell: %s\n", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
