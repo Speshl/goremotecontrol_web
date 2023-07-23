@@ -8,10 +8,10 @@ import (
 )
 
 type IndexPageData struct {
-	HeaderHTML string
-	NavHTML    string
-	MainHTML   string
-	FooterHTML string
+	HeaderHTML template.HTML
+	NavHTML    template.HTML
+	MainHTML   template.HTML
+	FooterHTML template.HTML
 }
 
 type LoginFormData struct {
