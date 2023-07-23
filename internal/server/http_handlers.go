@@ -42,7 +42,10 @@ func (s *Server) RegisterHTTPHandlers() {
 }
 
 func (s *Server) indexHandler(w http.ResponseWriter, req *http.Request) {
-	s.buildIndex(w, nil)
+	s.buildIndex(w, IndexBuildOptions{
+		includeShell: true,
+		authorized:   false,
+	})
 }
 
 func (s *Server) loginHandler(w http.ResponseWriter, req *http.Request) {
@@ -75,10 +78,11 @@ func (s *Server) loginHandler(w http.ResponseWriter, req *http.Request) {
 		Expires: time.Now().Add(5 * time.Minute),
 	})
 
-	s.buildIndex(w, &LoginFormData{
-		IsLoggedIn: true,
-		Username:   creds.Username,
-		Rank:       "69420",
+	s.buildIndex(w, IndexBuildOptions{
+		includeShell: false,
+		authorized:   true,
+		userName:     creds.Username,
+		userRank:     "69420",
 	})
 }
 

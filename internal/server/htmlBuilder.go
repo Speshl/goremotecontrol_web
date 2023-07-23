@@ -7,6 +7,13 @@ import (
 	"net/http"
 )
 
+type IndexBuildOptions struct {
+	includeShell bool
+	authorized   bool
+	userName     string
+	userRank     string
+}
+
 type PageShellData struct {
 	Body template.HTML
 }
@@ -24,8 +31,12 @@ type LoginFormData struct {
 	Rank       string
 }
 
-func (s *Server) buildIndex(w http.ResponseWriter, user *LoginFormData) {
-	loginFormData := user
+func (s *Server) buildIndex(w http.ResponseWriter, options IndexBuildOptions) {
+	loginFormData := LoginFormData{
+		IsLoggedIn: options.authorized,
+		Username:   options.userName,
+		Rank:       options.userRank,
+	}
 
 	//Build index header
 	loginFormTmpl := template.Must(template.ParseFiles("templates/loginForm.tmpl"))
@@ -48,6 +59,16 @@ func (s *Server) buildIndex(w http.ResponseWriter, user *LoginFormData) {
 		HeaderHTML: template.HTML(loginFormBuffer.String()),
 	}
 	indexBodyTmpl := template.Must(template.ParseFiles("templates/index.tmpl"))
+
+	if !options.includeShell {
+		err = indexBodyTmpl.Execute(w, indexBodyData)
+		if err != nil {
+			log.Printf("failed executing index body: %s\n", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		return
+	}
+	//place into shell
 
 	var indexBodyBuffer bytes.Buffer
 	err = indexBodyTmpl.Execute(&indexBodyBuffer, indexBodyData)
