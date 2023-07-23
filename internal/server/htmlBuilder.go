@@ -32,6 +32,7 @@ type LoginFormData struct {
 }
 
 func (s *Server) buildIndex(w http.ResponseWriter, options IndexBuildOptions) {
+	log.Printf("building index with options: %+v\n", options)
 	loginFormData := LoginFormData{
 		IsLoggedIn: options.authorized,
 		Username:   options.userName,
@@ -61,6 +62,7 @@ func (s *Server) buildIndex(w http.ResponseWriter, options IndexBuildOptions) {
 	indexBodyTmpl := template.Must(template.ParseFiles("templates/index_body.tmpl"))
 
 	if !options.includeShell {
+		log.Println("sending without shell")
 		err = indexBodyTmpl.Execute(w, indexBodyData)
 		if err != nil {
 			log.Printf("failed executing index body: %s\n", err.Error())
@@ -83,8 +85,7 @@ func (s *Server) buildIndex(w http.ResponseWriter, options IndexBuildOptions) {
 	}
 	indexTmpl := template.Must(template.ParseFiles("templates/index_shell.tmpl"))
 
-	var indexBuffer bytes.Buffer
-	err = indexTmpl.Execute(&indexBuffer, indexShellData)
+	err = indexTmpl.Execute(w, indexShellData)
 	if err != nil {
 		log.Printf("failed executing index shell: %s\n", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
