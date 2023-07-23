@@ -1,13 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <script src="https://unpkg.com/htmx.org@1.9.2" integrity="sha384-L6OqL9pRWyyFU3+/bjdSri+iIphTN/bvYyM37tICVyOJkWZLpP2vGn6VUEXgzg6h" crossorigin="anonymous"></script>
-        <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
-        <title>Go Remote Control</title>
-    </head>
-
-<body>
+{{if .IsLoggedIn }}
+    <div>
+        Username: {{ .Username }}
+        Rank: {{ .Rank }}
+        <button type="submit">Logout</button>
+    </div>
+{{ else }}
     <form hx-post="/signin" hx-ext='json-enc' hx-target="this" hx-swap="outerHTML">
         <div>
             <h1>Login</h1>
@@ -22,5 +19,4 @@
             <button type="submit">Login</button>
         </div>
     </form>
-</body>
-</html>
+{{ end }}

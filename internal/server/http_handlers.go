@@ -26,12 +26,17 @@ type Claims struct {
 }
 
 func (s *Server) RegisterHTTPHandlers() {
+	http.HandleFunc("/index", s.indexHandler)
 	http.HandleFunc("/authed", s.authedHandler)
 	http.HandleFunc("/signin", s.loginHandler)
 	http.HandleFunc("/preauth", s.preAuthHandler)
 	http.Handle("/", http.FileServer(http.Dir("public/")))
 	http.Handle("/socket.io/", s.socketio)
 
+}
+
+func (s *Server) indexHandler(w http.ResponseWriter, req *http.Request) {
+	s.buildIndex(w, req)
 }
 
 func (s *Server) preAuthHandler(w http.ResponseWriter, req *http.Request) {
