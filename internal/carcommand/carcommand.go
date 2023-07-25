@@ -162,15 +162,15 @@ func (c *CarCommand) startGPIO() error {
 	c.pins.servo.Mode(rpio.Pwm)
 	c.pins.servo.Freq(frequency)
 
-	c.pins.tilt = rpio.Pin(tiltPinID)
-	// c.pins.tilt.Pwm()
-	c.pins.tilt.Mode(rpio.Pwm)
-	c.pins.tilt.Freq(frequency)
+	// c.pins.tilt = rpio.Pin(tiltPinID)
+	// // c.pins.tilt.Pwm()
+	// c.pins.tilt.Mode(rpio.Pwm)
+	// c.pins.tilt.Freq(frequency)
 
-	c.pins.pan = rpio.Pin(panPinID)
-	// c.pins.pan.Pwm()
-	c.pins.pan.Mode(rpio.Pwm)
-	c.pins.pan.Freq(frequency)
+	// c.pins.pan = rpio.Pin(panPinID)
+	// // c.pins.pan.Pwm()
+	// c.pins.pan.Mode(rpio.Pwm)
+	// c.pins.pan.Freq(frequency)
 	c.sendNeutral()
 	return nil
 }
@@ -203,10 +203,11 @@ func (c *CarCommand) sendNeutral() {
 
 func (c *CarCommand) sendCommand(command Command) {
 	if !c.disableCommands {
-		c.pins.esc.DutyCycle(command.esc, maxvalue)
-		c.pins.servo.DutyCycle(command.servo, maxvalue)
-		c.pins.pan.DutyCycle(command.pan, maxvalue)
-		c.pins.tilt.DutyCycle(command.tilt, maxvalue)
+		log.Printf("Sending Command: %+v", command)
+		c.pins.esc.DutyCycle(command.esc, cycleLen)
+		c.pins.servo.DutyCycle(command.servo, cycleLen)
+		// c.pins.pan.DutyCycle(command.pan, cycleLen)
+		// c.pins.tilt.DutyCycle(command.tilt, cycleLen)
 	}
 }
 
