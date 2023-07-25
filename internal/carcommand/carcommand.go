@@ -187,7 +187,7 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 
 	if parsedCommand.esc != midvalue || parsedCommand.servo != midvalue ||
 		parsedCommand.pan != midvalue || parsedCommand.tilt != midvalue {
-		log.Printf("Parsed Command: %+v", parsedCommand)
+		//log.Printf("Parsed Command: %+v", parsedCommand)
 	}
 	return parsedCommand, nil
 }
