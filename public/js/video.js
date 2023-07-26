@@ -87,8 +87,10 @@ class CamPlayer {
             }
         });
 
-        //Send offer to server to start connection process
-        this.pc.createOffer().then(d => this.pc.setLocalDescription(d)).catch(log);
+        //Send offer to server to start connection process after a 500 ms delay
+        setTimeout(() => {
+            this.pc.createOffer().then(d => this.pc.setLocalDescription(d)).catch(log);
+        },500);
     }
 
     getSocket() {
