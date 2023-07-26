@@ -10,6 +10,8 @@ const gamePadTracker = new GamePadTracker();
 //Start listener loop for input commands
 setInterval(() => {
     gamePad = gamePadTracker.getGamePad()
+    
+    let command = [127,127,127,127];
     if(gamePad != null){
         command = gamePadTracker.getCommand(gamePad)
     }else{

@@ -33,6 +33,7 @@ class GamePadTracker {
                 document.getElementById('controllerType').innerHTML = "Unsupported - " + myGamepad.id;
             }
         }
+        return command
     }
 
     mapToRange(value, min, max, minReturn, maxReturn) {
