@@ -44,18 +44,18 @@ class GamePadTracker {
         let command = [127,127,127,127];
         //esc
         if(myGamepad.axes[2] < .9){
-            command[0] = mapToRange(myGamepad.axes[5], -1, 1, 127, 255);
+            command[0] = this.mapToRange(myGamepad.axes[5], -1, 1, 127, 255);
         }else if(myGamepad.axes[5] < .9){
-            command[0] = mapToRange(myGamepad.axes[2], -1, 1, 0, 127);
+            command[0] = this.mapToRange(myGamepad.axes[2], -1, 1, 0, 127);
         }else{
             command[0] = 127;
         }
     
         //servo
         if(myGamepad.axes[0] > .05){
-            command[1] = mapToRange(myGamepad.axes[0], .05, 1, 127, 255);
+            command[1] = this.mapToRange(myGamepad.axes[0], .05, 1, 127, 255);
         }else if(myGamepad.axes[0] < -.05){
-            command[1] = 127 - mapToRange(myGamepad.axes[0], -.05, -1, 0, 127);
+            command[1] = 127 - this.mapToRange(myGamepad.axes[0], -.05, -1, 0, 127);
         }else{
             command[1] = 127;
         }
@@ -109,37 +109,37 @@ class GamePadTracker {
         //esc
         if(myGamepad.buttons[6].value > .1 &&  myGamepad.buttons[6].value >= myGamepad.buttons[7].value){
             //brake
-            command[0] = 127 - mapToRange(myGamepad.buttons[6].value, .1, 1, 0, 127);
+            command[0] = 127 - this.mapToRange(myGamepad.buttons[6].value, .1, 1, 0, 127);
         }else if(myGamepad.buttons[7].value > .1){
             //gas
-            command[0] = mapToRange(myGamepad.buttons[7].value, .1, 1, 127, 255);
+            command[0] = this.mapToRange(myGamepad.buttons[7].value, .1, 1, 127, 255);
         }else{
             //neutral
             command[0] = 127;
         }
         //servo
         if(myGamepad.axes[0] > .1){
-            command[1] = mapToRange(myGamepad.axes[0], .1, 1, 127, 255);
+            command[1] = this.mapToRange(myGamepad.axes[0], .1, 1, 127, 255);
         }else if(myGamepad.axes[0] < -.1){
-            command[1] = mapToRange(myGamepad.axes[0], -1, -.1, 0, 127);
+            command[1] = this.mapToRange(myGamepad.axes[0], -1, -.1, 0, 127);
         }else{
             command[1] = 127;
         }
     
         //pan
         if(myGamepad.axes[2] > .1){
-            command[2] = mapToRange(myGamepad.axes[2], .1, 1, 127, 255);
+            command[2] = this.mapToRange(myGamepad.axes[2], .1, 1, 127, 255);
         }else if(myGamepad.axes[2] < -.1){
-            command[2] = mapToRange(myGamepad.axes[2], -1, -.1, 0, 127);
+            command[2] = this.mapToRange(myGamepad.axes[2], -1, -.1, 0, 127);
         }else{
             command[2] = 127;
         }
     
         //tilt
         if(myGamepad.axes[3] > .1){
-            command[3] = mapToRange(myGamepad.axes[3], .1, 1, 127, 255);
+            command[3] = this.mapToRange(myGamepad.axes[3], .1, 1, 127, 255);
         }else if(myGamepad.axes[3] < -.1){
-            command[3] = mapToRange(myGamepad.axes[3], -1, -.1, 0, 127);
+            command[3] = this.mapToRange(myGamepad.axes[3], -1, -.1, 0, 127);
         }else{
             command[3] = 127;
         }
