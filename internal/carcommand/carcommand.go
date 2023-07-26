@@ -185,12 +185,12 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 }
 
 func (c *CarCommand) sendNeutral() {
-	c.sendCommand(Command{
-		esc:   midvalue,
-		servo: midvalue,
-		// tilt:  midvalue,
-		// pan:   midvalue,
-	})
+	if !c.disableCommands {
+		c.pins.esc.DutyCycle(midvalue, cycleLen)
+		c.pins.servo.DutyCycle(midvalue, cycleLen)
+		// c.pins.pan.DutyCycle(command.pan, cycleLen)
+		// c.pins.tilt.DutyCycle(command.tilt, cycleLen)
+	}
 }
 
 func (c *CarCommand) sendCommand(command Command) {
