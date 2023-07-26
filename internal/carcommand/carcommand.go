@@ -15,8 +15,9 @@ import (
 // esc/servo/pan/tilt
 const escPinID = 12
 const servoPinID = 13
-const panPinID = 14
-const tiltPinID = 15
+
+// const panPinID = 14
+// const tiltPinID = 15
 
 const deadZone = uint32(2)
 
@@ -43,8 +44,8 @@ type CarCommand struct {
 type Pins struct {
 	esc   rpio.Pin
 	servo rpio.Pin
-	pan   rpio.Pin
-	tilt  rpio.Pin
+	// pan   rpio.Pin
+	// tilt  rpio.Pin
 }
 
 type LatestCommand struct {
@@ -56,8 +57,8 @@ type LatestCommand struct {
 type Command struct {
 	esc   uint32
 	servo uint32
-	pan   uint32
-	tilt  uint32
+	// pan   uint32
+	// tilt  uint32
 }
 
 func NewCarCommand(name string, refreshRate int, disableCommands bool) *CarCommand {
@@ -72,8 +73,8 @@ func NewCarCommand(name string, refreshRate int, disableCommands bool) *CarComma
 			command: Command{
 				esc:   midvalue,
 				servo: midvalue,
-				pan:   midvalue,
-				tilt:  midvalue,
+				// pan:   midvalue,
+				// tilt:  midvalue,
 			},
 		},
 	}
@@ -153,22 +154,18 @@ func (c *CarCommand) startGPIO() error {
 	}
 
 	c.pins.esc = rpio.Pin(escPinID)
-	//c.pins.esc.Pwm()
 	c.pins.esc.Mode(rpio.Pwm)
 	c.pins.esc.Freq(frequency)
 
 	c.pins.servo = rpio.Pin(servoPinID)
-	// c.pins.servo.Pwm()
 	c.pins.servo.Mode(rpio.Pwm)
 	c.pins.servo.Freq(frequency)
 
 	// c.pins.tilt = rpio.Pin(tiltPinID)
-	// // c.pins.tilt.Pwm()
 	// c.pins.tilt.Mode(rpio.Pwm)
 	// c.pins.tilt.Freq(frequency)
 
 	// c.pins.pan = rpio.Pin(panPinID)
-	// // c.pins.pan.Pwm()
 	// c.pins.pan.Mode(rpio.Pwm)
 	// c.pins.pan.Freq(frequency)
 	c.sendNeutral()
@@ -179,16 +176,11 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 	parsedCommand := Command{
 		esc:   c.mapToRange(uint32(command[0]), 0, 255, minvalue_limited, maxvalue_limited),
 		servo: c.mapToRange(uint32(command[1]), 0, 255, minvalue_limited, maxvalue_limited),
-		pan:   c.mapToRange(uint32(command[2]), 0, 255, minvalue_limited, maxvalue_limited),
-		tilt:  c.mapToRange(uint32(command[3]), 0, 255, minvalue_limited, maxvalue_limited),
+		// pan:   c.mapToRange(uint32(command[2]), 0, 255, minvalue_limited, maxvalue_limited),
+		// tilt:  c.mapToRange(uint32(command[3]), 0, 255, minvalue_limited, maxvalue_limited),
 	}
 
 	parsedCommand = c.applyDeadZone(parsedCommand)
-
-	if parsedCommand.esc != midvalue || parsedCommand.servo != midvalue ||
-		parsedCommand.pan != midvalue || parsedCommand.tilt != midvalue {
-		//log.Printf("Parsed Command: %+v", parsedCommand)
-	}
 	return parsedCommand, nil
 }
 
@@ -196,15 +188,15 @@ func (c *CarCommand) sendNeutral() {
 	c.sendCommand(Command{
 		esc:   midvalue,
 		servo: midvalue,
-		tilt:  midvalue,
-		pan:   midvalue,
+		// tilt:  midvalue,
+		// pan:   midvalue,
 	})
 }
 
 func (c *CarCommand) sendCommand(command Command) {
 	if !c.disableCommands {
 		log.Printf("Sending Command: %+v", command)
-		//c.pins.esc.DutyCycle(command.esc, cycleLen)
+		c.pins.esc.DutyCycle(command.esc, cycleLen)
 		c.pins.servo.DutyCycle(command.servo, cycleLen)
 		// c.pins.pan.DutyCycle(command.pan, cycleLen)
 		// c.pins.tilt.DutyCycle(command.tilt, cycleLen)
@@ -234,21 +226,21 @@ func (c *CarCommand) applyDeadZone(command Command) Command {
 		returnCommand.servo = midvalue
 	}
 
-	if command.pan > midvalue && midvalue+deadZone > command.pan {
-		returnCommand.pan = midvalue
-	}
+	// if command.pan > midvalue && midvalue+deadZone > command.pan {
+	// 	returnCommand.pan = midvalue
+	// }
 
-	if command.pan < midvalue && midvalue-deadZone < command.pan {
-		returnCommand.pan = midvalue
-	}
+	// if command.pan < midvalue && midvalue-deadZone < command.pan {
+	// 	returnCommand.pan = midvalue
+	// }
 
-	if command.tilt > midvalue && midvalue+deadZone > command.tilt {
-		returnCommand.tilt = midvalue
-	}
+	// if command.tilt > midvalue && midvalue+deadZone > command.tilt {
+	// 	returnCommand.tilt = midvalue
+	// }
 
-	if command.tilt < midvalue && midvalue-deadZone < command.tilt {
-		returnCommand.tilt = midvalue
-	}
+	// if command.tilt < midvalue && midvalue-deadZone < command.tilt {
+	// 	returnCommand.tilt = midvalue
+	// }
 
 	return returnCommand
 }

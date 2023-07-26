@@ -17,5 +17,7 @@ setInterval(() => {
     }
     document.getElementById('currentCommand').innerHTML = 'Esc: '+command[0] + ' Servo: '+command[1] + ' Pan: ' + command[2] + ' Tilt: ' + command[3];
         //Send the command we generated
-        camPlayer.getSocket().emit('command', command);
-}, 10); // print buttons that are pressed 10 times per second
+        if (camPlayer.gotRemoteDescription()) {
+            camPlayer.getSocket().emit('command', command);
+        }
+}, 10); 

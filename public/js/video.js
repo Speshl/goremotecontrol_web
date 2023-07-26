@@ -1,6 +1,8 @@
 class CamPlayer {
     constructor() {
         this.socket = io();
+        
+        this.gotAnswer = false;
 
         this.pc = new RTCPeerConnection({
             iceServers: [{
@@ -62,6 +64,7 @@ class CamPlayer {
             console.log("Setting Remote Description");        
             this.pc.setRemoteDescription(decodedAnswer)
                 .then(() => {
+                    this.gotAnswer = true;
                     console.log("Set Remote Description");
                     console.log(JSON.stringify(this.pc.remoteDescription));
                 })
@@ -86,6 +89,10 @@ class CamPlayer {
     }
 
     getSocket() {
-        return this.socket
+        return this.socket;
+    }
+
+    gotRemoteDescription() {
+        return this.gotAnswer;
     }
 }
