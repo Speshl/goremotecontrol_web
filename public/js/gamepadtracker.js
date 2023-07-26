@@ -26,9 +26,9 @@ class GamePadTracker {
             document.getElementById('controllerType').innerHTML = myGamepad.id; //show gamepad type
 
             if(myGamepad.id.toLowerCase().includes("xbox")){
-                command = commandFromXbox(myGamepad);
+                command = this.commandFromXbox(myGamepad);
             }else if(myGamepad.id.toLowerCase().includes("g27")){
-                command = commandFromG27(myGamepad);
+                command = this.commandFromG27(myGamepad);
             }else{
                 document.getElementById('controllerType').innerHTML = "Unsupported - " + myGamepad.id;
             }
