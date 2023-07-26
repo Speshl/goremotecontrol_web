@@ -45,6 +45,8 @@ class CamPlayer {
             const el = document.createElement(event.track.kind);
             el.srcObject = event.streams[0];
             el.autoplay = true;
+            el.muted = true;
+            el.playsinline = true;
             el.controls = true;
             document.getElementById('videoDiv').appendChild(el);
         }
@@ -53,11 +55,9 @@ class CamPlayer {
         this.pc.addTransceiver('video', {
             direction: 'recvonly'
         })
-        // this.pc.addTransceiver('audio', {
-        //     direction: 'recvonly'
-        // })
-        
-        this.pc.createOffer().then(d => this.pc.setLocalDescription(d)).catch(log)
+        this.pc.addTransceiver('audio', {
+            direction: 'recvonly'
+        })
 
         this.socket.on('answer', (answer) => {
             let decodedAnswer = JSON.parse(atob(answer));
@@ -86,6 +86,9 @@ class CamPlayer {
                 alert(e);
             }
         });
+
+        //Send offer to server to start connection process
+        this.pc.createOffer().then(d => this.pc.setLocalDescription(d)).catch(log);
     }
 
     getSocket() {
