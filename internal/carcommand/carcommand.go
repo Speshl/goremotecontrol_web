@@ -24,12 +24,12 @@ const deadZone = uint32(2)
 const frequency = 100000
 const cycleLen = uint32(2000)
 
-const maxvalue_limited = uint32(200)
+const maxvalue_limited = uint32(175)
 const maxvalue = uint32(250)
 
 const midvalue = uint32(150)
 
-const minvalue_limited = uint32(100)
+const minvalue_limited = uint32(125)
 const minvalue = uint32(50)
 
 type CarCommand struct {
