@@ -45,13 +45,16 @@ func GetConfig(ctx context.Context) CarConfig {
 
 	name, found := os.LookupEnv("CARCAM_NAME")
 	if !found {
+		log.Printf("no name env variable found, others most likely not loaded...")
 		name = DefaultCarName
+	} else {
+		log.Printf("found value For CARCAM_NAME: %s\n")
 	}
 
 	carConfig.camConfig = GetCamConfig(ctx, name)
 	carConfig.commandConfig = GetCommandConfig(ctx, name)
 
-	log.Printf("Using Config: \n %+v\n", carConfig)
+	log.Printf("Using Config: \n\n%+v\n\n", carConfig)
 	return carConfig
 }
 
@@ -68,7 +71,7 @@ func GetCamConfig(ctx context.Context, name string) carcam.CameraOptions {
 
 	height, found := os.LookupEnv("CARCAM_HEIGHT")
 	if !found {
-		width = DefaultHeight
+		height = DefaultHeight
 	}
 	camConfig.Height = height
 
