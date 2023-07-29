@@ -19,19 +19,19 @@ func (c *CarCam) StartStreaming(ctx context.Context) error {
 		"-t", "0",  // Disable timeout
 		"-o", "-", // Output to stdout
 		"--flush", // Flush output files immediately
-		"--width", c.options.width,
-		"--height", c.options.height,
-		"--framerate", c.options.fps,
+		"--width", c.options.Width,
+		"--height", c.options.Height,
+		"--framerate", c.options.Fps,
 		"-n", // Do not show a preview window
 		//"--profile", c.options.profile, // H264 profile baseline, main or high
 		//"--level", c.options.level,
 	}
-	// if c.options.horizontalFlip {
-	// 	args = append(args, "--hflip")
-	// }
-	// if c.options.verticalFlip {
-	// 	args = append(args, "--vflip")
-	// }
+	if c.options.HorizontalFlip {
+		args = append(args, "--hflip")
+	}
+	if c.options.VerticalFlip {
+		args = append(args, "--vflip")
+	}
 	// if !c.options.deNoise {
 	// 	args = append(args, "--denoise", "cdn_off")
 	// }
@@ -40,7 +40,7 @@ func (c *CarCam) StartStreaming(ctx context.Context) error {
 	// 	args = append(args, strconv.Itoa(c.options.rotation))
 	// }
 
-	if c.options.disableVideo {
+	if c.options.DisableVideo {
 		return c.noVideoLoop(ctx)
 	}
 

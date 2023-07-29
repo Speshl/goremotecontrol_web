@@ -11,7 +11,6 @@ import (
 )
 
 type CarCam struct {
-	Name         string
 	AudioTrack   *webrtc.TrackLocalStaticSample
 	VideoTrack   *webrtc.TrackLocalStaticSample
 	videoChannel chan []byte
@@ -19,19 +18,20 @@ type CarCam struct {
 }
 
 type CameraOptions struct {
-	width          string
-	height         string
-	fps            string
-	disableVideo   bool
-	horizontalFlip bool
-	verticalFlip   bool
-	deNoise        bool
-	rotation       int
-	level          string
-	profile        string
+	Name           string
+	Width          string
+	Height         string
+	Fps            string
+	DisableVideo   bool
+	HorizontalFlip bool
+	VerticalFlip   bool
+	DeNoise        bool
+	Rotation       int
+	Level          string
+	Profile        string
 }
 
-func NewCarCam(name string, width string, height string, fps string, disableVideo bool) (*CarCam, error) {
+func NewCarCam(options CameraOptions) (*CarCam, error) {
 	// Create a audio track
 	audioTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: "audio/opus"}, "audio", "pion1")
 	if err != nil {
@@ -45,20 +45,20 @@ func NewCarCam(name string, width string, height string, fps string, disableVide
 	}
 
 	return &CarCam{
-		Name:         name,
 		AudioTrack:   audioTrack,
 		VideoTrack:   videoTrack,
 		videoChannel: make(chan []byte, 5),
 		options: CameraOptions{
-			width:          width,
-			height:         height,
-			fps:            fps,
-			horizontalFlip: false,
-			verticalFlip:   false,
-			deNoise:        true,
-			rotation:       0,
-			level:          "4.2",
-			profile:        "baseline", //baseline, main or high
+			Name:           options.Name,
+			Width:          options.Width,
+			Height:         options.Height,
+			Fps:            options.Fps,
+			HorizontalFlip: options.HorizontalFlip,
+			VerticalFlip:   options.VerticalFlip,
+			DeNoise:        options.DeNoise,
+			Rotation:       options.Rotation,
+			Level:          "4.2",
+			Profile:        "baseline", //baseline, main or high
 		},
 	}, nil
 }
@@ -74,8 +74,8 @@ func (c *CarCam) Start(ctx context.Context) error {
 }
 
 func (c *CarCam) CreateTracks() error {
-	log.Printf("%s started creating tracks...", c.Name)
-	defer log.Printf("%s finished creating tracks", c.Name)
+	log.Printf("%s started creating tracks...", c.options.Name)
+	defer log.Printf("%s finished creating tracks", c.options.Name)
 
 	// Create a audio track
 	var err error
@@ -103,7 +103,7 @@ func (c *CarCam) StartVideoDataListener(ctx context.Context) {
 				log.Println("Data channel closed, stopping")
 				return
 			}
-			err := c.VideoTrack.WriteSample(media.Sample{Data: data, Duration: time.Millisecond * 17})
+			err := c.VideoTrack.WriteSample(media.Sample{Data: data, Duration: time.Millisecond * 17}) //TODO: Tie this to FPS
 			if err != nil {
 				log.Printf("error writing sample to track: %s\n", err.Error())
 				return

@@ -10,35 +10,39 @@ import (
 	"github.com/stianeikeland/go-rpio/v4"
 )
 
-//pwm pins: 12,13,18,19,40,41,45
+const frequency = 100000
 
-// esc/servo/pan/tilt
+const cycleLen = uint32(2000)
+const maxvalue = uint32(250)
+const midvalue = uint32(150)
+const minvalue = uint32(50)
+
 const escPinID = 12
 const servoPinID = 13
 
 // const panPinID = 14
 // const tiltPinID = 15
 
-const deadZone = uint32(2)
-
-const frequency = 100000
-const cycleLen = uint32(2000)
-
-const maxvalue_limited = uint32(175)
-const maxvalue = uint32(250)
-
-const midvalue = uint32(150)
-
-const minvalue_limited = uint32(125)
-const minvalue = uint32(50)
-
 type CarCommand struct {
-	name            string
-	refreshRate     int
-	disableCommands bool
-	CommandChannel  chan []byte
-	LatestCommand   LatestCommand
-	pins            Pins
+	CommandChannel chan []byte
+	options        CommandOptions
+	latestCommand  LatestCommand
+	pins           Pins
+}
+
+type CommandOptions struct {
+	Name            string
+	RefreshRate     int
+	DisableCommands bool
+	DeadZone        int
+
+	MaxESC int
+	MidESC int
+	MinESC int
+
+	MaxServo int
+	MidServo int
+	MinServo int
 }
 
 type Pins struct {
@@ -61,20 +65,17 @@ type Command struct {
 	// tilt  uint32
 }
 
-func NewCarCommand(name string, refreshRate int, disableCommands bool) *CarCommand {
-	if disableCommands {
+func NewCarCommand(options CommandOptions) *CarCommand {
+	if options.DisableCommands {
 		log.Println("Warning! GPIO commands are currently disabled")
 	}
 	return &CarCommand{
-		name:           name,
-		refreshRate:    refreshRate,
 		CommandChannel: make(chan []byte, 5),
-		LatestCommand: LatestCommand{
+		options:        options,
+		latestCommand: LatestCommand{
 			command: Command{
-				esc:   midvalue,
-				servo: midvalue,
-				// pan:   midvalue,
-				// tilt:  midvalue,
+				esc:   uint32(options.MidESC),
+				servo: uint32(options.MidServo),
 			},
 		},
 	}
@@ -94,7 +95,7 @@ func (c *CarCommand) Start(ctx context.Context) error {
 		log.Println("closed rpio")
 	}()
 
-	commandRate := 1000 / c.refreshRate
+	commandRate := 1000 / c.options.RefreshRate
 	commandDuration := time.Duration(int64(time.Millisecond) * int64(commandRate))
 	commandTicker := time.NewTicker(commandDuration)
 	seenSameCommand := 0
@@ -112,14 +113,14 @@ func (c *CarCommand) Start(ctx context.Context) error {
 				log.Printf("WARNING: command failed to parse: %s\n", err)
 				continue
 			}
-			c.LatestCommand.lock.Lock()
-			c.LatestCommand.used = false
-			c.LatestCommand.command = parsedCommand
-			c.LatestCommand.lock.Unlock()
+			c.latestCommand.lock.Lock()
+			c.latestCommand.used = false
+			c.latestCommand.command = parsedCommand
+			c.latestCommand.lock.Unlock()
 		case <-commandTicker.C: //time to send command to gpio
-			c.LatestCommand.lock.RLock()
-			if c.LatestCommand.used {
-				c.LatestCommand.lock.RUnlock()
+			c.latestCommand.lock.RLock()
+			if c.latestCommand.used {
+				c.latestCommand.lock.RUnlock()
 				if !warned {
 					//log.Printf("command was already used, skipping")
 				}
@@ -134,12 +135,12 @@ func (c *CarCommand) Start(ctx context.Context) error {
 			} else {
 				seenSameCommand = 0
 				warned = false
-				c.LatestCommand.lock.RUnlock()
+				c.latestCommand.lock.RUnlock()
 
-				c.LatestCommand.lock.Lock()
-				c.LatestCommand.used = true
-				command := c.LatestCommand.command
-				c.LatestCommand.lock.Unlock()
+				c.latestCommand.lock.Lock()
+				c.latestCommand.used = true
+				command := c.latestCommand.command
+				c.latestCommand.lock.Unlock()
 
 				c.sendCommand(command)
 			}
@@ -160,24 +161,14 @@ func (c *CarCommand) startGPIO() error {
 	c.pins.servo = rpio.Pin(servoPinID)
 	c.pins.servo.Mode(rpio.Pwm)
 	c.pins.servo.Freq(frequency)
-
-	// c.pins.tilt = rpio.Pin(tiltPinID)
-	// c.pins.tilt.Mode(rpio.Pwm)
-	// c.pins.tilt.Freq(frequency)
-
-	// c.pins.pan = rpio.Pin(panPinID)
-	// c.pins.pan.Mode(rpio.Pwm)
-	// c.pins.pan.Freq(frequency)
 	c.sendNeutral()
 	return nil
 }
 
 func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 	parsedCommand := Command{
-		esc:   c.mapToRange(uint32(command[0]), 0, 255, minvalue_limited, maxvalue_limited),
-		servo: c.mapToRange(uint32(command[1]), 0, 255, minvalue_limited, maxvalue_limited),
-		// pan:   c.mapToRange(uint32(command[2]), 0, 255, minvalue_limited, maxvalue_limited),
-		// tilt:  c.mapToRange(uint32(command[3]), 0, 255, minvalue_limited, maxvalue_limited),
+		esc:   c.mapToRange(uint32(command[0]), 0, 255, uint32(c.options.MinESC), uint32(c.options.MaxESC)),
+		servo: c.mapToRange(uint32(command[1]), 0, 255, uint32(c.options.MinServo), uint32(c.options.MaxServo)),
 	}
 
 	parsedCommand = c.applyDeadZone(parsedCommand)
@@ -185,16 +176,16 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 }
 
 func (c *CarCommand) sendNeutral() {
-	if !c.disableCommands {
-		c.pins.esc.DutyCycle(midvalue, cycleLen)
-		c.pins.servo.DutyCycle(midvalue, cycleLen)
+	if !c.options.DisableCommands {
+		c.pins.esc.DutyCycle(uint32(c.options.MidESC), cycleLen)
+		c.pins.servo.DutyCycle(uint32(c.options.MidServo), cycleLen)
 		// c.pins.pan.DutyCycle(command.pan, cycleLen)
 		// c.pins.tilt.DutyCycle(command.tilt, cycleLen)
 	}
 }
 
 func (c *CarCommand) sendCommand(command Command) {
-	if !c.disableCommands {
+	if !c.options.DisableCommands {
 		log.Printf("Sending Command: %+v", command)
 		c.pins.esc.DutyCycle(command.esc, cycleLen)
 		c.pins.servo.DutyCycle(command.servo, cycleLen)
@@ -210,19 +201,19 @@ func (c *CarCommand) mapToRange(value, min, max, minReturn, maxReturn uint32) ui
 func (c *CarCommand) applyDeadZone(command Command) Command {
 	returnCommand := command
 
-	if command.esc > midvalue && midvalue+deadZone > command.esc {
+	if command.esc > midvalue && midvalue+uint32(c.options.DeadZone) > command.esc {
 		returnCommand.esc = midvalue
 	}
 
-	if command.esc < midvalue && midvalue-deadZone < command.esc {
+	if command.esc < midvalue && midvalue-uint32(c.options.DeadZone) < command.esc {
 		returnCommand.esc = midvalue
 	}
 
-	if command.servo > midvalue && midvalue+deadZone > command.servo {
+	if command.servo > midvalue && midvalue+uint32(c.options.DeadZone) > command.servo {
 		returnCommand.servo = midvalue
 	}
 
-	if command.servo < midvalue && midvalue-deadZone < command.servo {
+	if command.servo < midvalue && midvalue-uint32(c.options.DeadZone) < command.servo {
 		returnCommand.servo = midvalue
 	}
 

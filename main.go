@@ -15,23 +15,15 @@ import (
 	"github.com/Speshl/goremotecontrol_web/internal/server"
 )
 
-const carName = "Car-Alpha"
-
-const width = "640"
-const height = "480"
-const fps = "60"
-const refreshRate = 60 //command refresh rate
-
-const disableCommands = false //used for debug, when commands are sent pi needs to be restarted after each app start/stop cycle
-const disableVideo = false    //used for debug, starting cam can fail without a restart
-
 func main() {
 	defer log.Println("server stopped")
 	log.Println("Starting server...")
 	ctx, cancel := context.WithCancel(context.Background())
 
+	carConfig := GetConfig(ctx)
+
 	//Temp way to connect client to server before splitting client out to separate repo
-	carCam, err := carcam.NewCarCam(carName, width, height, fps, disableVideo)
+	carCam, err := carcam.NewCarCam(carConfig.camConfig)
 	if err != nil {
 		log.Printf("NewCarCam error: %s\n", err)
 	}
@@ -48,7 +40,7 @@ func main() {
 	//give time for camera to start before commands start
 	time.Sleep(2 * time.Second)
 
-	carCommand := carcommand.NewCarCommand(carName, refreshRate, disableCommands)
+	carCommand := carcommand.NewCarCommand(carConfig.commandConfig)
 	go func() {
 		err := carCommand.Start(ctx)
 		if err != nil {
