@@ -193,7 +193,7 @@ func GetCommandConfig(ctx context.Context, name string) carcommand.CommandOption
 
 	midServo, found := os.LookupEnv("CARMCAM_MIDSERVO")
 	if !found {
-		commandConfig.MidESC = int(Default_Servo_MidValue)
+		commandConfig.MidServo = int(Default_Servo_MidValue)
 	} else {
 		intValue, err := strconv.ParseInt(midServo, 10, 32)
 		if err != nil {
@@ -211,7 +211,7 @@ func GetCommandConfig(ctx context.Context, name string) carcommand.CommandOption
 		intValue, err := strconv.ParseInt(minServo, 10, 32)
 		if err != nil {
 			log.Printf("warning: min servo not parsed - error: %s\n", err)
-			commandConfig.MinServo = Default_ESC_MinValue_limited
+			commandConfig.MinServo = Default_Servo_MinValue_limited
 		} else {
 			commandConfig.MinServo = int(intValue)
 		}
