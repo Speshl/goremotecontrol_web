@@ -22,8 +22,8 @@ func (c *CarCam) StartStreaming(ctx context.Context) error {
 		"--width", c.options.Width,
 		"--height", c.options.Height,
 		"--framerate", c.options.Fps,
-		"-n", // Do not show a preview window
-		//"--profile", c.options.profile, // H264 profile baseline, main or high
+		"-n",                           // Do not show a preview window
+		"--profile", c.options.Profile, // H264 profile baseline, main or high
 		//"--level", c.options.level,
 	}
 	if c.options.HorizontalFlip {

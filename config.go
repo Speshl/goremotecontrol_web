@@ -18,6 +18,7 @@ const DefaultHeight = "480"
 const DefaultFPS = "60"
 const DefaultVerticalFlip = false
 const DefaultHorizontalFlip = false
+const DefaultProfile = "high"
 
 const disableVideo = false //used for debug, starting cam can fail without a restart
 
@@ -104,6 +105,12 @@ func GetCamConfig(ctx context.Context, name string) carcam.CameraOptions {
 		}
 		camConfig.HorizontalFlip = boolValue
 	}
+
+	profile, found := os.LookupEnv("CARCAM_PROFILE")
+	if !found {
+		profile = DefaultProfile
+	}
+	camConfig.Profile = profile
 
 	return camConfig
 }
