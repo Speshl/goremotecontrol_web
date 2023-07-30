@@ -97,7 +97,7 @@ class CamPlayer {
         //Send offer to server to start connection process after a 500 ms delay
         setTimeout(() => {
             document.getElementById('statusMsg').innerHTML = "Sending Offer...";
-            this.pc.createOffer().then(d => this.pc.setLocalDescription(d)).catch(log);
+            this.pc.createOffer().then(d => this.pc.setLocalDescription(d)).catch();
         },500);
     }
 
