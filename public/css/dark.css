@@ -1,0 +1,23 @@
+body.dark-mode {
+    background-color: #222;
+    color: #fff;
+}
+
+#mainContainer.dark-mode {
+    border-color: #666;
+    background-color: #333;
+}
+
+#videoDiv.dark-mode {
+    border-color: #666;
+    border: 1px solid #ccc;
+}
+
+#infoContainer.dark-mode {
+    border-color: #666;
+}
+
+.infoItem.dark-mode {
+    background-color: #444;
+    border-color: #666;
+}

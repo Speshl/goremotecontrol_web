@@ -6,27 +6,54 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
 
         <!-- custom js -->
-        <script type="text/javascript" src="/js/video.js"></script>
-        <script type="text/javascript" src="/js/keypresstracker.js"></script>
-        <script type="text/javascript" src="/js/gamepadtracker.js"></script>
-        <script type="text/javascript" src="/js/drive.js"></script>
+        <script type="text/javascript" src="./js/video.js"></script>
+        <script type="text/javascript" src="./js/keypresstracker.js"></script>
+        <script type="text/javascript" src="./js/gamepadtracker.js"></script>
+        <script type="text/javascript" src="./js/drive.js"></script>
         <!-- custom css -->
-        <!-- <link rel="stylesheet" href="mystyle.css"> -->
+        <link rel="stylesheet" href="./css/drive.css">
+        <link rel="stylesheet" href="./css/dark.css"> 
         <title>Go Remote Control</title>
     </head>
 <body>
-    <div style="margin:auto">
+    <div id="mainContainer">
         <H1>GoRemoteControl</H1>
         <br/>
         <!--Video-->
         <div id="videoDiv" style="width:640px;height:480px">
         </div>
-        <div>
-            <div>Controller Type</div>
-            <div id="controllerType">Keyboard</div>
-            <div>Current Command</div>
-            <div id="currentCommand"></div>
+        <div id="infoContainer">
+            <div class="infoItem">
+                <div>Status</div>
+                <div id="statusMsg">Initializing...</div>
+            </div>
+            <div class="infoItem">
+                <div>Controller Type</div>
+                <div id="controllerType">Keyboard</div>
+            </div>
+            
+            <div class="infoItem">
+                <div>Current Command</div>
+                <div id="currentCommand"></div>
+            </div>
         </div>
     </div>
+
+    <script>
+        // Toggle dark mode
+        function toggleDarkMode() {
+            const body = document.querySelector('body');
+            body.classList.toggle('dark-mode',true);
+            body.classList.toggle('light-mode',false);
+        }
+
+        function toggleLightMode() {
+            const body = document.querySelector('body');
+            body.classList.toggle('dark-mode',false);
+            body.classList.toggle('light-mode',true);
+        }
+
+        toggleDarkMode();
+    </script>
 </body>
 </html>

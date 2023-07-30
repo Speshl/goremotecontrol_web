@@ -17,7 +17,7 @@ setInterval(() => {
     }else{
         command = keyPressTracker.getCommand();
     }
-    document.getElementById('currentCommand').innerHTML = 'Esc: '+command[0] + ' Servo: '+command[1] + ' Pan: ' + command[2] + ' Tilt: ' + command[3];
+    document.getElementById('currentCommand').innerHTML = 'Esc: '+command[0] + ' Servo: '+command[1]/* + ' Pan: ' + command[2] + ' Tilt: ' + command[3]*/;
         //Send the command we generated
         if (camPlayer.gotRemoteDescription()) {
             camPlayer.getSocket().emit('command', command);

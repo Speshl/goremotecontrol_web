@@ -13,21 +13,25 @@ class CamPlayer {
         this.pc.onicecandidateerror = e => {
             //log("ICE Candidate Error: "+JSON.stringify(e))
             console.log("Connection State: "+JSON.stringify(e))
+            document.getElementById('statusMsg').innerHTML = "ERROR";
         }
         
         this.pc.onconnectionstatechange = e => {
             //log("Connection State: "+pc.iceConnectionState)
             console.log("Connection State: "+this.pc.iceGatheringState)
+            document.getElementById('statusMsg').innerHTML = +this.pc.iceGatheringState;
         }
         
         this.pc.onicegatheringstatechange = e => {
             //log("Ice Gathering State: "+pc.iceConnectionState)
             console.log("Ice Gathering State: "+this.pc.iceGatheringState)
+            //document.getElementById('statusMsg').innerHTML = +this.pc.iceGatheringState;
         }
         
         this.pc.oniceconnectionstatechange = e => {
             //log("Ice Connection State: "+pc.iceConnectionState)
             console.log("Ice Connection State: "+this.pc.iceConnectionState)
+            document.getElementById('statusMsg').innerHTML = +this.pc.iceGatheringState;
         }
 
         this.pc.onicecandidate = event => {
@@ -69,6 +73,7 @@ class CamPlayer {
                     console.log(JSON.stringify(this.pc.remoteDescription));
                 })
                 .catch((error) => {
+                    document.getElementById('statusMsg').innerHTML = "ERROR";
                     console.error("Error setting remote description:", error);
                     alert("Error setting remote description: " + error.message);
                 });
@@ -83,12 +88,15 @@ class CamPlayer {
                     console.log("Added ICE candidate");
                 }, 1000);
             } catch (e) {
+                document.getElementById('statusMsg').innerHTML = "ERROR";
                 alert(e);
             }
         });
 
         //Send offer to server to start connection process after a 500 ms delay
         setTimeout(() => {
+            document.getElementById('statusMsg').innerHTML = "Sending Offer...";
+            statusMsg.innerText("Sending Offer...")
             this.pc.createOffer().then(d => this.pc.setLocalDescription(d)).catch(log);
         },500);
     }

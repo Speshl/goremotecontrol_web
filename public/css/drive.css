@@ -1,0 +1,33 @@
+  body {
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+
+    display: grid;
+    justify-content: center; /* Center horizontally */
+}
+
+#mainContainer {
+    text-align: center;
+    padding: 20px;
+    max-width: 800px;
+}
+
+#videoDiv {
+    width: 640px;
+    height: 480px;
+    margin: 0 auto;
+    border: 1px solid;
+}
+
+#infoContainer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    margin-top: 20px;
+}
+
+.infoItem {
+    padding: 5px;
+    text-align: center;
+}
