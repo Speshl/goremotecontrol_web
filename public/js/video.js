@@ -53,6 +53,7 @@ class CamPlayer {
             el.playsinline = true;
             el.controls = true;
             document.getElementById('videoDiv').appendChild(el);
+            document.getElementById('statusMsg').innerHTML = "Got Video...";
         }
         
         //Offer to receive 1 audio, and 1 video track
