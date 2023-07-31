@@ -186,7 +186,7 @@ func (c *CarCommand) sendNeutral() {
 
 func (c *CarCommand) sendCommand(command Command) {
 	if !c.options.DisableCommands {
-		log.Printf("Sending Command: %+v", command)
+		//log.Printf("Sending Command: %+v", command)
 		c.pins.esc.DutyCycle(command.esc, cycleLen)
 		c.pins.servo.DutyCycle(command.servo, cycleLen)
 		// c.pins.pan.DutyCycle(command.pan, cycleLen)
