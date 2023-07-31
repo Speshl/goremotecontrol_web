@@ -23,6 +23,8 @@ class GamePadTracker {
                 return myGamepad;
             }else if(myGamepad.id.toLowerCase().includes("g27")){
                 return myGamepad;
+            }else if(myGamepad.id.toLowerCase().includes("B684")){
+                return myGamepad;
             }
         }
         return null;
