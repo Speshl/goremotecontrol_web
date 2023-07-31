@@ -217,46 +217,46 @@ class GamePadTracker {
         }
         command[1] = steerCommand;
     
-        //dpad    Pan/Tilt
-        dpadValue = myGamepad.axes[9].toFixed(2)
-        const upkey = -1.00
-        const uprightkey = -0.71429
-        const rightkey = -0.42857
-        const downrightkey = -0.14286
-        const downkey = 0.14286
-        const downleftkey = 0.42857
-        const leftkey = 0.71429
-        const upleftkey = 1.00
+        // //dpad    Pan/Tilt
+        // dpadValue = myGamepad.axes[9].toFixed(2)
+        // const upkey = -1.00
+        // const uprightkey = -0.71429
+        // const rightkey = -0.42857
+        // const downrightkey = -0.14286
+        // const downkey = 0.14286
+        // const downleftkey = 0.42857
+        // const leftkey = 0.71429
+        // const upleftkey = 1.00
     
-        if(dpadValue == upkey.toFixed(2)){
-            //up
-            command[3] = 255;
-        }else if(dpadValue == uprightkey.toFixed(2)){
-            //up-right
-            command[3] = 255;
-            command[2] = 255;
-        }else if(dpadValue == rightkey.toFixed(2)){
-            //right
-            command[2] = 255;
-        }else if(dpadValue == downrightkey.toFixed(2)){
-            //down-right
-            command[2] = 255;
-            command[3] = 0;
-        }else if(dpadValue == downkey.toFixed(2)){
-            //down
-            command[3] = 0;
-        }else if(dpadValue == downleftkey.toFixed(2)){
-            //down-left
-            command[3] = 0;
-            command[2] = 0;
-        }else if(dpadValue == leftkey.toFixed(2)){
-            //left
-            command[2] = 0;
-        }else if(dpadValue == upleftkey.toFixed(2)){
-            //up-left
-            command[2] = 0;
-            command[3] = 255;
-        }
+        // if(dpadValue == upkey.toFixed(2)){
+        //     //up
+        //     command[3] = 255;
+        // }else if(dpadValue == uprightkey.toFixed(2)){
+        //     //up-right
+        //     command[3] = 255;
+        //     command[2] = 255;
+        // }else if(dpadValue == rightkey.toFixed(2)){
+        //     //right
+        //     command[2] = 255;
+        // }else if(dpadValue == downrightkey.toFixed(2)){
+        //     //down-right
+        //     command[2] = 255;
+        //     command[3] = 0;
+        // }else if(dpadValue == downkey.toFixed(2)){
+        //     //down
+        //     command[3] = 0;
+        // }else if(dpadValue == downleftkey.toFixed(2)){
+        //     //down-left
+        //     command[3] = 0;
+        //     command[2] = 0;
+        // }else if(dpadValue == leftkey.toFixed(2)){
+        //     //left
+        //     command[2] = 0;
+        // }else if(dpadValue == upleftkey.toFixed(2)){
+        //     //up-left
+        //     command[2] = 0;
+        //     command[3] = 255;
+        // }
         
         return command;
     }
