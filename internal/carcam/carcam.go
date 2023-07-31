@@ -58,7 +58,7 @@ func NewCarCam(options CameraOptions) (*CarCam, error) {
 			DeNoise:        options.DeNoise,
 			Rotation:       options.Rotation,
 			Level:          "4.2",
-			Profile:        "baseline", //baseline, main or high
+			Profile:        options.Profile, //baseline, main or high
 		},
 	}, nil
 }
