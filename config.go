@@ -18,7 +18,7 @@ const DefaultHeight = "480"
 const DefaultFPS = "60"
 const DefaultVerticalFlip = false
 const DefaultHorizontalFlip = false
-const DefaultProfile = "high"
+const DefaultProfile = "baseline"
 
 const disableVideo = false //used for debug, starting cam can fail without a restart
 
