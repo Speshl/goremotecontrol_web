@@ -18,7 +18,13 @@ class GamePadTracker {
 
     getGamePad() {
         if(this.gamepadIndex !== -1) {
-            const myGamepad = navigator.getGamepads()[this.gamepadIndex];
+            const myGamepads = navigator.getGamepads();
+            const myGamepad = myGamepads[this.gamepadIndex];
+
+            for(let i=0; i<myGamepads.length; i++){
+                console.log("GamePade ID: ",myGamepads[i].id);
+            }
+
             if(myGamepad.id.toLowerCase().includes("xbox")){
                 return myGamepad;
             }else if(myGamepad.id.toLowerCase().includes("g27")){
