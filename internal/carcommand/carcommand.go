@@ -125,7 +125,7 @@ func (c *CarCommand) Start(ctx context.Context) error {
 					//log.Printf("command was already used, skipping")
 				}
 				seenSameCommand++
-				if seenSameCommand >= 5 {
+				if seenSameCommand >= 1000 {
 					if !warned {
 						log.Println("no command, sending neutral")
 					}
