@@ -170,9 +170,9 @@ class GamePadTracker {
     commandFromTGT(myGamepad) {
         let command = this.neutralCommand;
         //esc
-        if(myGamepad.axes[2] < .9){
+        if(myGamepad.axes[5] < .9){
             command[0] = this.mapToRange(myGamepad.axes[5], -1, 1, 127, 255);
-        }else if(myGamepad.axes[5] < .9){
+        }else if(myGamepad.axes[1] < .9){
             command[0] = this.mapToRange(myGamepad.axes[1], -1, 1, 0, 127);
         }else{
             command[0] = 127;
@@ -189,22 +189,22 @@ class GamePadTracker {
         }
 
         //steering trim
-        if(myGamepad.buttons[14].pressed  && this.trimLeftPress == false){ //new press
+        if(myGamepad.buttons[3].pressed  && this.trimLeftPress == false){ //new press
             this.trimLeftPress = true;
             this.steeringTrim--;
             if(this.steeringTrim > this.minTrim){
                 this.steeringTrim--;
             }
-        }else if (!myGamepad.buttons[14].pressed  && this.trimLeftPress == true){
+        }else if (!myGamepad.buttons[3].pressed  && this.trimLeftPress == true){
             this.trimLeftPress = false;
         }
 
-        if(myGamepad.buttons[3].pressed  && this.trimRightPress == false){ //new press
+        if(myGamepad.buttons[4].pressed  && this.trimRightPress == false){ //new press
             this.trimRightPress = true;
             if(this.steeringTrim < this.maxTrim){
                 this.steeringTrim++;
             }
-        }else if (!myGamepad.buttons[15].pressed  && this.trimRightPress == true){
+        }else if (!myGamepad.buttons[4].pressed  && this.trimRightPress == true){
             this.trimRightPress = false;
         }
         
