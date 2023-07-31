@@ -15,7 +15,7 @@ class GamePadTracker {
             if(myGamepads != null && myGamepads[event.gamepad.index] != null){
                 this.gamepadIndex = event.gamepad.index;
             }else{
-                console.log("Got event from null gamepad: ", event.gamepad.index)
+                console.log("Got event from null gamepad: ", event.gamepad.index);
             }
         });
 
@@ -26,21 +26,21 @@ class GamePadTracker {
             const myGamepads = navigator.getGamepads();
             const myGamepad = myGamepads[this.gamepadIndex];
 
-            console.log("Gamepad Index: ", this.gamepadIndex);
-            console.log("Number Controllers Found: ", myGamepads.length);
-            for(let i=0; i<myGamepads.length; i++){
-                if(myGamepads[i] != null){
-                    console.log("GamePad ID: ",myGamepads[i].id);
-                }else{
-                    console.log("Game pad index" + i + " is null");
-                }
-            }
+            // console.log("Gamepad Index: ", this.gamepadIndex);
+            // console.log("Number Controllers Found: ", myGamepads.length);
+            // for(let i=0; i<myGamepads.length; i++){
+            //     if(myGamepads[i] != null){
+            //         console.log("GamePad ID: ",myGamepads[i].id);
+            //     }else{
+            //         console.log("Game pad index" + i + " is null");
+            //     }
+            // }
 
             if(myGamepad.id.toLowerCase().includes("xbox")){
                 return myGamepad;
             }else if(myGamepad.id.toLowerCase().includes("g27")){
                 return myGamepad;
-            }else if(myGamepad.id.toLowerCase().includes("B684")){
+            }else if(myGamepad.id.toLowerCase().includes("b684")){
                 return myGamepad;
             }
         }
@@ -56,8 +56,7 @@ class GamePadTracker {
                 command = this.commandFromXbox(myGamepad);
             }else if(myGamepad.id.toLowerCase().includes("g27")){
                 command = this.commandFromG27(myGamepad);
-            }
-            else if(myGamepad.id.toLowerCase().includes("B684")){
+            }else if(myGamepad.id.toLowerCase().includes("B684")){
                 command = this.commandFromTGT(myGamepad);
             }else{
                 document.getElementById('controllerType').innerHTML = "Unsupported - " + myGamepad.id;
