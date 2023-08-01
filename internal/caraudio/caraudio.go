@@ -2,6 +2,7 @@ package caraudio
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"os/exec"
@@ -32,11 +33,14 @@ func (c *CarAudio) Play(ctx context.Context) error {
 	args := []string{
 		"~/scripts/starwars.wav",
 	}
-	cmd := exec.CommandContext(ctx, "aplay", args...)
+	cmd := exec.CommandContext(ctx, "sudo aplay", args...)
 	err := cmd.Start()
 	if err != nil {
-		return err
+		return fmt.Errorf("error starting audio playback - %w", err)
 	}
 	err = cmd.Wait()
-	return err
+	if err != nil {
+		return fmt.Errorf("error during audio playback - %w", err)
+	}
+	return nil
 }
