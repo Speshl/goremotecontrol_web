@@ -33,7 +33,7 @@ func (c *CarAudio) Play(ctx context.Context) error {
 	args := []string{
 		"~/scripts/starwars.wav",
 	}
-	cmd := exec.CommandContext(ctx, "sudo aplay", args...)
+	cmd := exec.CommandContext(ctx, "aplay", args...)
 	err := cmd.Start()
 	if err != nil {
 		return fmt.Errorf("error starting audio playback - %w", err)
