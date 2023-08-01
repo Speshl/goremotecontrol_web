@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Speshl/goremotecontrol_web/internal/caraudio"
 	carcam "github.com/Speshl/goremotecontrol_web/internal/carcam"
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	"github.com/Speshl/goremotecontrol_web/internal/server"
@@ -21,6 +22,20 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	carConfig := GetConfig(ctx)
+
+	carAudio, err := caraudio.NewCarAudio(carConfig.audioConfig)
+	if err != nil {
+		log.Printf("NewCarCam error: %s\n", err)
+	}
+
+	go func() {
+		err = carAudio.Play(ctx)
+		if err != nil {
+			log.Printf("caraudio error: %s\n", err.Error())
+		}
+		//cancel() //stop anything else on this context because camera stopped
+		log.Println("Finished Playing Star Wars")
+	}()
 
 	//Temp way to connect client to server before splitting client out to separate repo
 	carCam, err := carcam.NewCarCam(carConfig.camConfig)
