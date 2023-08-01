@@ -1,3 +1,3 @@
 #!/bin/sh
 
-sudo aplay ./internal/caraudio/starwars.wav
+sudo aplay $1

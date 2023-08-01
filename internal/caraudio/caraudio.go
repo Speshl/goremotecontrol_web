@@ -3,16 +3,9 @@ package caraudio
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"os/exec"
 )
-
-type readerAtSeeker interface {
-	io.Reader
-	io.ReaderAt
-	io.Seeker
-}
 
 type CarAudio struct {
 	options AudioOptions
@@ -30,11 +23,11 @@ func NewCarAudio(options AudioOptions) (*CarAudio, error) {
 
 func (c *CarAudio) Play(ctx context.Context) error {
 	log.Println("Start playing Star Wars")
-	// args := []string{
-	// 	"-c", "./play.sh",
-	// }
-	// cmd := exec.Command("/bin/sh", args...)
-	cmd := exec.Command("sudo aplay ./internal/caraudio/starwars.wav")
+	args := []string{
+		"-c", "./play.sh",
+		"./internal/caraudio/starwars.wav",
+	}
+	cmd := exec.Command("/bin/sh", args...)
 	err := cmd.Start()
 	if err != nil {
 		return fmt.Errorf("error starting audio playback - %w", err)
