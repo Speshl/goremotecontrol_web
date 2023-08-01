@@ -3,6 +3,7 @@ package caraudio
 import (
 	"context"
 	"io"
+	"log"
 	"os/exec"
 )
 
@@ -27,6 +28,7 @@ func NewCarAudio(options AudioOptions) (*CarAudio, error) {
 }
 
 func (c *CarAudio) Play(ctx context.Context) error {
+	log.Println("Start playing Star Wars")
 	args := []string{
 		"~/scripts/starwars.wav",
 	}
@@ -35,6 +37,6 @@ func (c *CarAudio) Play(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	defer cmd.Wait()
-	return nil
+	err = cmd.Wait()
+	return err
 }
