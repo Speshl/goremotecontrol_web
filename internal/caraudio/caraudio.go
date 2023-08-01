@@ -31,9 +31,10 @@ func NewCarAudio(options AudioOptions) (*CarAudio, error) {
 func (c *CarAudio) Play(ctx context.Context) error {
 	log.Println("Start playing Star Wars")
 	args := []string{
+		"-c", "sudo aplay",
 		"~/scripts/starwars.wav",
 	}
-	cmd := exec.CommandContext(ctx, "aplay", args...)
+	cmd := exec.CommandContext(ctx, "/bin/sh", args...)
 	err := cmd.Start()
 	if err != nil {
 		return fmt.Errorf("error starting audio playback - %w", err)
