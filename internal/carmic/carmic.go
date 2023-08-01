@@ -49,20 +49,26 @@ func (c *CarMic) createPipeline() (*gst.Pipeline, error) {
 		return nil, err
 	}
 
+	opusenc, err := gst.NewElement("opusenc")
+	if err != nil {
+		return nil, err
+	}
+
 	sink, err := app.NewAppSink()
 	if err != nil {
 		return nil, err
 	}
 
-	pipeline.AddMany(src, sink.Element)
-	src.Link(sink.Element)
+	pipeline.AddMany(src, opusenc, sink.Element)
+	src.Link(opusenc)
+	opusenc.Link(sink.Element)
 
 	// Tell the appsink what format we want. It will then be the audiotestsrc's job to
 	// provide the format we request.
 	// This can be set after linking the two objects, because format negotiation between
 	// both elements will happen during pre-rolling of the pipeline.
 	sink.SetCaps(gst.NewCapsFromString(
-		"audio/x-raw, format=S16LE, layout=interleaved, channels=1, rate=48000",
+		"audio/opus",
 	))
 
 	// Getting data out of the appsink is done by setting callbacks on it.
@@ -94,7 +100,7 @@ func (c *CarMic) createPipeline() (*gst.Pipeline, error) {
 
 			c.AudioTrack.WriteSample(media.Sample{
 				Data:     sampleBytes,
-				Duration: time.Microsecond * 21,
+				Duration: time.Millisecond * 20, //This is the default for opus
 			})
 
 			defer buffer.Unmap()
@@ -157,6 +163,7 @@ func (c *CarMic) Start(ctx context.Context) error {
 		}
 		return c.mainLoop(ctx, pipeline)
 	})
+	return nil
 }
 
 // Run is used to wrap the given function in a main loop and print any error

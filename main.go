@@ -18,8 +18,8 @@ import (
 )
 
 func main() {
+	log.Println("starting server...")
 	defer log.Println("server stopped")
-	log.Println("Starting server...")
 	ctx, cancel := context.WithCancel(context.Background())
 
 	carConfig := GetConfig(ctx)
@@ -39,6 +39,7 @@ func main() {
 	carMic, err := carmic.NewCarMic(carConfig.micConfig)
 	if err != nil {
 		log.Printf("NewCarMic error: %s\n", err)
+		cancel() //stop anything else on this context because mic stopped
 	}
 
 	go func() {
@@ -54,6 +55,7 @@ func main() {
 	carCam, err := carcam.NewCarCam(carConfig.camConfig)
 	if err != nil {
 		log.Printf("NewCarCam error: %s\n", err)
+		cancel() //stop anything else on this context because camera stopped
 	}
 
 	go func() {
