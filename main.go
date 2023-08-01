@@ -29,12 +29,12 @@ func main() {
 	}
 
 	go func() {
-		err = carAudio.Play(ctx)
+		err = carAudio.Play(ctx, "startup")
 		if err != nil {
 			log.Printf("caraudio error: %s\n", err.Error())
 		}
 		//cancel() //stop anything else on this context because camera stopped
-		log.Println("Finished Playing Star Wars")
+		log.Println("finished playing startup")
 	}()
 
 	//Temp way to connect client to server before splitting client out to separate repo

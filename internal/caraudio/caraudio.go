@@ -7,6 +7,11 @@ import (
 	"os/exec"
 )
 
+var soundMap = map[string]string{
+	"startup":  "./internal/caraudio/audio/startup.mp3",
+	"starwars": "./internal/caraudio/audio/starwars.wav",
+}
+
 type CarAudio struct {
 	options AudioOptions
 }
@@ -21,12 +26,17 @@ func NewCarAudio(options AudioOptions) (*CarAudio, error) {
 	}, nil
 }
 
-func (c *CarAudio) Play(ctx context.Context) error {
-	log.Println("Start playing Star Wars")
+func (c *CarAudio) Play(ctx context.Context, sound string) error {
+
+	soundPath, ok := soundMap[sound]
+	if !ok {
+		return fmt.Errorf("sound not found")
+	}
+
+	log.Printf("start playing %s\n", sound)
 	args := []string{
-		// "-c",
 		"./play.sh",
-		"./internal/caraudio/starwars.wav",
+		soundPath,
 	}
 	cmd := exec.Command("/bin/sh", args...)
 	err := cmd.Start()
@@ -37,5 +47,6 @@ func (c *CarAudio) Play(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("error during audio playback - %w", err)
 	}
+	log.Printf("finished playing %s\n", sound)
 	return nil
 }
