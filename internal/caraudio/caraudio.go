@@ -8,7 +8,7 @@ import (
 )
 
 var soundMap = map[string]string{
-	"startup":  "./internal/caraudio/audio/startup.mp3",
+	"startup":  "./internal/caraudio/audio/startup.wav",
 	"starwars": "./internal/caraudio/audio/starwars.wav",
 }
 
