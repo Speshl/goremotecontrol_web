@@ -6,9 +6,10 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/Speshl/goremotecontrol_web/internal/caraudio"
-	carcam "github.com/Speshl/goremotecontrol_web/internal/carcam"
+	"github.com/Speshl/goremotecontrol_web/internal/carcam"
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
+	"github.com/Speshl/goremotecontrol_web/internal/carmic"
+	"github.com/Speshl/goremotecontrol_web/internal/carspeaker"
 )
 
 const DefaultCarName = "Car-Alpha"
@@ -40,7 +41,8 @@ const disableCommands = false //used for debug, when commands are sent pi needs 
 type CarConfig struct {
 	camConfig     carcam.CameraOptions
 	commandConfig carcommand.CommandOptions
-	audioConfig   caraudio.AudioOptions
+	speakerConfig carspeaker.SpeakerOptions
+	micConfig     carmic.MicOptions
 }
 
 func GetConfig(ctx context.Context) CarConfig {

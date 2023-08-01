@@ -10,9 +10,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Speshl/goremotecontrol_web/internal/caraudio"
-	carcam "github.com/Speshl/goremotecontrol_web/internal/carcam"
+	"github.com/Speshl/goremotecontrol_web/internal/carcam"
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
+	"github.com/Speshl/goremotecontrol_web/internal/carmic"
+	"github.com/Speshl/goremotecontrol_web/internal/carspeaker"
 	"github.com/Speshl/goremotecontrol_web/internal/server"
 )
 
@@ -23,16 +24,30 @@ func main() {
 
 	carConfig := GetConfig(ctx)
 
-	carAudio, err := caraudio.NewCarAudio(carConfig.audioConfig)
+	carSpeaker, err := carspeaker.NewCarSpeaker(carConfig.speakerConfig)
 	if err != nil {
 		log.Printf("NewCarCam error: %s\n", err)
 	}
 
 	go func() {
-		err = carAudio.Play(ctx, "startup")
+		err = carSpeaker.Play(ctx, "startup")
 		if err != nil {
 			log.Printf("caraudio error: %s\n", err.Error())
 		}
+	}()
+
+	carMic, err := carmic.NewCarMic(carConfig.micConfig)
+	if err != nil {
+		log.Printf("NewCarMic error: %s\n", err)
+	}
+
+	go func() {
+		err = carMic.Start(ctx)
+		if err != nil {
+			log.Printf("carmic error: %s\n", err.Error())
+		}
+		cancel() //stop anything else on this context because mic stopped
+		log.Println("Stopping due to carmic stopping unexpectedly")
 	}()
 
 	//Temp way to connect client to server before splitting client out to separate repo
@@ -63,7 +78,7 @@ func main() {
 		log.Println("Stopping due to carcommand stopping unexpectedly")
 	}()
 
-	socketServer := server.NewServer(carCam, carCommand)
+	socketServer := server.NewServer(carMic.AudioTrack, carCam.VideoTrack, carCommand.CommandChannel)
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()
 

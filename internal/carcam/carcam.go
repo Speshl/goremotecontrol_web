@@ -11,7 +11,6 @@ import (
 )
 
 type CarCam struct {
-	AudioTrack   *webrtc.TrackLocalStaticSample
 	VideoTrack   *webrtc.TrackLocalStaticSample
 	videoChannel chan []byte
 	options      CameraOptions
@@ -32,12 +31,6 @@ type CameraOptions struct {
 }
 
 func NewCarCam(options CameraOptions) (*CarCam, error) {
-	// Create a audio track
-	audioTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: "audio/opus"}, "audio", "pion1")
-	if err != nil {
-		return nil, fmt.Errorf("error creating audio track: %w", err)
-	}
-
 	// Create a video track
 	videoTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: webrtc.MimeTypeH264}, "video", "pion")
 	if err != nil {
@@ -45,7 +38,6 @@ func NewCarCam(options CameraOptions) (*CarCam, error) {
 	}
 
 	return &CarCam{
-		AudioTrack:   audioTrack,
 		VideoTrack:   videoTrack,
 		videoChannel: make(chan []byte, 5),
 		options: CameraOptions{
@@ -64,32 +56,8 @@ func NewCarCam(options CameraOptions) (*CarCam, error) {
 }
 
 func (c *CarCam) Start(ctx context.Context) error {
-	err := c.CreateTracks()
-	if err != nil {
-		return err
-	}
-
 	go c.StartVideoDataListener(ctx)
 	return c.StartStreaming(ctx)
-}
-
-func (c *CarCam) CreateTracks() error {
-	log.Printf("%s started creating tracks...", c.options.Name)
-	defer log.Printf("%s finished creating tracks", c.options.Name)
-
-	// Create a audio track
-	var err error
-	c.AudioTrack, err = webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: "audio/opus"}, "audio", "pion1")
-	if err != nil {
-		return fmt.Errorf("error creating audio track: %w", err)
-	}
-
-	// Create a video track
-	c.VideoTrack, err = webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: webrtc.MimeTypeH264}, "video", "pion")
-	if err != nil {
-		return fmt.Errorf("error creating first video track: %w", err)
-	}
-	return nil
 }
 
 func (c *CarCam) StartVideoDataListener(ctx context.Context) {

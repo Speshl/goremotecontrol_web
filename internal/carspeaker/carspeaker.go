@@ -1,4 +1,4 @@
-package caraudio
+package carspeaker
 
 import (
 	"context"
@@ -12,21 +12,21 @@ var soundMap = map[string]string{
 	"starwars": "./internal/caraudio/audio/starwars.wav",
 }
 
-type CarAudio struct {
-	options AudioOptions
+type CarSpeaker struct {
+	options SpeakerOptions
 }
 
-type AudioOptions struct {
+type SpeakerOptions struct {
 	Name string
 }
 
-func NewCarAudio(options AudioOptions) (*CarAudio, error) {
-	return &CarAudio{
+func NewCarSpeaker(options SpeakerOptions) (*CarSpeaker, error) {
+	return &CarSpeaker{
 		options: options,
 	}, nil
 }
 
-func (c *CarAudio) Play(ctx context.Context, sound string) error {
+func (c *CarSpeaker) Play(ctx context.Context, sound string) error {
 
 	soundPath, ok := soundMap[sound]
 	if !ok {
