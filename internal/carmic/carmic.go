@@ -49,6 +49,11 @@ func (c *CarMic) createPipeline() (*gst.Pipeline, error) {
 		return nil, err
 	}
 
+	converter, err := gst.NewElement("audioconvert")
+	if err != nil {
+		return nil, err
+	}
+
 	opusenc, err := gst.NewElement("opusenc")
 	if err != nil {
 		return nil, err
@@ -59,8 +64,9 @@ func (c *CarMic) createPipeline() (*gst.Pipeline, error) {
 		return nil, err
 	}
 
-	pipeline.AddMany(src, opusenc, sink.Element)
-	src.Link(opusenc)
+	pipeline.AddMany(src, converter, opusenc, sink.Element)
+	src.Link(converter)
+	converter.Link(opusenc)
 	opusenc.Link(sink.Element)
 
 	// Tell the appsink what format we want. It will then be the audiotestsrc's job to
