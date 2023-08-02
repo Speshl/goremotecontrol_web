@@ -44,7 +44,7 @@ func (c *CarMic) createPipeline() (*gst.Pipeline, error) {
 		return nil, err
 	}
 
-	src, err := gst.NewElement("audiotestsrc")
+	src, err := gst.NewElement("pulsesrc")
 	if err != nil {
 		return nil, err
 	}
