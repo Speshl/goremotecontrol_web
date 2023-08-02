@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/Speshl/goremotecontrol_web/internal/carcam"
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/pion/webrtc/v3"
 )
@@ -49,13 +48,13 @@ func (c *Connection) Disconnect() {
 	c.PeerConnection.Close()
 }
 
-func (c *Connection) RegisterHandlers(car *carcam.CarCam) error {
-	_, err := c.PeerConnection.AddTrack(car.AudioTrack)
+func (c *Connection) RegisterHandlers(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample) error {
+	_, err := c.PeerConnection.AddTrack(audioTrack)
 	if err != nil {
 		return fmt.Errorf("error adding audio track: %w", err)
 	}
 
-	_, err = c.PeerConnection.AddTrack(car.VideoTrack)
+	_, err = c.PeerConnection.AddTrack(videoTrack)
 	if err != nil {
 		return fmt.Errorf("error adding video track: %w", err)
 	}
