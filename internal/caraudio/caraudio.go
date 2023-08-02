@@ -8,8 +8,7 @@ import (
 )
 
 var soundMap = map[string]string{
-	"startup":  "./internal/caraudio/audio/startup.wav",
-	"starwars": "./internal/caraudio/audio/starwars.wav",
+	"startup": "./internal/caraudio/audio/startup.wav",
 }
 
 type CarAudio struct {
@@ -38,7 +37,7 @@ func (c *CarAudio) Play(ctx context.Context, sound string) error {
 		"./play.sh",
 		soundPath,
 	}
-	cmd := exec.Command("/bin/sh", args...)
+	cmd := exec.CommandContext(ctx, "/bin/sh", args...)
 	err := cmd.Start()
 	if err != nil {
 		return fmt.Errorf("error starting audio playback - %w", err)
