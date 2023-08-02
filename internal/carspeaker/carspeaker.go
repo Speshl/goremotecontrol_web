@@ -8,7 +8,32 @@ import (
 )
 
 var soundMap = map[string]string{
+	//Affirmatives
+	"kool_aid_oh_yeah":  "./internal/caraudio/audio/kool_aid_oh_yeah.wav",
+	"hell_yeah_brother": "./internal/caraudio/audio/hell_yeah_brother.wav",
+	"yeah":              "./internal/caraudio/audio/yeah.wav",
+
+	//Negatives
+	"oh_hell_no": "./internal/caraudio/audio/oh_hell_no.wav",
+	"nope":       "./internal/caraudio/audio/nope.wav",
+
+	//Aggressive
+	"move_bitch":       "./internal/caraudio/audio/move_bitch.wav",
+	"emotional_damage": "./internal/caraudio/audio/emotional_damage.wav",
+	"bruh":             "./internal/caraudio/audio/bruh.wav",
+	"spongebob_fail":   "./internal/caraudio/audio/spongebob_fail.wav",
+
+	//Sorry
+
+	//other
 	"startup": "./internal/caraudio/audio/startup.wav",
+}
+
+var soundGroups = map[string][]string{
+	"affirmative": {"kool_aid_oh_yeah", "hell_yeah_brother", "yeah"},
+	"negative":    {"oh_hell_no", "nope"},
+	"aggressive":  {"move_bitch", "emotional_damage", "bruh", "spongebob_fail"},
+	"sorry":       {""},
 }
 
 type CarSpeaker struct {
