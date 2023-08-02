@@ -90,7 +90,7 @@ func (c *CarMic) createPipeline() (*gst.Pipeline, error) {
 				return gst.FlowEOS
 			}
 
-			log.Printf("Sample Caps: %s\n", sample.GetCaps().String())
+			//log.Printf("Sample Caps: %s\n", sample.GetCaps().String())
 
 			// Retrieve the buffer from the sample
 			buffer := sample.GetBuffer()
