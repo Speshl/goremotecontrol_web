@@ -73,9 +73,9 @@ func (c *CarMic) createPipeline() (*gst.Pipeline, error) {
 	// provide the format we request.
 	// This can be set after linking the two objects, because format negotiation between
 	// both elements will happen during pre-rolling of the pipeline.
-	sink.SetCaps(gst.NewCapsFromString(
-		"audio/opus",
-	))
+	// sink.SetCaps(gst.NewCapsFromString(
+	// 	"audio/opus",
+	// ))
 
 	// Getting data out of the appsink is done by setting callbacks on it.
 	// The appsink will then call those handlers, as soon as data is available.
