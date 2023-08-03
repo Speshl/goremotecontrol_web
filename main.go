@@ -30,6 +30,15 @@ func main() {
 	}
 
 	go func() {
+		err = carSpeaker.Start(ctx)
+		if err != nil {
+			log.Printf("carspeaker error: %s\n", err.Error())
+		}
+		cancel() //stop anything else on this context because mic stopped
+		log.Println("Stopping due to carspeaker stopping unexpectedly")
+	}()
+
+	go func() {
 		err = carSpeaker.Play(ctx, "startup")
 		if err != nil {
 			log.Printf("caraudio error: %s\n", err.Error())

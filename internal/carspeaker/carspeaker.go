@@ -57,17 +57,17 @@ func NewCarSpeaker(options SpeakerOptions) (*CarSpeaker, error) {
 	}, nil
 }
 
-func (c *CarSpeaker) StartSpeakerListener(ctx context.Context) {
+func (c *CarSpeaker) Start(ctx context.Context) error {
 	for {
 		select {
 		case <-ctx.Done():
 			log.Println("speaker listener done due to ctx")
-			return
+			return nil
 		case data, ok := <-c.SpeakerChannel:
 			log.Printf("Got sound %s\n", data)
 			if !ok {
 				log.Println("speaker listener channel closed, stopping")
-				return
+				return nil
 			}
 			if c.lastPlayedAt.Add(delayBetweenSounds).Compare(time.Now()) == 1 {
 				continue //Skip playing sound so we don't spam
