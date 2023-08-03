@@ -84,7 +84,7 @@ func (s *Server) commandParser(msg []byte) {
 	//5th byte is a sound signal
 	switch msg[4] {
 	case 0:
-		break
+		log.Println("got no sound bruh")
 	case 1:
 		s.speakerChannel <- "affirmative"
 	case 2:

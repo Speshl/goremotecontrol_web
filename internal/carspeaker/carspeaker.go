@@ -64,6 +64,7 @@ func (c *CarSpeaker) StartSpeakerListener(ctx context.Context) {
 			log.Println("speaker listener done due to ctx")
 			return
 		case data, ok := <-c.SpeakerChannel:
+			log.Printf("Got sound %s\n", data)
 			if !ok {
 				log.Println("speaker listener channel closed, stopping")
 				return
