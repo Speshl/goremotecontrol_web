@@ -20,7 +20,6 @@ var soundMap = map[string]string{
 	//Negatives
 	"negative_ghostrider": "./internal/carspeaker/audio/negative_ghostrider.wav",
 	"oh_hell_no":          "./internal/carspeaker/audio/oh_hell_no.wav",
-	"hell_naw":            "./internal/carspeaker/audio/hell_naw.wav",
 
 	//Aggressive
 	"move_bitch":       "./internal/carspeaker/audio/move_bitch.wav",
@@ -36,7 +35,7 @@ var soundMap = map[string]string{
 
 var soundGroups = map[string][]string{
 	"affirmative": {"kool_aid_oh_yeah", "hell_yeah_brother", "yeah"},
-	"negative":    {"oh_hell_no", "negative_ghostrider", "hell_naw"},
+	"negative":    {"oh_hell_no", "negative_ghostrider"},
 	"aggressive":  {"move_bitch", "emotional_damage", "bruh", "spongebob_fail"},
 	"sorry":       {""},
 }
