@@ -1,0 +1,24 @@
+gst-launch-1.0 -v audiotestsrc wave=sine num-buffers=100 ! audioconvert ! opusenc ! oggmux ! filesink location=sine.ogg
+
+gst-launch-1.0 audiotestsrc wave=sine ! opusenc ! oggmux ! filesink location=test.ogg
+
+gst-launch-1.0 pulsesrc ! audioconvert ! opusenc ! oggmux ! filesink location=mic.ogg
+
+
+
+
+
+Must do below to run pulseaudio with sudo
+
+https://github.com/shivasiddharth/PulseAudio-System-Wide
+
+sudo apt-get update     
+sudo apt-get install git    
+cd /home/${USER}/       
+git clone https://github.com/shivasiddharth/PulseAudio-System-Wide       
+cd ./PulseAudio-System-Wide/      
+sudo cp ./pulseaudio.service /etc/systemd/system/pulseaudio.service    
+systemctl --system enable pulseaudio.service       
+systemctl --system start pulseaudio.service       
+sudo cp ./client.conf /etc/pulse/client.conf        
+sudo sed -i '/^pulse-access:/ s/$/root,pi/' /etc/group    
