@@ -54,11 +54,11 @@ func (c *CarSpeaker) Play(ctx context.Context, sound string) error {
 
 	soundPath, ok := soundMap[sound]
 	if !ok {
-		return fmt.Errorf("sound not found")
+		return fmt.Errorf("error: sound not found")
 	}
 
 	log.Printf("start playing %s sound\n", sound)
-	log.Printf("finished playing %s sound\n", sound)
+	defer log.Printf("finished playing %s sound\n", sound)
 	args := []string{
 		"./play.sh",
 		soundPath,
