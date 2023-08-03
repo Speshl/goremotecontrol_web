@@ -18,8 +18,9 @@ var soundMap = map[string]string{
 	"yeah":              "./internal/carspeaker/audio/yeah.wav",
 
 	//Negatives
-	"oh_hell_no": "./internal/carspeaker/audio/oh_hell_no.wav",
-	"nope":       "./internal/carspeaker/audio/nope.wav",
+	"negative_ghostrider": "./internal/carspeaker/audio/negative_ghostrider.wav",
+	"oh_hell_no":          "./internal/carspeaker/audio/oh_hell_no.wav",
+	"hell_naw":            "./internal/carspeaker/audio/hell_naw",
 
 	//Aggressive
 	"move_bitch":       "./internal/carspeaker/audio/move_bitch.wav",
