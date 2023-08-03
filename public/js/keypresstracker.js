@@ -1,5 +1,6 @@
 class KeyPressTracker {
     constructor() {
+        this.neutralCommand = [127,127,127,127,0];
         this.pressedKeys = {};
         this.steeringTrim = 0;
 
@@ -34,7 +35,7 @@ class KeyPressTracker {
     }
 
     getCommand() {
-        let command = [127,127,127,127];
+        let command = this.neutralCommand;
         if(this.pressedKeys['s'] === true) {
             command[0] = 0;
         }else if(this.pressedKeys['w'] === true) {
