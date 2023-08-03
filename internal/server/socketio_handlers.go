@@ -82,7 +82,6 @@ func (s *Server) commandParser(msg []byte) {
 	s.commandChannel <- msg[0:4] //first 4 bytes go to carCommand
 
 	//5th byte is a sound signal
-	log.Printf("sound byte %d\n", msg[4])
 	switch msg[4] {
 	case 0:
 		break

@@ -35,9 +35,10 @@ var soundMap = map[string]string{
 
 var soundGroups = map[string][]string{
 	"affirmative": {"kool_aid_oh_yeah", "hell_yeah_brother", "yeah"},
-	"negative":    {"oh_hell_no", "nope"},
-	"aggressive":  {"move_bitch", "emotional_damage", "bruh", "spongebob_fail"},
-	"sorry":       {""},
+	//"negative":    {"oh_hell_no", "nope"},
+	"negative":   {"move_bitch", "emotional_damage", "bruh", "spongebob_fail"},
+	"aggressive": {"move_bitch", "emotional_damage", "bruh", "spongebob_fail"},
+	"sorry":      {""},
 }
 
 type CarSpeaker struct {
