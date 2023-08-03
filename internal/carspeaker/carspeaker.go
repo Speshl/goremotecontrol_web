@@ -59,11 +59,16 @@ func (c *CarSpeaker) Play(ctx context.Context, sound string) error {
 
 	log.Printf("start playing %s sound\n", sound)
 	defer log.Printf("finished playing %s sound\n", sound)
+	// args := []string{
+	// 	"./play.sh",
+	// 	soundPath,
+	// }
+	// cmd := exec.CommandContext(ctx, "/bin/sh", args...)
 	args := []string{
-		"./play.sh",
+		"-D", "hw:CARD=wm8960soundcard,DEV=0",
 		soundPath,
 	}
-	cmd := exec.CommandContext(ctx, "/bin/sh", args...)
+	cmd := exec.CommandContext(ctx, "aplay", args...)
 	err := cmd.Start()
 	if err != nil {
 		return fmt.Errorf("error starting audio playback - %w", err)

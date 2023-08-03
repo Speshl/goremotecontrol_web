@@ -1,3 +1,3 @@
 #!/bin/sh
 
-sudo aplay $1 2>&1 | tee ./playOutputLog.txt
+aplay -D hw:CARD=wm8960soundcard,DEV=0 $1
