@@ -28,7 +28,7 @@ var allowOriginFunc = func(r *http.Request) bool {
 	return true
 }
 
-func NewServer(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample, speakerChannel chan string, commandChannel chan []byte) *Server {
+func NewServer(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample, commandChannel chan []byte, speakerChannel chan string) *Server {
 	socketioServer := socketio.NewServer(&engineio.Options{
 		Transports: []transport.Transport{
 			&polling.Transport{
