@@ -9,24 +9,24 @@ import (
 
 var soundMap = map[string]string{
 	//Affirmatives
-	"kool_aid_oh_yeah":  "./internal/caraudio/audio/kool_aid_oh_yeah.wav",
-	"hell_yeah_brother": "./internal/caraudio/audio/hell_yeah_brother.wav",
-	"yeah":              "./internal/caraudio/audio/yeah.wav",
+	"kool_aid_oh_yeah":  "./internal/carspeaker/audio/kool_aid_oh_yeah.wav",
+	"hell_yeah_brother": "./internal/carspeaker/audio/hell_yeah_brother.wav",
+	"yeah":              "./internal/carspeaker/audio/yeah.wav",
 
 	//Negatives
-	"oh_hell_no": "./internal/caraudio/audio/oh_hell_no.wav",
-	"nope":       "./internal/caraudio/audio/nope.wav",
+	"oh_hell_no": "./internal/carspeaker/audio/oh_hell_no.wav",
+	"nope":       "./internal/carspeaker/audio/nope.wav",
 
 	//Aggressive
-	"move_bitch":       "./internal/caraudio/audio/move_bitch.wav",
-	"emotional_damage": "./internal/caraudio/audio/emotional_damage.wav",
-	"bruh":             "./internal/caraudio/audio/bruh.wav",
-	"spongebob_fail":   "./internal/caraudio/audio/spongebob_fail.wav",
+	"move_bitch":       "./internal/carspeaker/audio/move_bitch.wav",
+	"emotional_damage": "./internal/carspeaker/audio/emotional_damage.wav",
+	"bruh":             "./internal/carspeaker/audio/bruh.wav",
+	"spongebob_fail":   "./internal/carspeaker/audio/spongebob_fail.wav",
 
 	//Sorry
 
 	//other
-	"startup": "./internal/caraudio/audio/startup.wav",
+	"startup": "./internal/carspeaker/audio/startup.wav",
 }
 
 var soundGroups = map[string][]string{
