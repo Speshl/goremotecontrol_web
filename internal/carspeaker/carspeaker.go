@@ -4,8 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"os/exec"
+	"time"
 )
+
+const delayBetweenSounds = 2 * time.Second
 
 var soundMap = map[string]string{
 	//Affirmatives
@@ -37,7 +41,9 @@ var soundGroups = map[string][]string{
 }
 
 type CarSpeaker struct {
-	options SpeakerOptions
+	SpeakerChannel chan string
+	lastPlayedAt   time.Time
+	options        SpeakerOptions
 }
 
 type SpeakerOptions struct {
@@ -46,8 +52,45 @@ type SpeakerOptions struct {
 
 func NewCarSpeaker(options SpeakerOptions) (*CarSpeaker, error) {
 	return &CarSpeaker{
-		options: options,
+		SpeakerChannel: make(chan string, 10),
+		options:        options,
 	}, nil
+}
+
+func (c *CarSpeaker) StartSpeakerListener(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			log.Println("speaker listener done due to ctx")
+			return
+		case data, ok := <-c.SpeakerChannel:
+			if !ok {
+				log.Println("speaker listener channel closed, stopping")
+				return
+			}
+			if c.lastPlayedAt.Add(delayBetweenSounds).Compare(time.Now()) == 1 {
+				continue //Skip playing sound so we don't spam
+			}
+
+			c.lastPlayedAt = time.Now()
+			go func() {
+				err := c.PlayFromGroup(ctx, data)
+				if err != nil {
+					log.Printf("failed to play sound from group - %s\n", err.Error())
+				}
+			}()
+		}
+	}
+}
+
+func (c *CarSpeaker) PlayFromGroup(ctx context.Context, group string) error {
+	soundGroup, ok := soundGroups[group]
+	if !ok {
+		return fmt.Errorf("error: sound group not found")
+	}
+
+	value := rand.Intn(len(soundGroup))
+	return c.Play(ctx, soundGroup[value])
 }
 
 func (c *CarSpeaker) Play(ctx context.Context, sound string) error {
@@ -59,11 +102,6 @@ func (c *CarSpeaker) Play(ctx context.Context, sound string) error {
 
 	log.Printf("start playing %s sound\n", sound)
 	defer log.Printf("finished playing %s sound\n", sound)
-	// args := []string{
-	// 	"./play.sh",
-	// 	soundPath,
-	// }
-	// cmd := exec.CommandContext(ctx, "/bin/sh", args...)
 	args := []string{
 		"-D", "hw:CARD=wm8960soundcard,DEV=0",
 		soundPath,

@@ -17,6 +17,7 @@ type Server struct {
 	audioTrack     *webrtc.TrackLocalStaticSample
 	videoTrack     *webrtc.TrackLocalStaticSample
 	commandChannel chan []byte
+	speakerChannel chan string
 
 	socketio        *socketio.Server
 	connections     map[string]*Connection

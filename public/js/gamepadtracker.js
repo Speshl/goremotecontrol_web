@@ -1,6 +1,6 @@
 class GamePadTracker {
     constructor() {
-        this.neutralCommand = [127,127,127,127];
+        this.neutralCommand = [127,127,127,127,0];
         this.gamepadIndex = -1;
         this.steeringTrim = 0;
 
@@ -262,7 +262,7 @@ class GamePadTracker {
     }
 
     commandFromXbox(myGamepad) {
-        let command = [127,127,127,127];
+        let command = this.neutralCommand;
         //esc
         if(myGamepad.buttons[6].value > .1 &&  myGamepad.buttons[6].value >= myGamepad.buttons[7].value){
             //brake
@@ -329,6 +329,20 @@ class GamePadTracker {
         }else{
             command[3] = 127;
         }
+
+        //Quuick Sounds
+        if(myGamepad.buttons[0].pressed){
+            command[4] = 1;
+        }else if(myGamepad.buttons[1].pressed){
+            command[4] = 2;
+        }else if(myGamepad.buttons[2].pressed){
+            command[4] = 3;
+        }else if(myGamepad.buttons[3].pressed){
+            command[4] = 4;
+        }else{
+            command[4] = 0;
+        }
+
         return command;
     }    
 }

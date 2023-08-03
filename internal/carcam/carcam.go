@@ -64,11 +64,11 @@ func (c *CarCam) StartVideoDataListener(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Println("Data Listener Done due to ctx")
+			log.Println("video data listener done due to ctx")
 			return
 		case data, ok := <-c.videoChannel:
 			if !ok {
-				log.Println("Data channel closed, stopping")
+				log.Println("video data channel closed, stopping")
 				return
 			}
 			err := c.VideoTrack.WriteSample(media.Sample{Data: data, Duration: time.Millisecond * 17}) //TODO: Tie this to FPS

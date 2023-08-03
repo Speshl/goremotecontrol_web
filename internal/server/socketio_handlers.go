@@ -62,7 +62,7 @@ func (s *Server) onICECandidate(socketConn socketio.Conn, msg []byte) {
 }
 
 func (s *Server) onCommand(socketConn socketio.Conn, msg []byte) {
-	s.commandChannel <- msg
+	s.commandParser(msg)
 }
 
 func (s *Server) OnDisconnect(socketConn socketio.Conn, reason string) {
@@ -72,4 +72,28 @@ func (s *Server) OnDisconnect(socketConn socketio.Conn, reason string) {
 
 func (s *Server) onError(socketConn socketio.Conn, err error) {
 	log.Printf("connection %s error: %s\n", socketConn.ID(), err.Error())
+}
+
+func (s *Server) commandParser(msg []byte) {
+	if len(msg) != 5 {
+		log.Println("error: command is incorrect length")
+	}
+
+	s.commandChannel <- msg[0:4] //first 4 bytes go to carCommand
+
+	//5th byte is a sound signal
+	switch msg[4] {
+	case 0:
+		break
+	case 1:
+		s.speakerChannel <- "affirmative"
+	case 2:
+		s.speakerChannel <- "negative"
+	case 3:
+		s.speakerChannel <- "aggressive"
+	case 4:
+		s.speakerChannel <- "sorry"
+	default:
+		log.Println("error: invalid sound command")
+	}
 }
