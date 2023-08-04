@@ -138,11 +138,15 @@ class CamPlayer {
 
     async startMicrophone() {
         try{
-            mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaStream.getTracks().forEach(track => this.pc.addTrack(track, mediaStream));
+            if(navigator.mediaDevices != null){
+                mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaStream.getTracks().forEach(track => this.pc.addTrack(track, mediaStream));
+            }else{
+                console.log("No media devices found");
+            }
         }
         catch (error) {
-            console.error("Error accessing microphone:", error);
+            console.log("Error accessing microphone:", error);
         }
     }
 
