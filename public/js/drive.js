@@ -1,10 +1,12 @@
 //Startup all the processes we need
 const camPlayer = new CamPlayer();
 
-camPlayer.startMicrophone().then(() => {
-    camPlayer.setupListeners();
-    camPlayer.sendOfferWithDelay(500);
-})
+setTimeout(() => {
+    camPlayer.startMicrophone().then(() => {
+        camPlayer.setupListeners();
+        camPlayer.sendOffer();
+    });
+},500);
 
 const keyPressTracker = new KeyPressTracker();
 const gamePadTracker = new GamePadTracker();
