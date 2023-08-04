@@ -54,6 +54,7 @@ class CamPlayer {
                 el.muted = true;
                 el.playsinline = true;
                 el.controls = true;
+                document.getElementById('videoDiv').appendChild(el);
 
                 el.addEventListener("play", () => {
                     this.playMedia();
@@ -63,7 +64,7 @@ class CamPlayer {
                     this.pauseMedia();
                 });
 
-                el.addEventListener("volumechange", (event) =>{
+                el.addEventListener("volumechange", () =>{
                     const audio = document.getElementById('audioTrack');
                     const video = document.getElementById('videoTrack');
                     audio.volume = video.volume;
@@ -79,6 +80,7 @@ class CamPlayer {
                 el.muted = false;
                 el.playsinline = true;
                 el.controls = false;
+                document.getElementById('videoDiv').appendChild(el);
                 console.log("Audio Track Added");
             }
             
