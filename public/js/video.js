@@ -139,7 +139,7 @@ class CamPlayer {
     async startMicrophone() {
         try{
             if(navigator.mediaDevices != null){
-                mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaStream.getTracks().forEach(track => this.pc.addTrack(track, mediaStream));
             }else{
                 console.log("No media devices found");

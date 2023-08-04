@@ -6,7 +6,7 @@ setTimeout(() => {
     camPlayer.startMicrophone().then(() => {
         camPlayer.sendOffer();
     });
-},5000);
+},1000);
 
 const keyPressTracker = new KeyPressTracker();
 const gamePadTracker = new GamePadTracker();
