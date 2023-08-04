@@ -45,15 +45,40 @@ class CamPlayer {
         }
         
         this.pc.ontrack = (event) => {
-            console.log("Track Added");
-            const el = document.createElement(event.track.kind);
-            el.srcObject = event.streams[0];
-            el.autoplay = true;
-            el.muted = true;
-            el.playsinline = true;
-            el.controls = true;
-            document.getElementById('videoDiv').appendChild(el);
-            document.getElementById('statusMsg').innerHTML = "Got Video...";
+            if(event.track.kind == "video"){
+                console.log("Video Track Added");
+                const el = document.createElement("video");
+                el.id = "videoTrack";
+                el.srcObject = event.streams[0];
+                el.autoplay = true;
+                el.muted = false;
+                el.playsinline = true;
+                el.controls = true;
+
+                el.addEventListener("play", () => {
+                    this.playMedia();
+                });
+
+                el.addEventListener("pause", () => {
+                    this.pauseMedia();
+                });
+
+                el.addEventListener("volumechange", (event) =>{
+                    const audio = document.getElementById('audioTrack');
+                    const video = document.getElementById('videoTrack');
+                    audio.volume = video.volume;
+                })
+            }else{
+                console.log("Audio Track Added");
+                const el = document.createElement("audio");
+                el.id = "audioTrack";
+                el.srcObject = event.streams[0];
+                el.autoplay = false;
+                el.muted = false;
+                el.playsinline = true;
+                el.controls = false;
+            }
+            
         }
         
         //Offer to receive 1 audio, and 1 video track
@@ -107,5 +132,23 @@ class CamPlayer {
 
     gotRemoteDescription() {
         return this.gotAnswer;
+    }
+
+    pauseMedia() {
+        console.log("Pausing...");
+        const video = document.getElementById('videoTrack');
+        video.pause();
+
+        const audio = document.getElementById('audioTrack');
+        audio.pause();
+    }
+
+    playMedia() {
+        console.log("Playing...");
+        const video = document.getElementById('videoTrack');
+        video.play();
+
+        const audio = document.getElementById('audioTrack');
+        audio.play();
     }
 }
