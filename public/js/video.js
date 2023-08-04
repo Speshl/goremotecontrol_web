@@ -46,12 +46,12 @@ class CamPlayer {
         
         this.pc.ontrack = (event) => {
             if(event.track.kind == "video"){
-                console.log("Video Track Added");
+                console.log("Creating Video Track");
                 const el = document.createElement("video");
                 el.id = "videoTrack";
                 el.srcObject = event.streams[0];
                 el.autoplay = true;
-                el.muted = false;
+                el.muted = true;
                 el.playsinline = true;
                 el.controls = true;
 
@@ -67,9 +67,11 @@ class CamPlayer {
                     const audio = document.getElementById('audioTrack');
                     const video = document.getElementById('videoTrack');
                     audio.volume = video.volume;
-                })
+                });
+
+                console.log("Video Track Added");
             }else{
-                console.log("Audio Track Added");
+                console.log("Creating Audio Track");
                 const el = document.createElement("audio");
                 el.id = "audioTrack";
                 el.srcObject = event.streams[0];
@@ -77,6 +79,7 @@ class CamPlayer {
                 el.muted = false;
                 el.playsinline = true;
                 el.controls = false;
+                console.log("Audio Track Added");
             }
             
         }
