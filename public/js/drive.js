@@ -6,7 +6,7 @@ setTimeout(() => {
         camPlayer.setupListeners();
         camPlayer.sendOffer();
     });
-},500);
+},2000);
 
 const keyPressTracker = new KeyPressTracker();
 const gamePadTracker = new GamePadTracker();
