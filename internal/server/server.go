@@ -14,8 +14,8 @@ import (
 )
 
 type Server struct {
-	audioTrack     *webrtc.TrackLocalStaticSample
-	videoTrack     *webrtc.TrackLocalStaticSample
+	carAudioTrack  *webrtc.TrackLocalStaticSample
+	carVideoTrack  *webrtc.TrackLocalStaticSample
 	commandChannel chan []byte
 	speakerChannel chan string
 
@@ -46,8 +46,8 @@ func NewServer(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.Tra
 
 		speakerChannel: speakerChannel,
 		commandChannel: commandChannel,
-		audioTrack:     audioTrack,
-		videoTrack:     videoTrack,
+		carAudioTrack:  audioTrack,
+		carVideoTrack:  videoTrack,
 	}
 }
 
@@ -69,7 +69,7 @@ func (s *Server) NewClientConn(socketConn socketio.Conn) (*Connection, error) {
 		return nil, err
 	}
 
-	err = clientConn.RegisterHandlers(s.audioTrack, s.videoTrack)
+	err = clientConn.RegisterHandlers(s.carAudioTrack, s.carVideoTrack)
 	if err != nil {
 		return nil, err
 	}

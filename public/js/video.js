@@ -9,7 +9,9 @@ class CamPlayer {
             urls: 'stun:stun.l.google.com:19302'
             }]
         })
+    }
 
+    setupListeners() {
         this.pc.onicecandidateerror = e => {
             //log("ICE Candidate Error: "+JSON.stringify(e))
             console.log("Connection State: "+JSON.stringify(e))
@@ -38,7 +40,7 @@ class CamPlayer {
             if (event.candidate === null) {
                 console.log("Emmiting offer");
                 this.socket.emit('offer', btoa(JSON.stringify(this.pc.localDescription)));
-            }else{
+            } else{
                 console.log("Found Candidate");
                 this.socket.emit('candidate', btoa(JSON.stringify(event.candidate)));
             }
@@ -123,12 +125,25 @@ class CamPlayer {
                 alert(e);
             }
         });
+    }
 
-        //Send offer to server to start connection process after a 500 ms delay
-        setTimeout(() => {
-            document.getElementById('statusMsg').innerHTML = "Sending Offer...";
-            this.pc.createOffer().then(d => this.pc.setLocalDescription(d)).catch();
-        },500);
+    sendOffer() {
+        document.getElementById('statusMsg').innerHTML = "Sending Offer...";
+        this.pc.createOffer().then(d => this.pc.setLocalDescription(d)).catch();
+    }
+
+    sendOfferWithDelay(delay) {
+        setTimeout(this.sendOffer(),delay);
+    }
+
+    async startMicrophone() {
+        try{
+            mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaStream.getTracks().forEach(track => this.pc.addTrack(track, mediaStream));
+        }
+        catch (error) {
+            console.error("Error accessing microphone:", error);
+        }
     }
 
     getSocket() {

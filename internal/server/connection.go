@@ -4,8 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
+	"time"
 
 	socketio "github.com/googollee/go-socket.io"
+	"github.com/pion/rtcp"
 	"github.com/pion/webrtc/v3"
 )
 
@@ -20,8 +23,6 @@ type Connection struct {
 func NewConnection(socketConn socketio.Conn) (*Connection, error) {
 	log.Printf("Creating Client %s\n", socketConn.ID())
 
-	ctx, cancelCTX := context.WithCancel(context.Background())
-
 	peerConnection, err := webrtc.NewPeerConnection(webrtc.Configuration{
 		ICEServers: []webrtc.ICEServer{
 			{
@@ -33,6 +34,7 @@ func NewConnection(socketConn socketio.Conn) (*Connection, error) {
 		return nil, fmt.Errorf("Failed to create Peer Connection: %s", err)
 	}
 
+	ctx, cancelCTX := context.WithCancel(context.Background())
 	conn := &Connection{
 		ID:             socketConn.ID(),
 		Socket:         socketConn,
@@ -77,6 +79,34 @@ func (c *Connection) RegisterHandlers(audioTrack *webrtc.TrackLocalStaticSample,
 				log.Printf("Error encoding candidate: %s", err.Error())
 			}
 			c.Socket.Emit("candidate", encodedCandidate)
+		}
+	})
+
+	c.PeerConnection.OnTrack(func(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
+		// Send a PLI on an interval so that the publisher is pushing a keyframe every rtcpPLIInterval
+		go func() { //No clue why I need this?
+			ticker := time.NewTicker(time.Second * 3)
+			for range ticker.C {
+				errSend := c.PeerConnection.WriteRTCP([]rtcp.Packet{&rtcp.PictureLossIndication{MediaSSRC: uint32(track.SSRC())}})
+				if errSend != nil {
+					log.Printf("pli keyframe thingy error - %s\n", errSend.Error())
+				}
+			}
+		}()
+
+		log.Printf("Got track from client: %+v\n", track)
+
+		log.Printf("Track Type: ")
+		codecName := strings.Split(track.Codec().RTPCodecCapability.MimeType, "/")[1]
+		log.Printf("Track has started, of type %d: %s \n", track.PayloadType(), codecName)
+
+		buf := make([]byte, 1400)
+		for {
+			_, _, readErr := track.Read(buf)
+			if readErr != nil {
+				log.Printf("error reading client audio track - %s\n", err.Error())
+			}
+			//pipeline.Push(buf[:i])
 		}
 	})
 
