@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pion/rtcp"
 	"github.com/pion/webrtc/v3"
 	"github.com/tinyzimmer/go-glib/glib"
 	"github.com/tinyzimmer/go-gst/gst"
@@ -15,20 +16,20 @@ import (
 
 func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.Pipeline, error) {
 	// Send a PLI on an interval so that the publisher is pushing a keyframe every rtcpPLIInterval
-	// go func() { //No clue why I need this?
-	// 	ticker := time.NewTicker(time.Second * 3)
-	// 	for range ticker.C {
-	// 		errSend := c.PeerConnection.WriteRTCP([]rtcp.Packet{&rtcp.PictureLossIndication{MediaSSRC: uint32(track.SSRC())}})
-	// 		if errSend != nil {
-	// 			log.Printf("pli keyframe thingy error - %s\n", errSend.Error())
-	// 		}
-	// 	}
-	// }()
+	go func() { //No clue why I need this?
+		ticker := time.NewTicker(time.Second * 3)
+		for range ticker.C {
+			errSend := c.PeerConnection.WriteRTCP([]rtcp.Packet{&rtcp.PictureLossIndication{MediaSSRC: uint32(track.SSRC())}})
+			if errSend != nil {
+				log.Printf("pli keyframe thingy error - %s\n", errSend.Error())
+			}
+		}
+	}()
 
-	log.Printf("Got track from client: %+v\n", track)
+	log.Printf("Got track from client: %+v\n\n", track)
 
 	codecName := strings.Split(track.Codec().RTPCodecCapability.MimeType, "/")[1]
-	log.Printf("Track has started, of type %d: %s \n", track.PayloadType(), codecName)
+	log.Printf("Track has started, of type %d: %s \n\n", track.PayloadType(), codecName)
 
 	gst.Init(nil)
 
@@ -37,12 +38,12 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 		return nil, fmt.Errorf("error creating client audio pipeline - %s\n", err.Error())
 	}
 
-	elems, err := gst.NewElementMany("appsrc", "opusdec", "audioconvert", "pulsesink")
+	elems, err := gst.NewElementMany("appsrc", "opusdec", "pulsesink")
 	if err != nil {
 		return nil, fmt.Errorf("error adding client audio elements to pipeline - %s\n", err.Error())
 	}
 
-	err = elems[3].SetProperty("device", "1") //The sound hat device id from            pacmd list-cards                    index: ?
+	err = elems[2].SetProperty("device", "1") //The sound hat device id from            pacmd list-cards                    index: ?
 	if err != nil {
 		return nil, fmt.Errorf("error setting audio output device - %s\n", err.Error())
 	}
