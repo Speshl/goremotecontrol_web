@@ -27,7 +27,6 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 
 	log.Printf("Got track from client: %+v\n", track)
 
-	log.Printf("Track Type: ")
 	codecName := strings.Split(track.Codec().RTPCodecCapability.MimeType, "/")[1]
 	log.Printf("Track has started, of type %d: %s \n", track.PayloadType(), codecName)
 
@@ -43,7 +42,7 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 		return nil, fmt.Errorf("error adding client audio elements to pipeline - %s\n", err.Error())
 	}
 
-	err = elems[2].SetProperty("device", 1) //The sound hat device id from            pacmd list-cards                    index: ?
+	err = elems[3].SetProperty("device", 1) //The sound hat device id from            pacmd list-cards                    index: ?
 	if err != nil {
 		return nil, fmt.Errorf("error setting audio output device - %s\n", err.Error())
 	}
