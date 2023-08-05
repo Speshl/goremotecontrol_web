@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"strings"
 
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/pion/webrtc/v3"
@@ -80,33 +79,7 @@ func (c *Connection) RegisterHandlers(audioTrack *webrtc.TrackLocalStaticSample,
 		}
 	})
 
-	c.PeerConnection.OnTrack(func(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
-		// Send a PLI on an interval so that the publisher is pushing a keyframe every rtcpPLIInterval
-		// go func() { //No clue why I need this?
-		// 	ticker := time.NewTicker(time.Second * 3)
-		// 	for range ticker.C {
-		// 		errSend := c.PeerConnection.WriteRTCP([]rtcp.Packet{&rtcp.PictureLossIndication{MediaSSRC: uint32(track.SSRC())}})
-		// 		if errSend != nil {
-		// 			log.Printf("pli keyframe thingy error - %s\n", errSend.Error())
-		// 		}
-		// 	}
-		// }()
-
-		log.Printf("Got track from client: %+v\n", track)
-
-		log.Printf("Track Type: ")
-		codecName := strings.Split(track.Codec().RTPCodecCapability.MimeType, "/")[1]
-		log.Printf("Track has started, of type %d: %s \n", track.PayloadType(), codecName)
-
-		// buf := make([]byte, 1400)
-		// for {
-		// 	_, _, readErr := track.Read(buf)
-		// 	if readErr != nil {
-		// 		log.Printf("error reading client audio track - %s\n", err.Error())
-		// 	}
-		// 	//pipeline.Push(buf[:i])
-		// }
-	})
+	c.PeerConnection.OnTrack(c.playClientMic)
 
 	// // Add the data channel to the peer connection
 	// dataChannel, err := peerConnection.CreateDataChannel("data", nil)
