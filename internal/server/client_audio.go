@@ -38,12 +38,22 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 		return nil, fmt.Errorf("error creating client audio pipeline - %s\n", err.Error())
 	}
 
-	elems, err := gst.NewElementMany("appsrc", "opusdec", "pulsesink")
+	// elems, err := gst.NewElementMany("appsrc", "opusdec", "pulsesink")
+	// if err != nil {
+	// 	return nil, fmt.Errorf("error adding client audio elements to pipeline - %s\n", err.Error())
+	// }
+
+	// err = elems[2].SetProperty("device", "1") //The sound hat device id from            pacmd list-cards                    index: ?
+	// if err != nil {
+	// 	return nil, fmt.Errorf("error setting audio output device - %s\n", err.Error())
+	// }
+
+	elems, err := gst.NewElementMany("appsrc", "filesink")
 	if err != nil {
 		return nil, fmt.Errorf("error adding client audio elements to pipeline - %s\n", err.Error())
 	}
 
-	err = elems[2].SetProperty("device", "1") //The sound hat device id from            pacmd list-cards                    index: ?
+	err = elems[1].SetProperty("location", "appsinktest.opus") //The sound hat device id from            pacmd list-cards                    index: ?
 	if err != nil {
 		return nil, fmt.Errorf("error setting audio output device - %s\n", err.Error())
 	}
@@ -53,7 +63,8 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 
 	src := app.SrcFromElement(elems[0])
 
-	srcCaps := gst.NewCapsFromString("audio/opus,rate=48000,channels=2")
+	//srcCaps := gst.NewCapsFromString("audio/opus,rate=48000,channels=2")
+	srcCaps := gst.NewAnyCaps()
 
 	src.SetCaps(srcCaps)
 
