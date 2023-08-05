@@ -43,7 +43,14 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 		return nil, fmt.Errorf("error adding client audio elements to pipeline - %s\n", err.Error())
 	}
 
-	err = elems[0].SetProperty("format", "3") //The sound hat device id from            pacmd list-cards                    index: ?
+	formatType, err := elems[0].GetPropertyType("format")
+	if err != nil {
+		return nil, fmt.Errorf("error setting audio src caps - %s\n", err.Error())
+	}
+
+	log.Println("format type: %+v\n", formatType)
+
+	err = elems[0].SetProperty("format", '3') //The sound hat device id from            pacmd list-cards                    index: ?
 	if err != nil {
 		return nil, fmt.Errorf("error setting audio src caps - %s\n", err.Error())
 	}
