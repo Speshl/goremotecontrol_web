@@ -58,6 +58,7 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 
 	src.SetCallbacks(&app.SourceCallbacks{
 		NeedDataFunc: func(self *app.Source, _ uint) {
+			log.Println("client audio needs more data")
 
 			buf := make([]byte, 1400)
 			numRead, _, err := track.Read(buf)
@@ -71,6 +72,7 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 
 			// Push the buffer onto the pipeline.
 			self.PushBuffer(buffer) //Only push the number of bytes read
+			log.Println("client audio data send")
 		},
 	})
 	return pipeline, nil
@@ -122,7 +124,7 @@ func (c *Connection) StartClientAudio(track *webrtc.TrackRemote, _ *webrtc.RTPRe
 		var err error
 		var pipeline *gst.Pipeline
 		if pipeline, err = c.createClientAudioPipeline(track); err != nil {
-			return err
+			return fmt.Errorf("error creating pipeline - %w", err)
 		}
 		return c.mainLoop(c.CTX, pipeline)
 	})
