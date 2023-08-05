@@ -43,6 +43,26 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 		return nil, fmt.Errorf("error adding client audio elements to pipeline - %s\n", err.Error())
 	}
 
+	err = elems[0].SetProperty("format", "time") //The sound hat device id from            pacmd list-cards                    index: ?
+	if err != nil {
+		return nil, fmt.Errorf("error setting audio src caps - %s\n", err.Error())
+	}
+
+	err = elems[0].SetProperty("is-live", "true") //The sound hat device id from            pacmd list-cards                    index: ?
+	if err != nil {
+		return nil, fmt.Errorf("error setting audio src caps - %s\n", err.Error())
+	}
+
+	err = elems[0].SetProperty("do-timestamp", "true") //The sound hat device id from            pacmd list-cards                    index: ?
+	if err != nil {
+		return nil, fmt.Errorf("error setting audio src caps - %s\n", err.Error())
+	}
+
+	err = elems[0].SetProperty("name", "src") //The sound hat device id from            pacmd list-cards                    index: ?
+	if err != nil {
+		return nil, fmt.Errorf("error setting audio src caps - %s\n", err.Error())
+	}
+
 	err = elems[3].SetProperty("device", "1") //The sound hat device id from            pacmd list-cards                    index: ?
 	if err != nil {
 		return nil, fmt.Errorf("error setting audio output device - %s\n", err.Error())
