@@ -43,13 +43,13 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 		return nil, fmt.Errorf("error adding client audio elements to pipeline - %s\n", err.Error())
 	}
 
-	val, err := glib.ValueInit(glib.TYPE_ENUM)
+	val, err := glib.ValueAlloc()
 	if err != nil {
 		return nil, err
 	}
 	val.SetEnum(int(gst.FormatTime))
 
-	err = elems[0].SetPropertyValue("format", val) //The sound hat device id from            pacmd list-cards                    index: ?
+	err = elems[0].SetPropertyValue("format", val)
 	if err != nil {
 		return nil, fmt.Errorf("error setting format property - %s\n", err.Error())
 	}
