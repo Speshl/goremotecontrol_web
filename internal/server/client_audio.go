@@ -43,11 +43,13 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 		return nil, fmt.Errorf("error adding client audio elements to pipeline - %s\n", err.Error())
 	}
 
-	val, err := glib.ValueAlloc()
+	val, err := glib.ValueInit(glib.TYPE_ENUM)
 	if err != nil {
 		return nil, err
 	}
-	val.SetEnum(int(gst.FormatTime))
+	val.SetEnum(3)
+
+	log.Printf("Val: %+v\n", val)
 
 	err = elems[0].SetPropertyValue("format", val)
 	if err != nil {
