@@ -19,6 +19,7 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 	go func() { //No clue why I need this?
 		ticker := time.NewTicker(time.Second * 3)
 		for range ticker.C {
+			log.Println("Ticking")
 			errSend := c.PeerConnection.WriteRTCP([]rtcp.Packet{&rtcp.PictureLossIndication{MediaSSRC: uint32(track.SSRC())}})
 			if errSend != nil {
 				log.Printf("pli keyframe thingy error - %s\n", errSend.Error())
@@ -35,7 +36,7 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 
 	log.Println("building pipeline")
 	//pipelineString := fmt.Sprintf("appsrc format=time is-live=true do-timestamp=true name=src ! application/x-rtp, payload=%d, encoding-name=OPUS ! rtpopusdepay ! decodebin ! pulsesink device=1", track.PayloadType())
-	pipeline, err := gst.NewPipelineFromString("appsrc format=time is-live=true do-timestamp=true name=src ! application/x-rtp, payload=111, encoding-name=OPUS ! rtpopusdepay ! decodebin ! pulsesink device=1")
+	pipeline, err := gst.NewPipelineFromString("appsrc format=time is-live=true do-timestamp=true name=src ! application/x-rtp, payload=111, encoding-name=OPUS ! rtpopusdepay ! opusdec ! pulsesink device=1")
 	if err != nil {
 		return nil, fmt.Errorf("error creating client audio pipeline - %s\n", err.Error())
 	}
