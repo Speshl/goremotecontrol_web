@@ -50,7 +50,13 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 
 	log.Printf("format type name: %s\n", formatType.Name())
 
-	err = elems[0].SetProperty("format", gst.FormatTime) //The sound hat device id from            pacmd list-cards                    index: ?
+	val, err := glib.ValueInit(glib.TYPE_ENUM)
+	if err != nil {
+		return nil, err
+	}
+	val.SetEnum(int(gst.FormatTime))
+
+	err = elems[0].SetPropertyValue("format", val) //The sound hat device id from            pacmd list-cards                    index: ?
 	if err != nil {
 		return nil, fmt.Errorf("error setting audio src caps - %s\n", err.Error())
 	}
