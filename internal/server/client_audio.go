@@ -140,9 +140,12 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 			numRead := len(audioBuffer.buffer)
 			log.Printf("Got %d bytes from track\n", numRead)
 
-			if numRead <= 0 {
+			for numRead <= 0 {
 				audioBuffer.lock.Unlock()
-				return
+				time.Sleep(1 * time.Millisecond)
+				log.Println("wait loop")
+				numRead := len(audioBuffer.buffer)
+				log.Printf("Got %d bytes from track\n", numRead)
 			}
 
 			buffer := gst.NewBufferWithSize(int64(numRead))
