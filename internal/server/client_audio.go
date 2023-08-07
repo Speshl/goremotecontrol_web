@@ -34,14 +34,14 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 	gst.Init(nil)
 
 	log.Println("building pipeline")
-	pipelineString := fmt.Sprintf("appsrc format=time is-live=true do-timestamp=true name=src ! application/x-rtp, payload=%d, encoding-name=OPUS ! rtpopusdepay ! decodebin ! pulsesink device=1", track.PayloadType())
-	pipeline, err := gst.NewPipelineFromString(pipelineString)
+	//pipelineString := fmt.Sprintf("appsrc format=time is-live=true do-timestamp=true name=src ! application/x-rtp, payload=%d, encoding-name=OPUS ! rtpopusdepay ! decodebin ! pulsesink device=1", track.PayloadType())
+	pipeline, err := gst.NewPipelineFromString("appsrc format=time is-live=true do-timestamp=true name=src ! rtpopusdepay ! decodebin ! pulsesink device=1")
 	if err != nil {
 		return nil, fmt.Errorf("error creating client audio pipeline - %s\n", err.Error())
 	}
 
 	log.Println("getting elements")
-	elements, err := pipeline.GetElements()
+	srcElement, err := pipeline.GetElementByName("src")
 	if err != nil {
 		return nil, fmt.Errorf("error getting client audio pipeline elements - %s\n", err.Error())
 	}
@@ -97,13 +97,13 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 	*/
 
 	log.Println("setting source")
-	src := app.SrcFromElement(elements[0])
+	src := app.SrcFromElement(srcElement)
 
 	capsString := fmt.Sprintf("application/x-rtp, payload= %d, encoding-name=OPUS", track.PayloadType())
 	log.Println("build src caps")
 	srcCaps := gst.NewCapsFromString(capsString)
 
-	log.Println("set source caps")
+	log.Println("set source")
 	src.SetCaps(srcCaps)
 
 	log.Println("Setting callback")
