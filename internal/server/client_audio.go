@@ -43,13 +43,6 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 		return nil, fmt.Errorf("error adding client audio elements to pipeline - %s\n", err.Error())
 	}
 
-	formatType, err := elems[0].GetPropertyType("format")
-	if err != nil {
-		return nil, fmt.Errorf("error setting audio src caps - %s\n", err.Error())
-	}
-
-	log.Printf("format type name: %s\n", formatType.Name())
-
 	val, err := glib.ValueInit(glib.TYPE_ENUM)
 	if err != nil {
 		return nil, err
@@ -58,23 +51,23 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 
 	err = elems[0].SetPropertyValue("format", val) //The sound hat device id from            pacmd list-cards                    index: ?
 	if err != nil {
-		return nil, fmt.Errorf("error setting audio src caps - %s\n", err.Error())
+		return nil, fmt.Errorf("error setting format property - %s\n", err.Error())
 	}
 
-	err = elems[0].SetProperty("is-live", true)
-	if err != nil {
-		return nil, fmt.Errorf("error setting audio src caps - %s\n", err.Error())
-	}
+	// err = elems[0].SetProperty("is-live", true)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("error setting is-live property - %s\n", err.Error())
+	// }
 
-	err = elems[0].SetProperty("do-timestamp", true)
-	if err != nil {
-		return nil, fmt.Errorf("error setting audio src caps - %s\n", err.Error())
-	}
+	// err = elems[0].SetProperty("do-timestamp", true)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("error setting do-timestamp property - %s\n", err.Error())
+	// }
 
-	err = elems[0].SetProperty("name", "src")
-	if err != nil {
-		return nil, fmt.Errorf("error setting audio src caps - %s\n", err.Error())
-	}
+	// err = elems[0].SetProperty("name", "src")
+	// if err != nil {
+	// 	return nil, fmt.Errorf("error setting name property - %s\n", err.Error())
+	// }
 
 	err = elems[3].SetProperty("device", "1") //The sound hat device id from            pacmd list-cards                    index: ?
 	if err != nil {
