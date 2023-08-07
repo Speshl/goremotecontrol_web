@@ -35,7 +35,7 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 
 	log.Println("building pipeline")
 	//pipelineString := fmt.Sprintf("appsrc format=time is-live=true do-timestamp=true name=src ! application/x-rtp, payload=%d, encoding-name=OPUS ! rtpopusdepay ! decodebin ! pulsesink device=1", track.PayloadType())
-	pipeline, err := gst.NewPipelineFromString("appsrc format=time is-live=true do-timestamp=true name=src ! rtpopusdepay ! decodebin ! pulsesink device=1")
+	pipeline, err := gst.NewPipelineFromString("appsrc format=time is-live=true do-timestamp=true name=src ! application/x-rtp, payload=111, encoding-name=OPUS ! rtpopusdepay ! decodebin ! pulsesink device=1")
 	if err != nil {
 		return nil, fmt.Errorf("error creating client audio pipeline - %s\n", err.Error())
 	}
@@ -99,12 +99,12 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 	log.Println("setting source")
 	src := app.SrcFromElement(srcElement)
 
-	capsString := fmt.Sprintf("application/x-rtp, payload= %d, encoding-name=OPUS", track.PayloadType())
+	//capsString := fmt.Sprintf("application/x-rtp, payload= %d, encoding-name=OPUS", track.PayloadType())
 	log.Println("build src caps")
-	srcCaps := gst.NewCapsFromString(capsString)
+	//srcCaps := gst.NewCapsFromString(capsString)
 
 	log.Println("set source")
-	src.SetCaps(srcCaps)
+	//src.SetCaps(srcCaps)
 
 	log.Println("Setting callback")
 	src.SetCallbacks(&app.SourceCallbacks{
@@ -119,11 +119,11 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 
 			log.Printf("Got %d bytes from track\n", numRead)
 
-			buffer := gst.NewBufferFromBytes(buf[0:numRead])
+			//buffer := gst.NewBufferFromBytes(buf[0:numRead])
 
-			// buffer := gst.NewBufferWithSize(int64(numRead))
-			// buffer.Map(gst.MapWrite).WriteData(buf[0:numRead]) //send all recieved bytes since last asked
-			// buffer.Unmap()
+			buffer := gst.NewBufferWithSize(int64(numRead))
+			buffer.Map(gst.MapWrite).WriteData(buf[0:numRead]) //send all recieved bytes since last asked
+			buffer.Unmap()
 
 			// Push the buffer onto the pipeline.
 			self.PushBuffer(buffer) //Only push the number of bytes read
