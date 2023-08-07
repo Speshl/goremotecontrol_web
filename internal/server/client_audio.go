@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/pion/rtcp"
@@ -13,6 +14,11 @@ import (
 	"github.com/tinyzimmer/go-gst/gst"
 	"github.com/tinyzimmer/go-gst/gst/app"
 )
+
+type AudioBuffer struct {
+	lock   sync.RWMutex
+	buffer []byte
+}
 
 func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.Pipeline, error) {
 	// Send a PLI on an interval so that the publisher is pushing a keyframe every rtcpPLIInterval
@@ -108,23 +114,38 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 	//src.SetCaps(srcCaps)
 
 	log.Println("Setting callback")
-	src.SetCallbacks(&app.SourceCallbacks{
-		NeedDataFunc: func(self *app.Source, _ uint) {
-			log.Println("client audio needs more data")
 
+	audioBuffer := AudioBuffer{}
+
+	go func() {
+		for {
 			buf := make([]byte, 1400)
 			numRead, _, err := track.Read(buf)
 			if err != nil {
 				log.Printf("error reading from client audio buffer: %s\n", err.Error())
+				return
 			}
+			audioBuffer.lock.Lock()
+			audioBuffer.buffer = append(audioBuffer.buffer, buf[:numRead]...)
+			audioBuffer.lock.Unlock()
+		}
 
+	}()
+
+	src.SetCallbacks(&app.SourceCallbacks{
+		NeedDataFunc: func(self *app.Source, _ uint) {
+			log.Println("client audio needs more data")
+
+			audioBuffer.lock.Lock()
+			numRead := len(audioBuffer.buffer)
 			log.Printf("Got %d bytes from track\n", numRead)
 
-			//buffer := gst.NewBufferFromBytes(buf[0:numRead])
-
 			buffer := gst.NewBufferWithSize(int64(numRead))
-			buffer.Map(gst.MapWrite).WriteData(buf[0:numRead]) //send all recieved bytes since last asked
+			buffer.Map(gst.MapWrite).WriteData(audioBuffer.buffer[0:numRead]) //send all recieved bytes since last asked
 			buffer.Unmap()
+
+			audioBuffer.buffer = audioBuffer.buffer[:0]
+			audioBuffer.lock.Unlock()
 
 			// Push the buffer onto the pipeline.
 			self.PushBuffer(buffer) //Only push the number of bytes read
