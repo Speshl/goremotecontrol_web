@@ -33,12 +33,14 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 
 	gst.Init(nil)
 
+	log.Println("building pipeline")
 	pipelineString := fmt.Sprintf("appsrc format=time is-live=true do-timestamp=true name=src ! application/x-rtp, payload=%d, encoding-name=OPUS ! rtpopusdepay ! decodebin ! pulsesink device=1", track.PayloadType())
 	pipeline, err := gst.NewPipelineFromString(pipelineString)
 	if err != nil {
 		return nil, fmt.Errorf("error creating client audio pipeline - %s\n", err.Error())
 	}
 
+	log.Println("getting elements")
 	elements, err := pipeline.GetElements()
 	if err != nil {
 		return nil, fmt.Errorf("error getting client audio pipeline elements - %s\n", err.Error())
@@ -94,10 +96,14 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 	gst.ElementLinkMany(elems...)
 	*/
 
+	log.Println("setting source")
 	src := app.SrcFromElement(elements[0])
 
 	capsString := fmt.Sprintf("application/x-rtp, payload= %d, encoding-name=OPUS", track.PayloadType())
+	log.Println("build src caps")
 	srcCaps := gst.NewCapsFromString(capsString)
+
+	log.Println("set source caps")
 	src.SetCaps(srcCaps)
 
 	log.Println("Setting callback")
