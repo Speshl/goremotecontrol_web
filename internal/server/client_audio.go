@@ -33,7 +33,17 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 
 	gst.Init(nil)
 
-	pipeline, err := gst.NewPipeline("")
+	pipelineString := fmt.Sprintf("appsrc format=time is-live=true do-timestamp=true name=src ! application/x-rtp, payload=%d, encoding-name=OPUS ! rtpopusdepay ! decodebin ! pulsesink device=1", track.PayloadType())
+	pipeline, err := gst.NewPipelineFromString(pipelineString)
+	if err != nil {
+		return nil, fmt.Errorf("error creating client audio pipeline - %s\n", err.Error())
+	}
+
+	elements, err := pipeline.GetElements()
+	if err != nil {
+		return nil, fmt.Errorf("error getting client audio pipeline elements - %s\n", err.Error())
+	}
+	/*pipeline, err := gst.NewPipeline("")
 	if err != nil {
 		return nil, fmt.Errorf("error creating client audio pipeline - %s\n", err.Error())
 	}
@@ -83,10 +93,12 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 	pipeline.AddMany(elems...)
 	gst.ElementLinkMany(elems...)
 
+
 	src := app.SrcFromElement(elems[0])
 
-	src.SetCaps(srcCaps)
+	src.SetCaps(srcCaps) */
 
+	src := app.SrcFromElement(elements[0])
 	src.SetCallbacks(&app.SourceCallbacks{
 		NeedDataFunc: func(self *app.Source, _ uint) {
 			log.Println("client audio needs more data")
