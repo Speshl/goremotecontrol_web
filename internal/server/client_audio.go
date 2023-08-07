@@ -92,13 +92,15 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 
 	pipeline.AddMany(elems...)
 	gst.ElementLinkMany(elems...)
-
-
-	src := app.SrcFromElement(elems[0])
-
-	src.SetCaps(srcCaps) */
+	*/
 
 	src := app.SrcFromElement(elements[0])
+
+	capsString := fmt.Sprintf("application/x-rtp, payload= %d, encoding-name=OPUS", track.PayloadType())
+	srcCaps := gst.NewCapsFromString(capsString)
+	src.SetCaps(srcCaps)
+
+	log.Println("Setting callback")
 	src.SetCallbacks(&app.SourceCallbacks{
 		NeedDataFunc: func(self *app.Source, _ uint) {
 			log.Println("client audio needs more data")
@@ -122,6 +124,7 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 			log.Println("client audio data send")
 		},
 	})
+	log.Println("Returning pipeline")
 	return pipeline, nil
 }
 
