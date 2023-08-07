@@ -36,7 +36,7 @@ func (c *Connection) createClientAudioPipeline(track *webrtc.TrackRemote) (*gst.
 
 	log.Println("building pipeline")
 	//pipelineString := fmt.Sprintf("appsrc format=time is-live=true do-timestamp=true name=src ! application/x-rtp, payload=%d, encoding-name=OPUS ! rtpopusdepay ! decodebin ! pulsesink device=1", track.PayloadType())
-	pipeline, err := gst.NewPipelineFromString("appsrc format=time is-live=true do-timestamp=true name=src ! application/x-rtp, payload=111, encoding-name=OPUS ! rtpopusdepay ! opusdec ! queue ! pulsesink device=1")
+	pipeline, err := gst.NewPipelineFromString("appsrc format=time is-live=true do-timestamp=true name=src ! application/x-rtp, payload=111, encoding-name=OPUS ! queue ! rtpopusdepay ! decodebin ! pulsesink device=1")
 	if err != nil {
 		return nil, fmt.Errorf("error creating client audio pipeline - %s\n", err.Error())
 	}
