@@ -14,7 +14,6 @@ import (
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	"github.com/Speshl/goremotecontrol_web/internal/carmic"
 	"github.com/Speshl/goremotecontrol_web/internal/carspeaker"
-	"github.com/Speshl/goremotecontrol_web/internal/gst"
 	"github.com/Speshl/goremotecontrol_web/internal/server"
 )
 
@@ -26,11 +25,11 @@ func main() {
 	carConfig := GetConfig(ctx)
 
 	//Start client audio pipeline listener
-	go func() {
-		log.Println("starting gstreamer main loops")
-		gst.StartMainRecieveLoop() //Start gstreamer main loop from main thread
-		log.Println("warning: gstreamer main loop ended")
-	}()
+	// go func() {
+	// 	log.Println("starting gstreamer main loops")
+	// 	gst.StartMainRecieveLoop() //Start gstreamer main loop from main thread
+	// 	log.Println("warning: gstreamer main loop ended")
+	// }()
 
 	carSpeaker, err := carspeaker.NewCarSpeaker(carConfig.speakerConfig)
 	if err != nil {

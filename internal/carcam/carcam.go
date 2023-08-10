@@ -71,6 +71,7 @@ func (c *CarCam) StartVideoDataListener(ctx context.Context) {
 				log.Println("video data channel closed, stopping")
 				return
 			}
+			log.Println("Writing Sample")
 			err := c.VideoTrack.WriteSample(media.Sample{Data: data, Duration: time.Millisecond * 17}) //TODO: Tie this to FPS
 			if err != nil {
 				log.Printf("error writing sample to track: %s\n", err.Error())

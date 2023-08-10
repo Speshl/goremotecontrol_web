@@ -48,18 +48,15 @@ func (c *Connection) Disconnect() {
 }
 
 func (c *Connection) RegisterHandlers(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample) error {
-	if audioTrack != nil {
-		_, err := c.PeerConnection.AddTrack(audioTrack)
-		if err != nil {
-			return fmt.Errorf("error adding audio track: %w", err)
-		}
+
+	_, err := c.PeerConnection.AddTrack(audioTrack)
+	if err != nil {
+		return fmt.Errorf("error adding audio track: %w", err)
 	}
 
-	if videoTrack != nil {
-		_, err := c.PeerConnection.AddTrack(videoTrack)
-		if err != nil {
-			return fmt.Errorf("error adding video track: %w", err)
-		}
+	_, err = c.PeerConnection.AddTrack(videoTrack)
+	if err != nil {
+		return fmt.Errorf("error adding video track: %w", err)
 	}
 
 	// Set the handler for ICE connection state
