@@ -12,7 +12,6 @@ import (
 
 	"github.com/Speshl/goremotecontrol_web/internal/carcam"
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
-	"github.com/Speshl/goremotecontrol_web/internal/carmic"
 	"github.com/Speshl/goremotecontrol_web/internal/carspeaker"
 	"github.com/Speshl/goremotecontrol_web/internal/gst"
 	"github.com/Speshl/goremotecontrol_web/internal/server"
@@ -46,20 +45,20 @@ func main() {
 	// 	}
 	// }()
 
-	carMic, err := carmic.NewCarMic(carConfig.micConfig)
-	if err != nil {
-		log.Printf("NewCarMic error: %s\n", err)
-		cancel() //stop anything else on this context because mic stopped
-	}
+	// carMic, err := carmic.NewCarMic(carConfig.micConfig)
+	// if err != nil {
+	// 	log.Printf("NewCarMic error: %s\n", err)
+	// 	cancel() //stop anything else on this context because mic stopped
+	// }
 
-	go func() {
-		err = carMic.Start(ctx)
-		if err != nil {
-			log.Printf("carmic error: %s\n", err.Error())
-		}
-		cancel() //stop anything else on this context because mic stopped
-		log.Println("Stopping due to carmic stopping unexpectedly")
-	}()
+	// go func() {
+	// 	err = carMic.Start(ctx)
+	// 	if err != nil {
+	// 		log.Printf("carmic error: %s\n", err.Error())
+	// 	}
+	// 	cancel() //stop anything else on this context because mic stopped
+	// 	log.Println("Stopping due to carmic stopping unexpectedly")
+	// }()
 
 	//Temp way to connect client to server before splitting client out to separate repo
 	carCam, err := carcam.NewCarCam(carConfig.camConfig)
@@ -90,7 +89,7 @@ func main() {
 		log.Println("Stopping due to carcommand stopping unexpectedly")
 	}()
 
-	socketServer := server.NewServer(carMic.AudioTrack, carCam.VideoTrack, carCommand.CommandChannel, carSpeaker.SpeakerChannel)
+	socketServer := server.NewServer( /*carMic.AudioTrack*/ nil, carCam.VideoTrack, carCommand.CommandChannel, carSpeaker.SpeakerChannel)
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()
 
@@ -115,15 +114,15 @@ func main() {
 		log.Println("Stopping due to http server stopping unexpectedly")
 	}()
 
-	// go func() {
-	// 	log.Println("starting gstreamer main loop")
-	// 	gst.StartMainLoop() //Start gstreamer main loop from main thread
-	// 	log.Println("warning: gstreamer main loop ended")
-	// }()
+	go func() {
+		log.Println("starting gstreamer main loop")
+		gst.StartMainLoop() //Start gstreamer main loop from main thread
+		log.Println("warning: gstreamer main loop ended")
+	}()
 
-	log.Println("starting gstreamer main loop")
-	gst.StartMainLoop() //Start gstreamer main loop from main thread
-	log.Println("warning: gstreamer main loop ended")
+	// log.Println("starting gstreamer main loop")
+	// gst.StartMainLoop() //Start gstreamer main loop from main thread
+	// log.Println("warning: gstreamer main loop ended")
 
 	//Handle shutdown signals
 	signal.Ignore(os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
