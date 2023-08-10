@@ -6,7 +6,7 @@ typedef struct SampleHandlerUserData {
   int pipelineId;
 } SampleHandlerUserData;
 
-GMainLoop *gstreamer_send_main_loop = NULL;
+//GMainLoop *gstreamer_send_main_loop = NULL;
 GMainLoop *gstreamer_receive_main_loop = NULL;
 
 void gstreamer_receive_start_mainloop(void) {
@@ -68,9 +68,9 @@ void gstreamer_receive_push_buffer(GstElement *pipeline, void *buffer, int len) 
 }
 
 void gstreamer_send_start_mainloop(void) {
-  gstreamer_send_main_loop = g_main_loop_new(NULL, FALSE);
+  // gstreamer_send_main_loop = g_main_loop_new(NULL, FALSE);
 
-  g_main_loop_run(gstreamer_send_main_loop);
+  // g_main_loop_run(gstreamer_send_main_loop);
 }
 
 static gboolean gstreamer_send_bus_call(GstBus *bus, GstMessage *msg, gpointer data) {

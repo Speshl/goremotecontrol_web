@@ -19,7 +19,7 @@ import (
 )
 
 func InitSendLoop() {
-	go C.gstreamer_send_start_mainloop()
+	//go C.gstreamer_send_start_mainloop()
 }
 
 // Pipeline is a wrapper for a GStreamer Pipeline

@@ -32,8 +32,6 @@ func main() {
 		log.Println("warning: gstreamer main loop ended")
 	}()
 
-	time.Sleep(2 * time.Second)
-
 	carSpeaker, err := carspeaker.NewCarSpeaker(carConfig.speakerConfig)
 	if err != nil {
 		log.Printf("NewCarCam error: %s\n", err)
