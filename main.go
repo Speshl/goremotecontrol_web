@@ -23,8 +23,6 @@ func main() {
 	defer log.Println("server stopped")
 	ctx, cancel := context.WithCancel(context.Background())
 
-	gst.StartMainLoop() //Start gstreamer main loop from main thread
-
 	carConfig := GetConfig(ctx)
 
 	carSpeaker, err := carspeaker.NewCarSpeaker(carConfig.speakerConfig)
@@ -115,6 +113,11 @@ func main() {
 		}
 		cancel() //stop anything else on this context because the http server stopped
 		log.Println("Stopping due to http server stopping unexpectedly")
+	}()
+
+	go func() {
+		gst.StartMainLoop() //Start gstreamer main loop from main thread
+		log.Println("warning: gstreamer main loop ended")
 	}()
 
 	//Handle shutdown signals
