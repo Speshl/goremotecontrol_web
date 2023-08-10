@@ -31,7 +31,7 @@ type SendPipeline struct {
 	clockRate float32
 }
 
-var pipelines = make(map[int]*Pipeline)
+var pipelines = make(map[int]*SendPipeline)
 var pipelinesLock sync.Mutex
 
 const (
