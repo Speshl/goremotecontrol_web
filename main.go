@@ -115,11 +115,15 @@ func main() {
 		log.Println("Stopping due to http server stopping unexpectedly")
 	}()
 
-	go func() {
-		log.Println("starting gstreamer main loop")
-		gst.StartMainLoop() //Start gstreamer main loop from main thread
-		log.Println("warning: gstreamer main loop ended")
-	}()
+	// go func() {
+	// 	log.Println("starting gstreamer main loop")
+	// 	gst.StartMainLoop() //Start gstreamer main loop from main thread
+	// 	log.Println("warning: gstreamer main loop ended")
+	// }()
+
+	log.Println("starting gstreamer main loop")
+	gst.StartMainLoop() //Start gstreamer main loop from main thread
+	log.Println("warning: gstreamer main loop ended")
 
 	//Handle shutdown signals
 	signal.Ignore(os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
