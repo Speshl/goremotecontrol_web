@@ -32,7 +32,7 @@ func (c *Connection) PlayTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPRe
 	fmt.Printf("Track has started, of type %d: %s \n", track.PayloadType(), codecName)
 	pipeline := gst.CreateRecievePipeline(track.PayloadType(), strings.ToLower(codecName))
 	pipeline.Start()
-	c.carMic.Start()
+	c.TempCarMic.Start()
 	buf := make([]byte, 1400)
 	for {
 		i, _, err := track.Read(buf)
@@ -40,7 +40,7 @@ func (c *Connection) PlayTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPRe
 			log.Printf("error reading client audio track buffer - %w\n", err)
 		}
 
-		log.Printf("Pushing %d bytes to pipeline", i)
+		//log.Printf("Pushing %d bytes to pipeline", i)
 		pipeline.Push(buf[:i])
 	}
 }
