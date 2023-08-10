@@ -21,17 +21,17 @@ import (
 // It needs to be called from the process' main thread
 // Because many gstreamer plugins require access to the main thread
 // See: https://golang.org/pkg/runtime/#LockOSThread
-func StartMainLoop() {
+func StartMainRecieveLoop() {
 	C.gstreamer_receive_start_mainloop()
 }
 
 // Pipeline is a wrapper for a GStreamer Pipeline
-type Pipeline struct {
+type RecievePipeline struct {
 	Pipeline *C.GstElement
 }
 
 // CreatePipeline creates a GStreamer Pipeline
-func CreatePipeline(payloadType webrtc.PayloadType, codecName string) *Pipeline {
+func CreateRecievePipeline(payloadType webrtc.PayloadType, codecName string) *RecievePipeline {
 	pipelineStr := "appsrc format=time is-live=true do-timestamp=true name=src ! application/x-rtp"
 	switch strings.ToLower(codecName) {
 	case "vp8":
@@ -51,21 +51,21 @@ func CreatePipeline(payloadType webrtc.PayloadType, codecName string) *Pipeline 
 	pipelineStrUnsafe := C.CString(pipelineStr)
 	defer C.free(unsafe.Pointer(pipelineStrUnsafe))
 	log.Printf("client audio pipeline: %s\n", pipelineStr)
-	return &Pipeline{Pipeline: C.gstreamer_receive_create_pipeline(pipelineStrUnsafe)}
+	return &RecievePipeline{Pipeline: C.gstreamer_receive_create_pipeline(pipelineStrUnsafe)}
 }
 
 // Start starts the GStreamer Pipeline
-func (p *Pipeline) Start() {
+func (p *RecievePipeline) Start() {
 	C.gstreamer_receive_start_pipeline(p.Pipeline)
 }
 
 // Stop stops the GStreamer Pipeline
-func (p *Pipeline) Stop() {
+func (p *RecievePipeline) Stop() {
 	C.gstreamer_receive_stop_pipeline(p.Pipeline)
 }
 
 // Push pushes a buffer on the appsrc of the GStreamer Pipeline
-func (p *Pipeline) Push(buffer []byte) {
+func (p *RecievePipeline) Push(buffer []byte) {
 	b := C.CBytes(buffer)
 	defer C.free(b)
 	C.gstreamer_receive_push_buffer(p.Pipeline, b, C.int(len(buffer)))
