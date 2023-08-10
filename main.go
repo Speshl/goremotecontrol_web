@@ -10,7 +10,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Speshl/goremotecontrol_web/internal/carcam"
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	"github.com/Speshl/goremotecontrol_web/internal/carmic"
 	"github.com/Speshl/goremotecontrol_web/internal/carspeaker"
@@ -62,20 +61,20 @@ func main() {
 	}()
 
 	//Temp way to connect client to server before splitting client out to separate repo
-	carCam, err := carcam.NewCarCam(carConfig.camConfig)
-	if err != nil {
-		log.Printf("NewCarCam error: %s\n", err)
-		cancel() //stop anything else on this context because camera stopped
-	}
+	// carCam, err := carcam.NewCarCam(carConfig.camConfig)
+	// if err != nil {
+	// 	log.Printf("NewCarCam error: %s\n", err)
+	// 	cancel() //stop anything else on this context because camera stopped
+	// }
 
-	go func() {
-		err = carCam.Start(ctx)
-		if err != nil {
-			log.Printf("carcam error: %s\n", err.Error())
-		}
-		cancel() //stop anything else on this context because camera stopped
-		log.Println("Stopping due to carcam stopping unexpectedly")
-	}()
+	// go func() {
+	// 	err = carCam.Start(ctx)
+	// 	if err != nil {
+	// 		log.Printf("carcam error: %s\n", err.Error())
+	// 	}
+	// 	cancel() //stop anything else on this context because camera stopped
+	// 	log.Println("Stopping due to carcam stopping unexpectedly")
+	// }()
 
 	//give time for camera to start before commands start
 	time.Sleep(2 * time.Second)
@@ -90,7 +89,7 @@ func main() {
 		log.Println("Stopping due to carcommand stopping unexpectedly")
 	}()
 
-	socketServer := server.NewServer(carMic.AudioTrack, carCam.VideoTrack, carCommand.CommandChannel, carSpeaker.SpeakerChannel)
+	socketServer := server.NewServer(carMic.AudioTrack, nil /*carCam.VideoTrack*/, carCommand.CommandChannel, carSpeaker.SpeakerChannel)
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()
 
