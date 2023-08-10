@@ -60,7 +60,7 @@ func main() {
 	}
 
 	//TODO: Figure out why starting mic stop client audio
-	carMic.Start()
+	//carMic.Start()
 	log.Println("Mic Started")
 
 	// go func() {
