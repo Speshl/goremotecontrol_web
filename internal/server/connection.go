@@ -40,7 +40,7 @@ func NewConnection(socketConn socketio.Conn, carMic *carmic.CarMic) (*Connection
 		PeerConnection: peerConnection,
 		Cancel:         cancelCTX,
 		CTX:            ctx,
-		TempCarMic:     *carMic,
+		TempCarMic:     carMic,
 	}
 	return conn, nil
 }
