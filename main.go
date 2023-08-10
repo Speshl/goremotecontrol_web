@@ -52,14 +52,16 @@ func main() {
 		cancel() //stop anything else on this context because mic stopped
 	}
 
-	go func() {
-		err = carMic.Start(ctx)
-		if err != nil {
-			log.Printf("carmic error: %s\n", err.Error())
-		}
-		cancel() //stop anything else on this context because mic stopped
-		log.Println("Stopping due to carmic stopping unexpectedly")
-	}()
+	carMic.Start()
+
+	// go func() {
+	// 	err = carMic.Start(ctx)
+	// 	if err != nil {
+	// 		log.Printf("carmic error: %s\n", err.Error())
+	// 	}
+	// 	cancel() //stop anything else on this context because mic stopped
+	// 	log.Println("Stopping due to carmic stopping unexpectedly")
+	// }()
 
 	//Temp way to connect client to server before splitting client out to separate repo
 	carCam, err := carcam.NewCarCam(carConfig.camConfig)
