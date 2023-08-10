@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/googollee/go-socket.io v1.7.0
+	github.com/pion/rtcp v1.2.10
 	github.com/pion/webrtc/v3 v3.2.11
 	github.com/stianeikeland/go-rpio/v4 v4.6.0
 	github.com/tinyzimmer/go-glib v0.0.25
@@ -25,7 +26,6 @@ require (
 	github.com/pion/logging v0.2.2 // indirect
 	github.com/pion/mdns v0.0.7 // indirect
 	github.com/pion/randutil v0.1.0 // indirect
-	github.com/pion/rtcp v1.2.10 // indirect
 	github.com/pion/rtp v1.7.13 // indirect
 	github.com/pion/sctp v1.8.7 // indirect
 	github.com/pion/sdp/v3 v3.0.6 // indirect

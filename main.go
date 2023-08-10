@@ -14,6 +14,7 @@ import (
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	"github.com/Speshl/goremotecontrol_web/internal/carmic"
 	"github.com/Speshl/goremotecontrol_web/internal/carspeaker"
+	"github.com/Speshl/goremotecontrol_web/internal/gst"
 	"github.com/Speshl/goremotecontrol_web/internal/server"
 )
 
@@ -21,6 +22,8 @@ func main() {
 	log.Println("starting server...")
 	defer log.Println("server stopped")
 	ctx, cancel := context.WithCancel(context.Background())
+
+	gst.StartMainLoop() //Start gstreamer main loop from main thread
 
 	carConfig := GetConfig(ctx)
 
