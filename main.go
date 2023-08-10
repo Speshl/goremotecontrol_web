@@ -25,6 +25,13 @@ func main() {
 
 	carConfig := GetConfig(ctx)
 
+	//Start client audio pipeline listener
+	go func() {
+		log.Println("starting gstreamer main loops")
+		gst.StartMainRecieveLoop() //Start gstreamer main loop from main thread
+		log.Println("warning: gstreamer main loop ended")
+	}()
+
 	carSpeaker, err := carspeaker.NewCarSpeaker(carConfig.speakerConfig)
 	if err != nil {
 		log.Printf("NewCarCam error: %s\n", err)
@@ -115,12 +122,6 @@ func main() {
 		}
 		cancel() //stop anything else on this context because the http server stopped
 		log.Println("Stopping due to http server stopping unexpectedly")
-	}()
-
-	go func() {
-		log.Println("starting gstreamer main loops")
-		gst.StartMainRecieveLoop() //Start gstreamer main loop from main thread
-		log.Println("warning: gstreamer main loop ended")
 	}()
 
 	//Handle shutdown signals
