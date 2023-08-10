@@ -59,7 +59,7 @@ func main() {
 	// 	log.Println("Stopping due to carmic stopping unexpectedly")
 	// }()
 
-	Temp way to connect client to server before splitting client out to separate repo
+	//Temp way to connect client to server before splitting client out to separate repo
 	carCam, err := carcam.NewCarCam(carConfig.camConfig)
 	if err != nil {
 		log.Printf("NewCarCam error: %s\n", err)
@@ -88,7 +88,7 @@ func main() {
 		log.Println("Stopping due to carcommand stopping unexpectedly")
 	}()
 
-	socketServer := server.NewServer(carMic.AudioTrack, carCam.VideoTrack, nil/*carCommand.CommandChannel*/, carSpeaker.SpeakerChannel)
+	socketServer := server.NewServer(carMic.AudioTrack, carCam.VideoTrack, nil/*carCommand.CommandChannel, carSpeaker.SpeakerChannel)
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()
 
