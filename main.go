@@ -61,8 +61,6 @@ func main() {
 		cancel() //stop anything else on this context because mic stopped
 	}
 
-	carMic.Start()
-
 	// go func() {
 	// 	err = carMic.Start(ctx)
 	// 	if err != nil {
