@@ -10,6 +10,7 @@ package gst
 import "C"
 import (
 	"fmt"
+	"log"
 	"strings"
 	"unsafe"
 
@@ -49,6 +50,7 @@ func CreatePipeline(payloadType webrtc.PayloadType, codecName string) *Pipeline 
 
 	pipelineStrUnsafe := C.CString(pipelineStr)
 	defer C.free(unsafe.Pointer(pipelineStrUnsafe))
+	log.Printf("client audio pipeline: %s\n", pipelineStr)
 	return &Pipeline{Pipeline: C.gstreamer_receive_create_pipeline(pipelineStrUnsafe)}
 }
 
