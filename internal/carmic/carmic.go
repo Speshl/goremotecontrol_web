@@ -24,7 +24,7 @@ func NewCarMic(options MicOptions) (*CarMic, error) {
 		return nil, fmt.Errorf("error creating audio track: %w", err)
 	}
 
-	gst.InitSendLoop()
+	//gst.InitSendLoop()
 
 	return &CarMic{
 		AudioTrack: audioTrack,
