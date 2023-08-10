@@ -37,13 +37,13 @@ func CreateRecievePipeline(payloadType webrtc.PayloadType, codecName string) *Re
 	case "vp8":
 		pipelineStr += fmt.Sprintf(", payload=%d, encoding-name=VP8-DRAFT-IETF-01 ! rtpvp8depay ! decodebin ! autovideosink", payloadType)
 	case "opus":
-		pipelineStr += fmt.Sprintf(", payload=%d, encoding-name=OPUS ! rtpopusdepay ! decodebin ! pulsesink device=1", payloadType)
+		pipelineStr += fmt.Sprintf(", payload=%d, encoding-name=OPUS ! rtpopusdepay ! decodebin ! pulsesink device=0", payloadType)
 	case "vp9":
 		pipelineStr += " ! rtpvp9depay ! decodebin ! autovideosink"
 	case "h264":
 		pipelineStr += " ! rtph264depay ! decodebin ! autovideosink"
 	case "g722":
-		pipelineStr += " clock-rate=8000 ! rtpg722depay ! decodebin ! pulsesink device=1"
+		pipelineStr += " clock-rate=8000 ! rtpg722depay ! decodebin ! pulsesink device=0"
 	default:
 		panic("Unhandled codec " + codecName)
 	}
