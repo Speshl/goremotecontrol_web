@@ -12,7 +12,8 @@ import (
 )
 
 func (c *Connection) PlayTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
-	defer log.Println("Done playing track")
+	log.Println("start playing client track")
+	defer log.Println("done playing client track")
 	// Send a PLI on an interval so that the publisher is pushing a keyframe every rtcpPLIInterval
 	go func() {
 		ticker := time.NewTicker(time.Second * 3)
@@ -32,7 +33,14 @@ func (c *Connection) PlayTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPRe
 	fmt.Printf("Track has started, of type %d: %s \n", track.PayloadType(), codecName)
 	pipeline := gst.CreateRecievePipeline(track.PayloadType(), strings.ToLower(codecName))
 	pipeline.Start()
-	c.TempCarMic.Start()
+
+	go func() {
+		log.Println("Delay before mic starts")
+		time.Sleep(10 * time.Second)
+		c.TempCarMic.Start()
+		log.Println("Mic Started")
+	}()
+
 	buf := make([]byte, 1400)
 	for {
 		i, _, err := track.Read(buf)
