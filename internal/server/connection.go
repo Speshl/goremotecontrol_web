@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Speshl/goremotecontrol_web/internal/carmic"
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/pion/webrtc/v3"
 )
@@ -15,9 +16,10 @@ type Connection struct {
 	PeerConnection *webrtc.PeerConnection
 	Cancel         context.CancelFunc
 	CTX            context.Context
+	TempCarMic     *carmic.CarMic
 }
 
-func NewConnection(socketConn socketio.Conn) (*Connection, error) {
+func NewConnection(socketConn socketio.Conn, carMic *carmic.CarMic) (*Connection, error) {
 	log.Printf("Creating Client %s\n", socketConn.ID())
 
 	peerConnection, err := webrtc.NewPeerConnection(webrtc.Configuration{
@@ -38,6 +40,7 @@ func NewConnection(socketConn socketio.Conn) (*Connection, error) {
 		PeerConnection: peerConnection,
 		Cancel:         cancelCTX,
 		CTX:            ctx,
+		TempCarMic:     carMic,
 	}
 	return conn, nil
 }
