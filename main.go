@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
-	"github.com/Speshl/goremotecontrol_web/internal/carmic"
 	"github.com/Speshl/goremotecontrol_web/internal/carspeaker"
 	"github.com/Speshl/goremotecontrol_web/internal/gst"
 	"github.com/Speshl/goremotecontrol_web/internal/server"
@@ -45,36 +44,36 @@ func main() {
 	// 	}
 	// }()
 
-	carMic, err := carmic.NewCarMic(carConfig.micConfig)
-	if err != nil {
-		log.Printf("NewCarMic error: %s\n", err)
-		cancel() //stop anything else on this context because mic stopped
-	}
-
-	go func() {
-		err = carMic.Start(ctx)
-		if err != nil {
-			log.Printf("carmic error: %s\n", err.Error())
-		}
-		cancel() //stop anything else on this context because mic stopped
-		log.Println("Stopping due to carmic stopping unexpectedly")
-	}()
-
-	//Temp way to connect client to server before splitting client out to separate repo
-	// carCam, err := carcam.NewCarCam(carConfig.camConfig)
+	// carMic, err := carmic.NewCarMic(carConfig.micConfig)
 	// if err != nil {
-	// 	log.Printf("NewCarCam error: %s\n", err)
-	// 	cancel() //stop anything else on this context because camera stopped
+	// 	log.Printf("NewCarMic error: %s\n", err)
+	// 	cancel() //stop anything else on this context because mic stopped
 	// }
 
 	// go func() {
-	// 	err = carCam.Start(ctx)
+	// 	err = carMic.Start(ctx)
 	// 	if err != nil {
-	// 		log.Printf("carcam error: %s\n", err.Error())
+	// 		log.Printf("carmic error: %s\n", err.Error())
 	// 	}
-	// 	cancel() //stop anything else on this context because camera stopped
-	// 	log.Println("Stopping due to carcam stopping unexpectedly")
+	// 	cancel() //stop anything else on this context because mic stopped
+	// 	log.Println("Stopping due to carmic stopping unexpectedly")
 	// }()
+
+	Temp way to connect client to server before splitting client out to separate repo
+	carCam, err := carcam.NewCarCam(carConfig.camConfig)
+	if err != nil {
+		log.Printf("NewCarCam error: %s\n", err)
+		cancel() //stop anything else on this context because camera stopped
+	}
+
+	go func() {
+		err = carCam.Start(ctx)
+		if err != nil {
+			log.Printf("carcam error: %s\n", err.Error())
+		}
+		cancel() //stop anything else on this context because camera stopped
+		log.Println("Stopping due to carcam stopping unexpectedly")
+	}()
 
 	//give time for camera to start before commands start
 	time.Sleep(2 * time.Second)
@@ -89,7 +88,7 @@ func main() {
 		log.Println("Stopping due to carcommand stopping unexpectedly")
 	}()
 
-	socketServer := server.NewServer(carMic.AudioTrack, nil /*carCam.VideoTrack*/, carCommand.CommandChannel, carSpeaker.SpeakerChannel)
+	socketServer := server.NewServer(carMic.AudioTrack, carCam.VideoTrack, nil/*carCommand.CommandChannel*/, carSpeaker.SpeakerChannel)
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()
 
