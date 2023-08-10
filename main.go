@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Speshl/goremotecontrol_web/internal/carcam"
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	"github.com/Speshl/goremotecontrol_web/internal/carspeaker"
 	"github.com/Speshl/goremotecontrol_web/internal/gst"
@@ -88,7 +89,7 @@ func main() {
 		log.Println("Stopping due to carcommand stopping unexpectedly")
 	}()
 
-	socketServer := server.NewServer(carMic.AudioTrack, carCam.VideoTrack, nil/*carCommand.CommandChannel, carSpeaker.SpeakerChannel)
+	socketServer := server.NewServer( /*carMic.AudioTrack*/ nil, carCam.VideoTrack, carCommand.CommandChannel, carSpeaker.SpeakerChannel)
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()
 
