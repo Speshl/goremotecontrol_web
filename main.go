@@ -59,6 +59,10 @@ func main() {
 		cancel() //stop anything else on this context because mic stopped
 	}
 
+	//TODO: Figure out why starting mic stop client audio
+	carMic.Start()
+	log.Println("Mic Started")
+
 	// go func() {
 	// 	err = carMic.Start(ctx)
 	// 	if err != nil {
@@ -97,7 +101,7 @@ func main() {
 		log.Println("Stopping due to carcommand stopping unexpectedly")
 	}()
 
-	socketServer := server.NewServer(carMic.AudioTrack, carCam.VideoTrack, carCommand.CommandChannel, carSpeaker.SpeakerChannel, carMic)
+	socketServer := server.NewServer(carMic.AudioTrack, carCam.VideoTrack, carCommand.CommandChannel, carSpeaker.SpeakerChannel)
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()
 

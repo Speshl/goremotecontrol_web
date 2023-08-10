@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/Speshl/goremotecontrol_web/internal/carmic"
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/googollee/go-socket.io/engineio"
 	"github.com/googollee/go-socket.io/engineio/transport"
@@ -20,8 +19,6 @@ type Server struct {
 	commandChannel chan []byte
 	speakerChannel chan string
 
-	carMic *carmic.CarMic
-
 	socketio        *socketio.Server
 	connections     map[string]*Connection
 	connectionsLock sync.RWMutex
@@ -31,7 +28,7 @@ var allowOriginFunc = func(r *http.Request) bool {
 	return true
 }
 
-func NewServer(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample, commandChannel chan []byte, speakerChannel chan string, carMic *carmic.CarMic) *Server {
+func NewServer(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample, commandChannel chan []byte, speakerChannel chan string) *Server {
 	socketioServer := socketio.NewServer(&engineio.Options{
 		Transports: []transport.Transport{
 			&polling.Transport{
@@ -51,8 +48,6 @@ func NewServer(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.Tra
 		commandChannel: commandChannel,
 		carAudioTrack:  audioTrack,
 		carVideoTrack:  videoTrack,
-
-		carMic: carMic,
 	}
 }
 
@@ -69,7 +64,7 @@ func (s *Server) GetHandler() *socketio.Server {
 }
 
 func (s *Server) NewClientConn(socketConn socketio.Conn) (*Connection, error) {
-	clientConn, err := NewConnection(socketConn, s.carMic)
+	clientConn, err := NewConnection(socketConn)
 	if err != nil {
 		return nil, err
 	}
