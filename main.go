@@ -116,6 +116,7 @@ func main() {
 	}()
 
 	go func() {
+		log.Println("starting gstreamer main loop")
 		gst.StartMainLoop() //Start gstreamer main loop from main thread
 		log.Println("warning: gstreamer main loop ended")
 	}()

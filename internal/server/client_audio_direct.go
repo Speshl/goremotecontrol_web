@@ -12,6 +12,7 @@ import (
 )
 
 func (c *Connection) PlayTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
+	defer log.Println("Done playing track")
 	// Send a PLI on an interval so that the publisher is pushing a keyframe every rtcpPLIInterval
 	go func() {
 		ticker := time.NewTicker(time.Second * 3)
@@ -38,6 +39,7 @@ func (c *Connection) PlayTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPRe
 			log.Printf("error reading client audio track buffer - %w\n", err)
 		}
 
+		log.Printf("Pushing %d bytes to pipeline", i)
 		pipeline.Push(buf[:i])
 	}
 }
