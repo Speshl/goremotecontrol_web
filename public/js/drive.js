@@ -3,10 +3,10 @@ const camPlayer = new CamPlayer();
 camPlayer.setupListeners();
 
 setTimeout(() => {
-    // camPlayer.startMicrophone().then(() => {
-    //     camPlayer.sendOffer();
-    // });
-    camPlayer.sendOffer();
+    camPlayer.startMicrophone().then(() => {
+        camPlayer.sendOffer();
+    });
+    //camPlayer.sendOffer();
 },1000);
 
 const keyPressTracker = new KeyPressTracker();
