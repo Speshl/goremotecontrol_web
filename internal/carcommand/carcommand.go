@@ -86,22 +86,22 @@ func NewCarCommand(options *CommandOptions) (*CarCommand, error) {
 			DisableCommands: false,
 			DeadZone:        2,
 
-			ESCChannel:  2,
+			ESCChannel:  3,
 			ESCLimit:    50,
 			MaxESCPulse: pca9685.ServoMaxPulseDef,
 			MinESCPulse: pca9685.ServoMinPulseDef,
 
-			SteerChannel:  3,
+			SteerChannel:  4,
 			SteerLimit:    50,
 			MaxSteerPulse: pca9685.ServoMaxPulseDef,
 			MinSteerPulse: pca9685.ServoMinPulseDef,
 
-			PanChannel:  1,
+			PanChannel:  2,
 			PanLimit:    0,
 			MaxPanPulse: pca9685.ServoMaxPulseDef,
 			MinPanPulse: pca9685.ServoMinPulseDef,
 
-			TiltChannel:  0,
+			TiltChannel:  1,
 			TiltLimit:    0,
 			MaxTiltPulse: pca9685.ServoMaxPulseDef,
 			MinTiltPulse: pca9685.ServoMinPulseDef,
@@ -116,9 +116,9 @@ func NewCarCommand(options *CommandOptions) (*CarCommand, error) {
 		},
 	}
 
-	if options != nil {
-		carCommand.options = *options
-	}
+	// if options != nil {
+	// 	carCommand.options = *options
+	// }
 
 	err := carCommand.SetupServoController()
 	if err != nil {
@@ -159,8 +159,8 @@ func (c *CarCommand) SetupServoController() error {
 
 	c.servos.tilt = c.servoController.ServoNew(c.options.TiltChannel, &pca9685.ServOptions{
 		AcRange:  pca9685.ServoRangeDef,
-		MinPulse: c.options.MinPanPulse,
-		MaxPulse: c.options.MaxPanPulse,
+		MinPulse: c.options.MinTiltPulse,
+		MaxPulse: c.options.MaxTiltPulse,
 	})
 
 	return nil
