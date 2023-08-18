@@ -334,15 +334,7 @@ class GamePadTracker {
         //     }
         // }
 
-        if(myGamepad.axes[2] > .1 || myGamepad.axes[2] < -.1){
-            this.panPos += this.mapToRange(myGamepad.axes[2], -1, 1, -1*this.panSpeed, this.panSpeed);
-        }
-        if(myGamepad.axes[2] > .1 || myGamepad.axes[2] < -.1){
-            this.tiltPos += this.mapToRange(myGamepad.axes[3], -1, 1, -1*this.tiltSpeed, this.tiltSpeed);
-        }
-        
-    
-        // //tilt
+        //tilt
         // if(myGamepad.axes[3] > .1){
         //     this.tiltPos += this.mapToRange(myGamepad.axes[3], .1, 1, this.minPosition, this.tiltSpeed);
         //     if(this.tiltPos > this.maxPosition){
@@ -354,6 +346,28 @@ class GamePadTracker {
         //         this.tiltPos = this.minPosition;
         //     }
         // }
+
+        if(myGamepad.axes[2] > .1 || myGamepad.axes[2] < -.1){
+            this.panPos += this.mapToRange(myGamepad.axes[2], -1, 1, -1*this.panSpeed, this.panSpeed);
+        }
+        if(myGamepad.axes[3] > .1 || myGamepad.axes[3] < -.1){
+            this.tiltPos += this.mapToRange(myGamepad.axes[3], -1, 1, -1*this.tiltSpeed, this.tiltSpeed);
+        }
+
+        if(this.panPos < this.minPosition){
+            this.panPos = this.minPosition;
+        }
+        if(this.panPos > this.maxPosition){
+            this.panPos = this.maxPosition;
+        }
+
+        if(this.tiltPos < this.minPosition){
+            this.tiltPos = this.minPosition;
+        }
+        if(this.tiltPos > this.maxPosition){
+            this.tiltPos = this.maxPosition;
+        }
+        
 
         //Reset camera
         if(myGamepad.buttons[11].pressed){
