@@ -4,31 +4,35 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"sync"
 	"time"
 
-	"github.com/stianeikeland/go-rpio/v4"
+	"github.com/googolgl/go-i2c"
+	"github.com/googolgl/go-pca9685"
 )
 
-const frequency = 100000
-
-const cycleLen = uint32(2000)
-const maxvalue = uint32(250)
-const midvalue = uint32(150)
-const minvalue = uint32(50)
-
-const escPinID = 12
-const servoPinID = 13
-
-// const panPinID = 14
-// const tiltPinID = 15
+const MaxValue = 255
+const MinValue = 0
+const MidValue = (MaxValue - MinValue) / 2
 
 type CarCommand struct {
 	CommandChannel chan []byte
 	options        CommandOptions
 	latestCommand  LatestCommand
-	pins           Pins
+
+	servoController *pca9685.PCA9685
+	servos          Servos
 }
+
+type Servos struct {
+	esc   *pca9685.Servo
+	steer *pca9685.Servo
+	pan   *pca9685.Servo
+	tilt  *pca9685.Servo
+}
+
+// ServoRangeDef    int     = 135
+// ServoMinPulseDef float32 = 750.0
+// ServoMaxPulseDef float32 = 2250.0
 
 type CommandOptions struct {
 	Name            string
@@ -36,65 +40,133 @@ type CommandOptions struct {
 	DisableCommands bool
 	DeadZone        int
 
-	MaxESC int
-	MidESC int
-	MinESC int
+	ESCChannel  int
+	MaxESCPulse float32
+	MinESCPulse float32
+	ESCLimit    uint32 //Subtracted from max, and added to min to keep off servo endpoints
 
-	MaxServo int
-	MidServo int
-	MinServo int
-}
+	SteerChannel  int
+	MaxSteerPulse float32
+	MinSteerPulse float32
+	SteerLimit    uint32 //Subtracted from max, and added to min to keep off servo endpoints
 
-type Pins struct {
-	esc   rpio.Pin
-	servo rpio.Pin
-	// pan   rpio.Pin
-	// tilt  rpio.Pin
+	PanChannel  int
+	MaxPanPulse float32
+	MinPanPulse float32
+	PanLimit    uint32 //Subtracted from max, and added to min to keep off servo endpoints
+
+	TiltChannel  int
+	MaxTiltPulse float32
+	MinTiltPulse float32
+	TiltLimit    uint32 //Subtracted from max, and added to min to keep off servo endpoints
 }
 
 type LatestCommand struct {
-	lock    sync.RWMutex
+	// lock    sync.RWMutex
 	used    bool
 	command Command
 }
 
 type Command struct {
 	esc   uint32
-	servo uint32
-	// pan   uint32
-	// tilt  uint32
+	steer uint32
+	pan   uint32
+	tilt  uint32
 }
 
-func NewCarCommand(options CommandOptions) *CarCommand {
+func NewCarCommand(options *CommandOptions) (*CarCommand, error) {
 	if options.DisableCommands {
 		log.Println("Warning! GPIO commands are currently disabled")
 	}
-	return &CarCommand{
+	carCommand := CarCommand{
 		CommandChannel: make(chan []byte, 5),
-		options:        options,
+		options: CommandOptions{
+			Name:            "carcommand",
+			RefreshRate:     60,
+			DisableCommands: false,
+			DeadZone:        2,
+
+			ESCChannel:  2,
+			ESCLimit:    50,
+			MaxESCPulse: pca9685.ServoMaxPulseDef,
+			MinESCPulse: pca9685.ServoMinPulseDef,
+
+			SteerChannel:  3,
+			SteerLimit:    50,
+			MaxSteerPulse: pca9685.ServoMaxPulseDef,
+			MinSteerPulse: pca9685.ServoMinPulseDef,
+
+			PanChannel:  1,
+			PanLimit:    0,
+			MaxPanPulse: pca9685.ServoMaxPulseDef,
+			MinPanPulse: pca9685.ServoMinPulseDef,
+
+			TiltChannel:  0,
+			TiltLimit:    0,
+			MaxTiltPulse: pca9685.ServoMaxPulseDef,
+			MinTiltPulse: pca9685.ServoMinPulseDef,
+		},
 		latestCommand: LatestCommand{
 			command: Command{
-				esc:   uint32(options.MidESC),
-				servo: uint32(options.MidServo),
+				esc:   MidValue,
+				steer: MidValue,
+				pan:   MidValue,
+				tilt:  MidValue,
 			},
 		},
 	}
+
+	if options != nil {
+		carCommand.options = *options
+	}
+
+	err := carCommand.SetupServoController()
+	if err != nil {
+		return nil, fmt.Errorf("failed setting up servo controller - %w", err)
+	}
+
+	return &carCommand, nil
+}
+
+func (c *CarCommand) SetupServoController() error {
+	i2c, err := i2c.New(pca9685.Address, "/dev/i2c-1")
+	if err != nil {
+		return fmt.Errorf("error starting i2c with address - %w", err)
+	}
+
+	c.servoController, err = pca9685.New(i2c, nil)
+	if err != nil {
+		return fmt.Errorf("error getting servo driver - %w", err)
+	}
+
+	c.servos.esc = c.servoController.ServoNew(c.options.ESCChannel, &pca9685.ServOptions{
+		AcRange:  pca9685.ServoRangeDef,
+		MinPulse: c.options.MinESCPulse,
+		MaxPulse: c.options.MaxESCPulse,
+	})
+
+	c.servos.steer = c.servoController.ServoNew(c.options.SteerChannel, &pca9685.ServOptions{
+		AcRange:  pca9685.ServoRangeDef,
+		MinPulse: c.options.MinSteerPulse,
+		MaxPulse: c.options.MaxSteerPulse,
+	})
+
+	c.servos.pan = c.servoController.ServoNew(c.options.PanChannel, &pca9685.ServOptions{
+		AcRange:  pca9685.ServoRangeDef,
+		MinPulse: c.options.MinPanPulse,
+		MaxPulse: c.options.MaxPanPulse,
+	})
+
+	c.servos.tilt = c.servoController.ServoNew(c.options.TiltChannel, &pca9685.ServOptions{
+		AcRange:  pca9685.ServoRangeDef,
+		MinPulse: c.options.MinPanPulse,
+		MaxPulse: c.options.MaxPanPulse,
+	})
+
+	return nil
 }
 
 func (c *CarCommand) Start(ctx context.Context) error {
-	err := c.startGPIO()
-	if err != nil {
-		return err
-	}
-	defer func() {
-		log.Println("closing rpio")
-		err := rpio.Close()
-		if err != nil {
-			log.Printf("Error closing rpio: %s\n", err.Error())
-		}
-		log.Println("closed rpio")
-	}()
-
 	commandRate := 1000 / c.options.RefreshRate
 	commandDuration := time.Duration(int64(time.Millisecond) * int64(commandRate))
 	commandTicker := time.NewTicker(commandDuration)
@@ -113,17 +185,13 @@ func (c *CarCommand) Start(ctx context.Context) error {
 				log.Printf("WARNING: command failed to parse: %s\n", err)
 				continue
 			}
-			c.latestCommand.lock.Lock()
+			// c.latestCommand.lock.Lock()
 			c.latestCommand.used = false
 			c.latestCommand.command = parsedCommand
-			c.latestCommand.lock.Unlock()
+			// c.latestCommand.lock.Unlock()
 		case <-commandTicker.C: //time to send command to gpio
-			c.latestCommand.lock.RLock()
+
 			if c.latestCommand.used {
-				c.latestCommand.lock.RUnlock()
-				if !warned {
-					//log.Printf("command was already used, skipping")
-				}
 				seenSameCommand++
 				if seenSameCommand >= 1000 {
 					if !warned {
@@ -135,62 +203,46 @@ func (c *CarCommand) Start(ctx context.Context) error {
 			} else {
 				seenSameCommand = 0
 				warned = false
-				c.latestCommand.lock.RUnlock()
-
-				c.latestCommand.lock.Lock()
+				// c.latestCommand.lock.RUnlock()
+				// c.latestCommand.lock.Lock()
 				c.latestCommand.used = true
 				command := c.latestCommand.command
-				c.latestCommand.lock.Unlock()
-
+				// c.latestCommand.lock.Unlock()
 				c.sendCommand(command)
 			}
 		}
 	}
 }
 
-func (c *CarCommand) startGPIO() error {
-	err := rpio.Open()
-	if err != nil {
-		return err
-	}
-
-	c.pins.esc = rpio.Pin(escPinID)
-	c.pins.esc.Mode(rpio.Pwm)
-	c.pins.esc.Freq(frequency)
-
-	c.pins.servo = rpio.Pin(servoPinID)
-	c.pins.servo.Mode(rpio.Pwm)
-	c.pins.servo.Freq(frequency)
-	c.sendNeutral()
-	return nil
-}
-
 func (c *CarCommand) parseCommand(command []byte) (Command, error) {
+	if len(command) < 4 {
+		return Command{}, fmt.Errorf("incorrect command length - %d", len(command))
+	}
 	parsedCommand := Command{
-		esc:   c.mapToRange(uint32(command[0]), 0, 255, uint32(c.options.MinESC), uint32(c.options.MaxESC)),
-		servo: c.mapToRange(uint32(command[1]), 0, 255, uint32(c.options.MinServo), uint32(c.options.MaxServo)),
+		esc:   c.mapToRange(uint32(command[0]), MinValue, MaxValue, MinValue+c.options.ESCLimit, MaxValue-c.options.ESCLimit),
+		steer: c.mapToRange(uint32(command[1]), MinValue, MaxValue, MinValue+c.options.SteerLimit, MaxValue-c.options.SteerLimit),
+		pan:   c.mapToRange(uint32(command[2]), MinValue, MaxValue, MinValue+c.options.PanLimit, MaxValue-c.options.PanLimit),
+		tilt:  c.mapToRange(uint32(command[3]), MinValue, MaxValue, MinValue+c.options.TiltLimit, MaxValue-c.options.TiltLimit),
 	}
 
-	parsedCommand = c.applyDeadZone(parsedCommand)
-	return parsedCommand, nil
+	return c.applyDeadZone(parsedCommand), nil
 }
 
 func (c *CarCommand) sendNeutral() {
 	if !c.options.DisableCommands {
-		c.pins.esc.DutyCycle(uint32(c.options.MidESC), cycleLen)
-		c.pins.servo.DutyCycle(uint32(c.options.MidServo), cycleLen)
-		// c.pins.pan.DutyCycle(command.pan, cycleLen)
-		// c.pins.tilt.DutyCycle(command.tilt, cycleLen)
+		c.servos.esc.Fraction(MidValue / MaxValue)
+		c.servos.steer.Fraction(MidValue / MaxValue)
+		c.servos.pan.Fraction(MidValue / MaxValue)
+		c.servos.tilt.Fraction(MidValue / MaxValue)
 	}
 }
 
 func (c *CarCommand) sendCommand(command Command) {
 	if !c.options.DisableCommands {
-		//log.Printf("Sending Command: %+v", command)
-		c.pins.esc.DutyCycle(command.esc, cycleLen)
-		c.pins.servo.DutyCycle(command.servo, cycleLen)
-		// c.pins.pan.DutyCycle(command.pan, cycleLen)
-		// c.pins.tilt.DutyCycle(command.tilt, cycleLen)
+		c.servos.esc.Fraction(float32(command.esc / MaxValue))
+		c.servos.steer.Fraction(float32(command.steer / MaxValue))
+		c.servos.pan.Fraction(float32(command.pan / MaxValue))
+		c.servos.tilt.Fraction(float32(command.tilt / MaxValue))
 	}
 }
 
@@ -201,37 +253,37 @@ func (c *CarCommand) mapToRange(value, min, max, minReturn, maxReturn uint32) ui
 func (c *CarCommand) applyDeadZone(command Command) Command {
 	returnCommand := command
 
-	if command.esc > midvalue && midvalue+uint32(c.options.DeadZone) > command.esc {
-		returnCommand.esc = midvalue
+	if command.esc > MidValue && MidValue+uint32(c.options.DeadZone) > command.esc {
+		returnCommand.esc = MidValue
 	}
 
-	if command.esc < midvalue && midvalue-uint32(c.options.DeadZone) < command.esc {
-		returnCommand.esc = midvalue
+	if command.esc < MidValue && MidValue-uint32(c.options.DeadZone) < command.esc {
+		returnCommand.esc = MidValue
 	}
 
-	if command.servo > midvalue && midvalue+uint32(c.options.DeadZone) > command.servo {
-		returnCommand.servo = midvalue
+	if command.steer > MidValue && MidValue+uint32(c.options.DeadZone) > command.steer {
+		returnCommand.steer = MidValue
 	}
 
-	if command.servo < midvalue && midvalue-uint32(c.options.DeadZone) < command.servo {
-		returnCommand.servo = midvalue
+	if command.steer < MidValue && MidValue-uint32(c.options.DeadZone) < command.steer {
+		returnCommand.steer = MidValue
 	}
 
-	// if command.pan > midvalue && midvalue+deadZone > command.pan {
-	// 	returnCommand.pan = midvalue
-	// }
+	if command.pan > MidValue && MidValue+uint32(c.options.DeadZone) > command.pan {
+		returnCommand.pan = MidValue
+	}
 
-	// if command.pan < midvalue && midvalue-deadZone < command.pan {
-	// 	returnCommand.pan = midvalue
-	// }
+	if command.pan < MidValue && MidValue-uint32(c.options.DeadZone) < command.pan {
+		returnCommand.pan = MidValue
+	}
 
-	// if command.tilt > midvalue && midvalue+deadZone > command.tilt {
-	// 	returnCommand.tilt = midvalue
-	// }
+	if command.tilt > MidValue && MidValue+uint32(c.options.DeadZone) > command.tilt {
+		returnCommand.tilt = MidValue
+	}
 
-	// if command.tilt < midvalue && midvalue-deadZone < command.tilt {
-	// 	returnCommand.tilt = midvalue
-	// }
+	if command.tilt < MidValue && MidValue-uint32(c.options.DeadZone) < command.tilt {
+		returnCommand.tilt = MidValue
+	}
 
 	return returnCommand
 }

@@ -4,6 +4,8 @@ go 1.20
 
 require (
 	github.com/golang-jwt/jwt/v5 v5.0.0
+	github.com/googolgl/go-i2c v0.1.1
+	github.com/googolgl/go-pca9685 v0.1.6
 	github.com/googollee/go-socket.io v1.7.0
 	github.com/pion/rtcp v1.2.10
 	github.com/pion/webrtc/v3 v3.2.11
@@ -34,6 +36,7 @@ require (
 	github.com/pion/transport/v2 v2.2.1 // indirect
 	github.com/pion/turn/v2 v2.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
 	golang.org/x/net v0.10.0 // indirect

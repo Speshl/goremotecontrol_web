@@ -26,7 +26,7 @@ setInterval(() => {
         trim = keyPressTracker.getTrim();
     }
 
-    document.getElementById('currentCommand').innerHTML = 'Esc: '+command[0] + ' Servo: '+command[1]/* + ' Pan: ' + command[2] + ' Tilt: ' + command[3]*/;
+    document.getElementById('currentCommand').innerHTML = 'Esc: '+command[0] + ' Servo: '+command[1] + ' Pan: ' + command[2] + ' Tilt: ' + command[3];
     document.getElementById('steeringTrim').innerHTML = trim;
 
     //Send the command we generated

@@ -14,6 +14,7 @@ import (
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	"github.com/Speshl/goremotecontrol_web/internal/carmic"
 	"github.com/Speshl/goremotecontrol_web/internal/carspeaker"
+	"github.com/Speshl/goremotecontrol_web/internal/gst"
 	"github.com/Speshl/goremotecontrol_web/internal/server"
 )
 
@@ -24,57 +25,49 @@ func main() {
 
 	carConfig := GetConfig(ctx)
 
-	//Start client audio pipeline listener
-	// go func() {
-	// 	log.Println("starting gstreamer main loops")
-	// 	gst.StartMainRecieveLoop() //Start gstreamer main loop from main thread
-	// 	log.Println("warning: gstreamer main loop ended")
-	// }()
+	//Start audio recieve pipeline listener
+	go func() {
+		log.Println("starting gstreamer main send recieve loops")
+		gst.StartMainSendLoop() //Start gstreamer main send loop from main thread
+		log.Println("starting gstreamer main recieve loops")
+		gst.StartMainRecieveLoop() //Start gstreamer main recieve loop from main thread
+		log.Println("warning: gstreamer main loops ended")
+	}()
 
 	carSpeaker, err := carspeaker.NewCarSpeaker(carConfig.speakerConfig)
 	if err != nil {
-		log.Printf("NewCarCam error: %s\n", err)
+		log.Printf("error creating carspeaker: %s\n", err)
 	}
 
-	// go func() {
-	// 	err = carSpeaker.Start(ctx)
-	// 	if err != nil {
-	// 		log.Printf("carspeaker error: %s\n", err.Error())
-	// 	}
-	// 	cancel() //stop anything else on this context because mic stopped
-	// 	log.Println("Stopping due to carspeaker stopping unexpectedly")
-	// }()
+	go func() {
+		err = carSpeaker.Start(ctx)
+		if err != nil {
+			log.Printf("carspeaker error: %s\n", err.Error())
+		}
+		cancel() //stop anything else on this context because mic stopped
+		log.Println("Stopping due to carspeaker stopping unexpectedly")
+	}()
 
-	// go func() {
-	// 	err = carSpeaker.Play(ctx, "startup")
-	// 	if err != nil {
-	// 		log.Printf("caraudio error: %s\n", err.Error())
-	// 	}
-	// }()
+	go func() {
+		err = carSpeaker.Play(ctx, "startup")
+		if err != nil {
+			log.Printf("caraudio error: %s\n", err.Error())
+		}
+	}()
 
 	carMic, err := carmic.NewCarMic(carConfig.micConfig)
 	if err != nil {
-		log.Printf("NewCarMic error: %s\n", err)
+		log.Printf("error creating carmic: %s\n", err)
 		cancel() //stop anything else on this context because mic stopped
 	}
 
-	//TODO: Figure out why starting mic stop client audio
-	//carMic.Start()
+	carMic.Start() //TODO: Figure out why starting mic stop client audio
 	log.Println("Mic Started")
-
-	// go func() {
-	// 	err = carMic.Start(ctx)
-	// 	if err != nil {
-	// 		log.Printf("carmic error: %s\n", err.Error())
-	// 	}
-	// 	cancel() //stop anything else on this context because mic stopped
-	// 	log.Println("Stopping due to carmic stopping unexpectedly")
-	// }()
 
 	//Temp way to connect client to server before splitting client out to separate repo
 	carCam, err := carcam.NewCarCam(carConfig.camConfig)
 	if err != nil {
-		log.Printf("NewCarCam error: %s\n", err)
+		log.Printf("error creating carcam: %s\n", err)
 		cancel() //stop anything else on this context because camera stopped
 	}
 
@@ -90,7 +83,11 @@ func main() {
 	//give time for camera to start before commands start
 	time.Sleep(2 * time.Second)
 
-	carCommand := carcommand.NewCarCommand(carConfig.commandConfig)
+	carCommand, err := carcommand.NewCarCommand(&carConfig.commandConfig)
+	if err != nil {
+		log.Printf("error creating carcommand: %s\n", err)
+		cancel() //stop anything else on this context because camera stopped
+	}
 	go func() {
 		err := carCommand.Start(ctx)
 		if err != nil {

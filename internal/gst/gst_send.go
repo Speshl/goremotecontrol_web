@@ -18,8 +18,8 @@ import (
 	"github.com/pion/webrtc/v3/pkg/media"
 )
 
-func InitSendLoop() {
-	//go C.gstreamer_send_start_mainloop()
+func StartMainSendLoop() {
+	go C.gstreamer_send_start_mainloop()
 }
 
 // Pipeline is a wrapper for a GStreamer Pipeline
