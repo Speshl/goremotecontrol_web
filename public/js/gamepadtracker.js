@@ -322,44 +322,46 @@ class GamePadTracker {
         command[1] = steerCommand;
     
         //pan
-        if(myGamepad.axes[2] > .1){
-            this.panPos += this.mapToRange(myGamepad.axes[2], .1, 1, this.minPosition, this.panSpeed);
-            if(this.panPos > this.maxPosition){
-                this.panPos = this.maxPosition;
-            }
-            command[2] = this.panPos
-        }else if(myGamepad.axes[2] < -.1){
-            this.panPos -= this.mapToRange(myGamepad.axes[2], -1, -.1, this.minPosition, this.panSpeed);
-            if(this.panPos < this.minPosition){
-                this.panPos = this.minPosition;
-            }
-            command[2] = this.panPos
-        }else{
-            command[2] = this.midPosition;
+        // if(myGamepad.axes[2] > .1){
+        //     this.panPos += this.mapToRange(myGamepad.axes[2], .1, 1, this.minPosition, this.panSpeed);
+        //     if(this.panPos > this.maxPosition){
+        //         this.panPos = this.maxPosition;
+        //     }
+        // }else if(myGamepad.axes[2] < -.1){
+        //     this.panPos -= this.mapToRange(myGamepad.axes[2], -1, -.1, this.minPosition, this.panSpeed);
+        //     if(this.panPos < this.minPosition){
+        //         this.panPos = this.minPosition;
+        //     }
+        // }
+
+        if(myGamepad.axes[2] > .1 || myGamepad.axes[2] < -.1){
+            this.panPos += this.mapToRange(myGamepad.axes[2], -1, 1, -1*this.panSpeed, this.panSpeed);
         }
+        if(myGamepad.axes[2] > .1 || myGamepad.axes[2] < -.1){
+            this.tiltPos += this.mapToRange(myGamepad.axes[3], -1, 1, -1*this.tiltSpeed, this.tiltSpeed);
+        }
+        
     
-        //tilt
-        if(myGamepad.axes[3] > .1){
-            this.tiltPos += this.mapToRange(myGamepad.axes[3], .1, 1, this.minPosition, this.tiltSpeed);
-            if(this.tiltPos > this.maxPosition){
-                this.tiltPos = this.maxPosition;
-            }
-            command[3] = this.tiltPos;
-        }else if(myGamepad.axes[3] < -.1){ 
-            this.tiltPos -= this.mapToRange(myGamepad.axes[3], -1, -.1, this.minPosition, this.tiltSpeed);
-            if(this.tiltPos < this.minPosition){
-                this.tiltPos = this.minPosition;
-            }
-            command[3] = this.tiltPos;
-        }else{
-            command[3] = this.midPosition;
-        }
+        // //tilt
+        // if(myGamepad.axes[3] > .1){
+        //     this.tiltPos += this.mapToRange(myGamepad.axes[3], .1, 1, this.minPosition, this.tiltSpeed);
+        //     if(this.tiltPos > this.maxPosition){
+        //         this.tiltPos = this.maxPosition;
+        //     }
+        // }else if(myGamepad.axes[3] < -.1){ 
+        //     this.tiltPos -= this.mapToRange(myGamepad.axes[3], -1, -.1, this.minPosition, this.tiltSpeed);
+        //     if(this.tiltPos < this.minPosition){
+        //         this.tiltPos = this.minPosition;
+        //     }
+        // }
 
         //Reset camera
         if(myGamepad.buttons[11].pressed){
             this.panPos = this.midPosition;
             this.tiltPos = this.midPosition;
         }
+        command[2] = this.panPos;
+        command[3] = this.tiltPos;
 
         //Quick Sounds
         if(myGamepad.buttons[0].pressed){
