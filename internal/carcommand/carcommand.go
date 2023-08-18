@@ -185,7 +185,7 @@ func (c *CarCommand) Start(ctx context.Context) error {
 				log.Printf("WARNING: command failed to parse: %s\n", err)
 				continue
 			}
-			log.Println("Command: %+v\n", parsedCommand)
+			log.Printf("Command: %+v\n", parsedCommand)
 			// c.latestCommand.lock.Lock()
 			c.latestCommand.used = false
 			c.latestCommand.command = parsedCommand
@@ -231,20 +231,20 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 
 func (c *CarCommand) sendNeutral() {
 	if !c.options.DisableCommands {
-		c.servos.esc.Fraction(MidValue / MaxValue)
-		c.servos.steer.Fraction(MidValue / MaxValue)
-		c.servos.pan.Fraction(MidValue / MaxValue)
-		c.servos.tilt.Fraction(MidValue / MaxValue)
+		c.servos.esc.Fraction(0.5)
+		c.servos.steer.Fraction(0.5)
+		c.servos.pan.Fraction(0.5)
+		c.servos.tilt.Fraction(0.5)
 	}
 }
 
 func (c *CarCommand) sendCommand(command Command) {
 	if !c.options.DisableCommands {
-		log.Printf("Fraction: %f\n", float32(command.tilt/MaxValue))
-		c.servos.esc.Fraction(float32(command.esc / MaxValue))
-		c.servos.steer.Fraction(float32(command.steer / MaxValue))
-		c.servos.pan.Fraction(float32(command.pan / MaxValue))
-		c.servos.tilt.Fraction(float32(command.tilt / MaxValue))
+		log.Printf("Fraction: %f\n", float32(command.tilt)/MaxValue)
+		c.servos.esc.Fraction(float32(command.esc) / MaxValue)
+		c.servos.steer.Fraction(float32(command.steer) / MaxValue)
+		c.servos.pan.Fraction(float32(command.pan) / MaxValue)
+		c.servos.tilt.Fraction(float32(command.tilt) / MaxValue)
 	}
 }
 
