@@ -323,15 +323,13 @@ class GamePadTracker {
     
         //pan
         if(myGamepad.axes[2] > .1){
-            moveAmt = this.mapToRange(myGamepad.axes[2], .1, 1, this.minPosition, this.panSpeed);
-            this.panPos += moveAmt;
+            this.panPos += this.mapToRange(myGamepad.axes[2], .1, 1, this.minPosition, this.panSpeed);
             if(this.panPos > this.maxPosition){
                 this.panPos = this.maxPosition;
             }
             command[2] = this.panPos
         }else if(myGamepad.axes[2] < -.1){
-            moveAmt = this.mapToRange(myGamepad.axes[2], -1, -.1, this.minPosition, this.panSpeed);
-            this.panPos -= moveAmt;
+            this.panPos -= this.mapToRange(myGamepad.axes[2], -1, -.1, this.minPosition, this.panSpeed);
             if(this.panPos < this.minPosition){
                 this.panPos = this.minPosition;
             }
@@ -342,15 +340,13 @@ class GamePadTracker {
     
         //tilt
         if(myGamepad.axes[3] > .1){
-            moveAmt = this.mapToRange(myGamepad.axes[3], .1, 1, this.minPosition, this.tiltSpeed);
-            this.tiltPos += moveAmt;
+            this.tiltPos += this.mapToRange(myGamepad.axes[3], .1, 1, this.minPosition, this.tiltSpeed);
             if(this.tiltPos > this.maxPosition){
                 this.tiltPos = this.maxPosition;
             }
             command[3] = this.tiltPos;
-        }else if(myGamepad.axes[3] < -.1){
-            moveAmt =  this.mapToRange(myGamepad.axes[3], -1, -.1, this.minPosition, this.tiltSpeed);
-            this.tiltPos -= moveAmt;
+        }else if(myGamepad.axes[3] < -.1){ 
+            this.tiltPos -= this.mapToRange(myGamepad.axes[3], -1, -.1, this.minPosition, this.tiltSpeed);
             if(this.tiltPos < this.minPosition){
                 this.tiltPos = this.minPosition;
             }

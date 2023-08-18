@@ -10,8 +10,6 @@ require (
 	github.com/pion/rtcp v1.2.10
 	github.com/pion/webrtc/v3 v3.2.11
 	github.com/stianeikeland/go-rpio/v4 v4.6.0
-	github.com/tinyzimmer/go-glib v0.0.25
-	github.com/tinyzimmer/go-gst v0.2.33
 )
 
 require (
@@ -20,7 +18,6 @@ require (
 	github.com/gomodule/redigo v1.8.4 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
-	github.com/mattn/go-pointer v0.0.1 // indirect
 	github.com/pion/datachannel v1.5.5 // indirect
 	github.com/pion/dtls/v2 v2.2.7 // indirect
 	github.com/pion/ice/v2 v2.3.8 // indirect
