@@ -185,6 +185,7 @@ func (c *CarCommand) Start(ctx context.Context) error {
 				log.Printf("WARNING: command failed to parse: %s\n", err)
 				continue
 			}
+			log.Println("Command: %+v\n", parsedCommand)
 			// c.latestCommand.lock.Lock()
 			c.latestCommand.used = false
 			c.latestCommand.command = parsedCommand
@@ -239,6 +240,7 @@ func (c *CarCommand) sendNeutral() {
 
 func (c *CarCommand) sendCommand(command Command) {
 	if !c.options.DisableCommands {
+		log.Printf("Fraction: %f\n", float32(command.tilt/MaxValue))
 		c.servos.esc.Fraction(float32(command.esc / MaxValue))
 		c.servos.steer.Fraction(float32(command.steer / MaxValue))
 		c.servos.pan.Fraction(float32(command.pan / MaxValue))

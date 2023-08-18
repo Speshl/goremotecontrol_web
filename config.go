@@ -30,22 +30,22 @@ const DefaultRefreshRate = 60 //command refresh rate
 const DefaultDeadZone = 2
 
 const ESCChannel = 2
-const ESCLimit = 50
+const ESCLimit = 50 //Percent of range
 const MaxESCPulse = pca9685.ServoMaxPulseDef
 const MinESCPulse = pca9685.ServoMinPulseDef
 
 const SteerChannel = 3
-const SteerLimit = 50
+const SteerLimit = 50 //Percent of range
 const MaxSteerPulse = pca9685.ServoMaxPulseDef
 const MinSteerPulse = pca9685.ServoMinPulseDef
 
 const PanChannel = 1
-const PanLimit = 0
+const PanLimit = 0 //Percent of range
 const MaxPanPulse = pca9685.ServoMaxPulseDef
 const MinPanPulse = pca9685.ServoMinPulseDef
 
 const TiltChannel = 0
-const TiltLimit = 0
+const TiltLimit = 0 //Percent of range
 const MaxTiltPulse = pca9685.ServoMaxPulseDef
 const MinTiltPulse = pca9685.ServoMinPulseDef
 

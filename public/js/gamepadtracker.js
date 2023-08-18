@@ -4,8 +4,8 @@ class GamePadTracker {
         this.midPosition = 127;
         this.minPosition = 0;
 
-        this.panSpeed = 5;
-        this.tiltSpeed = 5;
+        this.panSpeed = 3;
+        this.tiltSpeed = 3;
 
         this.neutralCommand = [this.midPosition,this.midPosition,this.midPosition,this.midPosition,0];
         this.panPos = this.midPosition;
