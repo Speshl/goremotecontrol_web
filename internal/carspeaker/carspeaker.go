@@ -9,7 +9,9 @@ import (
 	"time"
 )
 
-const delayBetweenSounds = 2 * time.Second
+const DelayBetweenSounds = 2 * time.Second
+
+const DefaultVolume = "5.0"
 
 var soundMap = map[string]string{
 	//Affirmatives
@@ -47,14 +49,22 @@ type CarSpeaker struct {
 }
 
 type SpeakerOptions struct {
-	Name string
+	Volume string
 }
 
-func NewCarSpeaker(options SpeakerOptions) (*CarSpeaker, error) {
-	return &CarSpeaker{
+func NewCarSpeaker(options *SpeakerOptions) (*CarSpeaker, error) {
+	carSpeaker := CarSpeaker{
 		SpeakerChannel: make(chan string, 10),
-		options:        options,
-	}, nil
+		options: SpeakerOptions{
+			Volume: DefaultVolume,
+		},
+	}
+
+	if options != nil {
+		carSpeaker.options = *options
+	}
+
+	return &carSpeaker, nil
 }
 
 func (c *CarSpeaker) Start(ctx context.Context) error {
@@ -69,7 +79,7 @@ func (c *CarSpeaker) Start(ctx context.Context) error {
 				log.Println("speaker listener channel closed, stopping")
 				return nil
 			}
-			if c.lastPlayedAt.Add(delayBetweenSounds).Compare(time.Now()) == 1 {
+			if c.lastPlayedAt.Add(DelayBetweenSounds).Compare(time.Now()) == 1 {
 				continue //Skip playing sound so we don't spam
 			}
 
@@ -104,7 +114,7 @@ func (c *CarSpeaker) Play(ctx context.Context, sound string) error {
 	log.Printf("start playing %s sound\n", sound)
 	defer log.Printf("finished playing %s sound\n", sound)
 	args := []string{
-		"-D", "hw:CARD=wm8960soundcard,DEV=0",
+		"-D", "hw:CARD=wm8960soundcard,DEV=0", //TODO: Make these changeable by environment variable
 		soundPath,
 	}
 	cmd := exec.CommandContext(ctx, "aplay", args...)

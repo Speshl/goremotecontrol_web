@@ -15,9 +15,10 @@ type Connection struct {
 	PeerConnection *webrtc.PeerConnection
 	Cancel         context.CancelFunc
 	CTX            context.Context
+	Volume         string
 }
 
-func NewConnection(socketConn socketio.Conn) (*Connection, error) {
+func NewConnection(socketConn socketio.Conn, volume string) (*Connection, error) {
 	log.Printf("Creating Client %s\n", socketConn.ID())
 
 	peerConnection, err := webrtc.NewPeerConnection(webrtc.Configuration{
@@ -38,6 +39,7 @@ func NewConnection(socketConn socketio.Conn) (*Connection, error) {
 		PeerConnection: peerConnection,
 		Cancel:         cancelCTX,
 		CTX:            ctx,
+		Volume:         volume,
 	}
 	return conn, nil
 }

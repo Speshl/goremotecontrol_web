@@ -114,9 +114,9 @@ func NewCarCommand(options *CommandOptions) (*CarCommand, error) {
 		},
 	}
 
-	// if options != nil {
-	// 	carCommand.options = *options
-	// }
+	if options != nil {
+		carCommand.options = *options
+	}
 
 	err := carCommand.SetupServoController()
 	if err != nil {

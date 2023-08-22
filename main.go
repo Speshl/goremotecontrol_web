@@ -35,7 +35,7 @@ func main() {
 		log.Println("warning: gstreamer main loops ended")
 	}()
 
-	carSpeaker, err := carspeaker.NewCarSpeaker(carConfig.speakerConfig)
+	carSpeaker, err := carspeaker.NewCarSpeaker(&carConfig.speakerConfig)
 	if err != nil {
 		log.Printf("error creating carspeaker: %s\n", err)
 	}
@@ -56,7 +56,7 @@ func main() {
 		}
 	}()
 
-	carMic, err := carmic.NewCarMic(carConfig.micConfig)
+	carMic, err := carmic.NewCarMic(&carConfig.micConfig)
 	if err != nil {
 		log.Printf("error creating carmic: %s\n", err)
 		cancel() //stop anything else on this context because mic stopped
@@ -98,7 +98,7 @@ func main() {
 		log.Println("Stopping due to carcommand stopping unexpectedly")
 	}()
 
-	socketServer := server.NewServer(carMic.AudioTrack, carCam.VideoTrack, carCommand.CommandChannel, carSpeaker.SpeakerChannel)
+	socketServer := server.NewServer(carMic.AudioTrack, carCam.VideoTrack, carCommand.CommandChannel, carSpeaker.SpeakerChannel, carConfig.speakerConfig.Volume)
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()
 

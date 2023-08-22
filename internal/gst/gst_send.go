@@ -40,11 +40,11 @@ const (
 	pcmClockRate   = 8000
 )
 
-func CreateMicSendPipeline(tracks []*webrtc.TrackLocalStaticSample) *SendPipeline {
+func CreateMicSendPipeline(tracks []*webrtc.TrackLocalStaticSample, volume string) *SendPipeline {
 	pipelineStr := "appsink name=appsink"
 	var clockRate float32
 
-	pipelineStr = "pulsesrc volume=5.0 ! audioconvert ! opusenc ! appsink name=appsink"
+	pipelineStr = fmt.Sprintf("pulsesrc volume=%s ! audioconvert ! opusenc ! appsink name=appsink", volume)
 	clockRate = videoClockRate
 
 	pipelineStrUnsafe := C.CString(pipelineStr)

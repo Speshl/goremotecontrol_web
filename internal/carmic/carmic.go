@@ -8,29 +8,39 @@ import (
 	"github.com/pion/webrtc/v3"
 )
 
+const DefaultVolume = "5.0"
+
 type CarMic struct {
 	AudioTrack *webrtc.TrackLocalStaticSample
 	options    MicOptions
 }
 
 type MicOptions struct {
-	Name string
+	Volume string
 }
 
-func NewCarMic(options MicOptions) (*CarMic, error) {
+func NewCarMic(options *MicOptions) (*CarMic, error) {
 	// Create a audio track
 	audioTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: "audio/opus"}, "audio", "pion1")
 	if err != nil {
 		return nil, fmt.Errorf("error creating audio track: %w", err)
 	}
 
-	return &CarMic{
+	carMic := CarMic{
 		AudioTrack: audioTrack,
-		options:    options,
-	}, nil
+		options: MicOptions{
+			Volume: DefaultVolume,
+		},
+	}
+
+	if options != nil {
+		carMic.options = *options
+	}
+
+	return &carMic, nil
 }
 
 func (c *CarMic) Start() {
 	log.Println("Creating Pipeline")
-	gst.CreateMicSendPipeline([]*webrtc.TrackLocalStaticSample{c.AudioTrack}).Start()
+	gst.CreateMicSendPipeline([]*webrtc.TrackLocalStaticSample{c.AudioTrack}, c.options.Volume).Start()
 }
