@@ -146,33 +146,55 @@ class GamePadTracker {
     
         if(dpadValue == upkey.toFixed(2)){
             //up
-            command[3] = this.maxPosition;
+            this.tiltPos += this.tiltSpeed;
         }else if(dpadValue == uprightkey.toFixed(2)){
             //up-right
-            command[3] = this.maxPosition;
-            command[2] = this.maxPosition;
+            this.tiltPos += this.tiltSpeed;
+            this.panPos += this.panSpeed;
         }else if(dpadValue == rightkey.toFixed(2)){
             //right
-            command[2] = this.maxPosition;
+            this.panPos += this.panSpeed;
         }else if(dpadValue == downrightkey.toFixed(2)){
             //down-right
-            command[2] = this.maxPosition;
-            command[3] = this.minPosition;
+            this.panPos += this.panSpeed;
+            this.tiltPos -= this.tiltSpeed;
         }else if(dpadValue == downkey.toFixed(2)){
             //down
-            command[3] = this.minPosition;
+            this.tiltPos -= this.tiltSpeed;
         }else if(dpadValue == downleftkey.toFixed(2)){
             //down-left
-            command[3] = this.minPosition;
-            command[2] = this.minPosition;
+            this.panPos -= this.panSpeed;
+            this.tiltPos -= this.tiltSpeed;
         }else if(dpadValue == leftkey.toFixed(2)){
             //left
-            command[2] = this.minPosition;
+            this.panPos -= this.panSpeed;
         }else if(dpadValue == upleftkey.toFixed(2)){
             //up-left
-            command[2] = this.minPosition;
-            command[3] = this.maxPosition;
+            this.panPos -= this.panSpeed;
+            this.tiltPos += this.tiltSpeed;
         }
+
+        if(this.panPos < this.minPosition){
+            this.panPos = this.minPosition;
+        }
+        if(this.panPos > this.maxPosition){
+            this.panPos = this.maxPosition;
+        }
+
+        if(this.tiltPos < this.minPosition){
+            this.tiltPos = this.minPosition;
+        }
+        if(this.tiltPos > this.maxPosition){
+            this.tiltPos = this.maxPosition;
+        }
+
+        //Reset camera
+        if(myGamepad.buttons[11].pressed){ //TODO: Need to figure out button for this
+            this.panPos = this.midPosition;
+            this.tiltPos = this.midPosition;
+        }
+        command[2] = this.panPos;
+        command[3] = this.tiltPos;
         return command;
     }
 
@@ -320,32 +342,6 @@ class GamePadTracker {
             steerCommand = steerCommand + this.steeringTrim;
         }
         command[1] = steerCommand;
-    
-        //pan
-        // if(myGamepad.axes[2] > .1){
-        //     this.panPos += this.mapToRange(myGamepad.axes[2], .1, 1, this.minPosition, this.panSpeed);
-        //     if(this.panPos > this.maxPosition){
-        //         this.panPos = this.maxPosition;
-        //     }
-        // }else if(myGamepad.axes[2] < -.1){
-        //     this.panPos -= this.mapToRange(myGamepad.axes[2], -1, -.1, this.minPosition, this.panSpeed);
-        //     if(this.panPos < this.minPosition){
-        //         this.panPos = this.minPosition;
-        //     }
-        // }
-
-        //tilt
-        // if(myGamepad.axes[3] > .1){
-        //     this.tiltPos += this.mapToRange(myGamepad.axes[3], .1, 1, this.minPosition, this.tiltSpeed);
-        //     if(this.tiltPos > this.maxPosition){
-        //         this.tiltPos = this.maxPosition;
-        //     }
-        // }else if(myGamepad.axes[3] < -.1){ 
-        //     this.tiltPos -= this.mapToRange(myGamepad.axes[3], -1, -.1, this.minPosition, this.tiltSpeed);
-        //     if(this.tiltPos < this.minPosition){
-        //         this.tiltPos = this.minPosition;
-        //     }
-        // }
 
         if(myGamepad.axes[2] > .1 || myGamepad.axes[2] < -.1){
             this.panPos -= this.mapToRange(myGamepad.axes[2], -1, 1, -1*this.panSpeed, this.panSpeed);

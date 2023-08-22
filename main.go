@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -114,7 +115,8 @@ func main() {
 
 	go func() {
 		log.Println("Start serving http...")
-		err = http.ListenAndServe(":8181", nil)
+		addr := fmt.Sprintf(":%s", carConfig.serverConfig.Port)
+		err = http.ListenAndServe(addr, nil)
 		if !errors.Is(err, http.ErrServerClosed) {
 			log.Printf("HTTP server error: %v", err)
 		}

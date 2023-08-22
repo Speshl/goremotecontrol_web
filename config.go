@@ -13,7 +13,9 @@ import (
 	"github.com/googolgl/go-pca9685"
 )
 
-const DefaultCarName = "Car-Alpha"
+const DefaultCarName = "Default-Car"
+
+const DefaultPort = "8181"
 
 // Default Camera Options
 const DefaultWidth = "640"
@@ -51,7 +53,13 @@ const MinTiltPulse = pca9685.ServoMinPulseDef
 
 const disableCommands = false //used for debug, when commands are sent pi needs to be restarted after each app start/stop cycle
 
+type ServerConfig struct {
+	Name string
+	Port string
+}
+
 type CarConfig struct {
+	serverConfig  ServerConfig
 	camConfig     carcam.CameraOptions
 	commandConfig carcommand.CommandOptions
 	speakerConfig carspeaker.SpeakerOptions
@@ -61,25 +69,34 @@ type CarConfig struct {
 func GetConfig(ctx context.Context) CarConfig {
 	carConfig := CarConfig{}
 
-	name, found := os.LookupEnv("CARCAM_NAME")
-	if !found {
-		log.Printf("no name env variable found, others most likely not loaded...")
-		name = DefaultCarName
-	} else {
-		log.Printf("found value For CARCAM_NAME: %s\n")
-	}
-
-	carConfig.camConfig = GetCamConfig(ctx, name)
-	carConfig.commandConfig = GetCommandConfig(ctx, name)
+	carConfig.serverConfig = GetServerConfig(ctx)
+	carConfig.camConfig = GetCamConfig(ctx)
+	carConfig.commandConfig = GetCommandConfig(ctx)
 
 	log.Printf("Using Config: \n\n%+v\n\n", carConfig)
 	return carConfig
 }
 
-func GetCamConfig(ctx context.Context, name string) carcam.CameraOptions {
-	camConfig := carcam.CameraOptions{
-		Name: name,
+func GetServerConfig(ctx context.Context) ServerConfig {
+	serverConfig := ServerConfig{}
+
+	name, found := os.LookupEnv("CARCAM_NAME")
+	if !found {
+		name = DefaultCarName
 	}
+	serverConfig.Name = name
+
+	port, found := os.LookupEnv("CARCAM_PORT")
+	if !found {
+		port = DefaultPort
+	}
+	serverConfig.Port = port
+
+	return serverConfig
+}
+
+func GetCamConfig(ctx context.Context) carcam.CameraOptions {
+	camConfig := carcam.CameraOptions{}
 
 	width, found := os.LookupEnv("CARCAM_WIDTH")
 	if !found {
@@ -132,10 +149,8 @@ func GetCamConfig(ctx context.Context, name string) carcam.CameraOptions {
 	return camConfig
 }
 
-func GetCommandConfig(ctx context.Context, name string) carcommand.CommandOptions {
-	commandConfig := carcommand.CommandOptions{
-		Name: name,
-	}
+func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
+	commandConfig := carcommand.CommandOptions{}
 
 	refreshRate, found := os.LookupEnv("CARMCAM_REFRESH")
 	if !found {
@@ -171,7 +186,7 @@ func GetCommandConfig(ctx context.Context, name string) carcommand.CommandOption
 		intValue, err := strconv.ParseInt(escChannel, 10, 32)
 		if err != nil {
 			log.Printf("warning: esc channel not parsed - error: %s\n", err)
-			commandConfig.ESCChannel = ESCLimit
+			commandConfig.ESCChannel = ESCChannel
 		} else {
 			commandConfig.ESCChannel = int(intValue)
 		}
@@ -263,7 +278,7 @@ func GetCommandConfig(ctx context.Context, name string) carcommand.CommandOption
 		intValue, err := strconv.ParseInt(minSteerPulse, 10, 32)
 		if err != nil {
 			log.Printf("warning: min steer not parsed - error: %s\n", err)
-			commandConfig.MinSteerPulse = MinESCPulse
+			commandConfig.MinSteerPulse = MinSteerPulse
 		} else {
 			commandConfig.MinSteerPulse = float32(intValue)
 		}
@@ -311,12 +326,12 @@ func GetCommandConfig(ctx context.Context, name string) carcommand.CommandOption
 
 	minPanPulse, found := os.LookupEnv("CARMCAM_MINPAN")
 	if !found {
-		commandConfig.MinPanPulse = MinESCPulse
+		commandConfig.MinPanPulse = MinPanPulse
 	} else {
 		intValue, err := strconv.ParseInt(minPanPulse, 10, 32)
 		if err != nil {
 			log.Printf("warning: min pan not parsed - error: %s\n", err)
-			commandConfig.MinPanPulse = MinESCPulse
+			commandConfig.MinPanPulse = MinPanPulse
 		} else {
 			commandConfig.MinPanPulse = float32(intValue)
 		}
@@ -325,12 +340,12 @@ func GetCommandConfig(ctx context.Context, name string) carcommand.CommandOption
 	//Tilt Settings
 	tiltChannel, found := os.LookupEnv("CARMCAM_TILTCHANNEL")
 	if !found {
-		commandConfig.TiltChannel = ESCLimit
+		commandConfig.TiltChannel = TiltChannel
 	} else {
 		intValue, err := strconv.ParseInt(tiltChannel, 10, 32)
 		if err != nil {
 			log.Printf("warning: pan channel not parsed - error: %s\n", err)
-			commandConfig.TiltChannel = ESCLimit
+			commandConfig.TiltChannel = TiltChannel
 		} else {
 			commandConfig.TiltChannel = int(intValue)
 		}

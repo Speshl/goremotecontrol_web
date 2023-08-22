@@ -4,4 +4,4 @@ go build .
 
 export $(grep -v '^#' alpha_car.env | xargs)
 
-sudo ./goremotecontrol_web
+sudo -E ./goremotecontrol_web

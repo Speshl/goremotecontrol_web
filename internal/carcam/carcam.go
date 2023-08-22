@@ -17,7 +17,6 @@ type CarCam struct {
 }
 
 type CameraOptions struct {
-	Name           string
 	Width          string
 	Height         string
 	Fps            string
@@ -41,7 +40,6 @@ func NewCarCam(options CameraOptions) (*CarCam, error) {
 		VideoTrack:   videoTrack,
 		videoChannel: make(chan []byte, 5),
 		options: CameraOptions{
-			Name:           options.Name,
 			Width:          options.Width,
 			Height:         options.Height,
 			Fps:            options.Fps,

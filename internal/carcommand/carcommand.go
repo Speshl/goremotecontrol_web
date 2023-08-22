@@ -35,7 +35,6 @@ type Servos struct {
 // ServoMaxPulseDef float32 = 2250.0
 
 type CommandOptions struct {
-	Name            string
 	RefreshRate     int
 	DisableCommands bool
 	DeadZone        int
@@ -81,7 +80,6 @@ func NewCarCommand(options *CommandOptions) (*CarCommand, error) {
 	carCommand := CarCommand{
 		CommandChannel: make(chan []byte, 5),
 		options: CommandOptions{
-			Name:            "carcommand",
 			RefreshRate:     60,
 			DisableCommands: false,
 			DeadZone:        2,
@@ -185,10 +183,8 @@ func (c *CarCommand) Start(ctx context.Context) error {
 				log.Printf("WARNING: command failed to parse: %s\n", err)
 				continue
 			}
-			// c.latestCommand.lock.Lock()
 			c.latestCommand.used = false
 			c.latestCommand.command = parsedCommand
-			// c.latestCommand.lock.Unlock()
 		case <-commandTicker.C: //time to send command to gpio
 
 			if c.latestCommand.used {
@@ -203,11 +199,8 @@ func (c *CarCommand) Start(ctx context.Context) error {
 			} else {
 				seenSameCommand = 0
 				warned = false
-				// c.latestCommand.lock.RUnlock()
-				// c.latestCommand.lock.Lock()
 				c.latestCommand.used = true
 				command := c.latestCommand.command
-				// c.latestCommand.lock.Unlock()
 				c.sendCommand(command)
 			}
 		}
