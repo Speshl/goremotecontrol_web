@@ -96,29 +96,49 @@ class KeyPressTracker {
         if(this.pressedKeys['ArrowLeft'] === true) {
             this.panPos -= this.panSpeed;
             if(this.panPos < this.minPosition){
-                this.panPos = this.minPosition
+                this.panPos = this.minPosition;
             }
         }else if(this.pressedKeys['ArrowRight'] === true) {
             this.panPos += this.panSpeed;
             if(this.panPos > this.maxPosition){
-                this.panPos = this.maxPosition
+                this.panPos = this.maxPosition;
             }
         }else{
-            this.panPos = this.midPosition
+            if(this.panPos > this.midPosition){
+                this.panPos -= this.panSpeed;
+            }
+            if(this.panPos < this.midPosition){
+                this.panPos += this.panSpeed;
+            }
+            
+            let diffrence = this.panPos - this.midPosition
+            if(Math.abs(diffrence) > this.panSpeed){
+                this.panPos = this.midPosition
+            }
         }
 
         if(this.pressedKeys['ArrowDown'] === true) {
             this.tiltPos -= this.tiltSpeed;
             if(this.tiltPos < this.minPosition){
-                this.tiltPos = this.minPosition
+                this.tiltPos = this.minPosition;
             }
         }else if(this.pressedKeys['ArrowUp'] === true) {
             this.tiltPos += this.tiltSpeed;
             if(this.tiltPos > this.maxPosition){
-                this.tiltPos = this.maxPosition
+                this.tiltPos = this.maxPosition;
             }
         }else{
-            this.tiltPos = this.midPosition
+            if(this.tiltPos > this.midPosition){
+                this.tiltPos -= this.tiltSpeed;
+            }
+            if(this.tiltPos < this.midPosition){
+                this.tiltPos += this.tiltSpeed;
+            }
+            
+            let diffrence = this.tiltPos - this.midPosition
+            if(Math.abs(diffrence) > this.tiltSpeed){
+                this.tiltPos = this.midPosition
+            }
         }
 
         //Resent camera on spacebar
