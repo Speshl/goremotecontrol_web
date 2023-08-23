@@ -8,7 +8,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Speshl/goremotecontrol_web/internal/carmic"
 	"github.com/Speshl/goremotecontrol_web/internal/carspeaker"
 	"github.com/Speshl/goremotecontrol_web/internal/gst"
 )
@@ -50,14 +49,14 @@ func main() {
 		}
 	}()
 
-	carMic, err := carmic.NewCarMic(&carConfig.micConfig)
-	if err != nil {
-		log.Printf("error creating carmic: %s\n", err)
-		cancel() //stop anything else on this context because mic stopped
-	}
+	// carMic, err := carmic.NewCarMic(&carConfig.micConfig)
+	// if err != nil {
+	// 	log.Printf("error creating carmic: %s\n", err)
+	// 	cancel() //stop anything else on this context because mic stopped
+	// }
 
-	carMic.Start() //TODO: Figure out why starting mic stop client audio
-	log.Println("Mic Started")
+	// carMic.Start() //TODO: Figure out why starting mic stop client audio
+	// log.Println("Mic Started")
 
 	//Temp way to connect client to server before splitting client out to separate repo
 	// carCam, err := carcam.NewCarCam(carConfig.camConfig)
