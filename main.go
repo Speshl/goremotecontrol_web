@@ -2,21 +2,15 @@ package main
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/Speshl/goremotecontrol_web/internal/carcam"
-	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	"github.com/Speshl/goremotecontrol_web/internal/carmic"
 	"github.com/Speshl/goremotecontrol_web/internal/carspeaker"
 	"github.com/Speshl/goremotecontrol_web/internal/gst"
-	"github.com/Speshl/goremotecontrol_web/internal/server"
 )
 
 func main() {
@@ -66,63 +60,63 @@ func main() {
 	log.Println("Mic Started")
 
 	//Temp way to connect client to server before splitting client out to separate repo
-	carCam, err := carcam.NewCarCam(carConfig.camConfig)
-	if err != nil {
-		log.Printf("error creating carcam: %s\n", err)
-		cancel() //stop anything else on this context because camera stopped
-	}
+	// carCam, err := carcam.NewCarCam(carConfig.camConfig)
+	// if err != nil {
+	// 	log.Printf("error creating carcam: %s\n", err)
+	// 	cancel() //stop anything else on this context because camera stopped
+	// }
 
-	go func() {
-		err = carCam.Start(ctx)
-		if err != nil {
-			log.Printf("carcam error: %s\n", err.Error())
-		}
-		cancel() //stop anything else on this context because camera stopped
-		log.Println("Stopping due to carcam stopping unexpectedly")
-	}()
+	// go func() {
+	// 	err = carCam.Start(ctx)
+	// 	if err != nil {
+	// 		log.Printf("carcam error: %s\n", err.Error())
+	// 	}
+	// 	cancel() //stop anything else on this context because camera stopped
+	// 	log.Println("Stopping due to carcam stopping unexpectedly")
+	// }()
 
-	//give time for camera to start before commands start
-	time.Sleep(2 * time.Second)
+	// //give time for camera to start before commands start
+	// time.Sleep(2 * time.Second)
 
-	carCommand, err := carcommand.NewCarCommand(&carConfig.commandConfig)
-	if err != nil {
-		log.Printf("error creating carcommand: %s\n", err)
-		cancel() //stop anything else on this context because camera stopped
-	}
-	go func() {
-		err := carCommand.Start(ctx)
-		if err != nil {
-			log.Printf("carcommand error: %s\n", err.Error())
-		}
-		cancel() //stop anything else on this context because the gpio output stopped
-		log.Println("Stopping due to carcommand stopping unexpectedly")
-	}()
+	// carCommand, err := carcommand.NewCarCommand(&carConfig.commandConfig)
+	// if err != nil {
+	// 	log.Printf("error creating carcommand: %s\n", err)
+	// 	cancel() //stop anything else on this context because camera stopped
+	// }
+	// go func() {
+	// 	err := carCommand.Start(ctx)
+	// 	if err != nil {
+	// 		log.Printf("carcommand error: %s\n", err.Error())
+	// 	}
+	// 	cancel() //stop anything else on this context because the gpio output stopped
+	// 	log.Println("Stopping due to carcommand stopping unexpectedly")
+	// }()
 
-	socketServer := server.NewServer(carMic.AudioTrack, carCam.VideoTrack, carCommand.CommandChannel, carSpeaker.SpeakerChannel, carConfig.speakerConfig.Volume)
-	socketServer.RegisterHTTPHandlers()
-	socketServer.RegisterSocketIOHandlers()
+	// socketServer := server.NewServer(carMic.AudioTrack, carCam.VideoTrack, carCommand.CommandChannel, carSpeaker.SpeakerChannel, carConfig.speakerConfig.Volume)
+	// socketServer.RegisterHTTPHandlers()
+	// socketServer.RegisterSocketIOHandlers()
 
-	defer socketServer.Close()
+	// defer socketServer.Close()
 
-	go func() {
-		log.Println("Start serving socketio...")
-		if err := socketServer.Serve(); err != nil {
-			log.Printf("socketio listen error: %s\n", err)
-		}
-		cancel() //stop anything else on this context because the socker server stopped
-		log.Println("Stopping due to socker server stopping unexpectedly")
-	}()
+	// go func() {
+	// 	log.Println("Start serving socketio...")
+	// 	if err := socketServer.Serve(); err != nil {
+	// 		log.Printf("socketio listen error: %s\n", err)
+	// 	}
+	// 	cancel() //stop anything else on this context because the socker server stopped
+	// 	log.Println("Stopping due to socker server stopping unexpectedly")
+	// }()
 
-	go func() {
-		log.Println("Start serving http...")
-		addr := fmt.Sprintf(":%s", carConfig.serverConfig.Port)
-		err = http.ListenAndServe(addr, nil)
-		if !errors.Is(err, http.ErrServerClosed) {
-			log.Printf("HTTP server error: %v", err)
-		}
-		cancel() //stop anything else on this context because the http server stopped
-		log.Println("Stopping due to http server stopping unexpectedly")
-	}()
+	// go func() {
+	// 	log.Println("Start serving http...")
+	// 	addr := fmt.Sprintf(":%s", carConfig.serverConfig.Port)
+	// 	err = http.ListenAndServe(addr, nil)
+	// 	if !errors.Is(err, http.ErrServerClosed) {
+	// 		log.Printf("HTTP server error: %v", err)
+	// 	}
+	// 	cancel() //stop anything else on this context because the http server stopped
+	// 	log.Println("Stopping due to http server stopping unexpectedly")
+	// }()
 
 	//Handle shutdown signals
 	signal.Ignore(os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
