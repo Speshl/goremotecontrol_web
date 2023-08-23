@@ -253,6 +253,7 @@ func (c *CarCommand) sendNeutral() error {
 			return err
 		}
 	}
+	return nil
 }
 
 func (c *CarCommand) sendCommand(command Command) error {
