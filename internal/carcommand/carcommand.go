@@ -194,14 +194,20 @@ func (c *CarCommand) Start(ctx context.Context) error {
 						log.Println("no command, sending neutral")
 					}
 					warned = true
-					c.sendNeutral()
+					err := c.sendNeutral()
+					if err != nil {
+						return fmt.Errorf("error sending neutral command: %w", err)
+					}
 				}
 			} else {
 				seenSameCommand = 0
 				warned = false
 				c.latestCommand.used = true
 				command := c.latestCommand.command
-				c.sendCommand(command)
+				err := c.sendCommand(command)
+				if err != nil {
+					return fmt.Errorf("error sending neutral command: %w", err)
+				}
 			}
 		}
 	}
@@ -221,22 +227,61 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 	return c.applyDeadZone(parsedCommand), nil
 }
 
-func (c *CarCommand) sendNeutral() {
+func (c *CarCommand) sendNeutral() error {
 	if !c.options.DisableCommands {
-		c.servos.esc.Fraction(0.5)
-		c.servos.steer.Fraction(0.5)
-		c.servos.pan.Fraction(0.5)
-		c.servos.tilt.Fraction(0.5)
+		err := c.servos.esc.Fraction(0.5)
+		if err != nil {
+			log.Printf("failed sending esc command: %s\n", err.Error())
+			return err
+		}
+
+		err = c.servos.steer.Fraction(0.5)
+		if err != nil {
+			log.Printf("failed sending steer command: %s\n", err.Error())
+			return err
+		}
+
+		err = c.servos.pan.Fraction(0.5)
+		if err != nil {
+			log.Printf("failed sending pan command: %s\n", err.Error())
+			return err
+		}
+
+		err = c.servos.tilt.Fraction(0.5)
+		if err != nil {
+			log.Printf("failed sending tilt command: %s\n", err.Error())
+			return err
+		}
 	}
 }
 
-func (c *CarCommand) sendCommand(command Command) {
+func (c *CarCommand) sendCommand(command Command) error {
 	if !c.options.DisableCommands {
-		c.servos.esc.Fraction(float32(command.esc) / MaxValue)
-		c.servos.steer.Fraction(float32(command.steer) / MaxValue)
-		c.servos.pan.Fraction(float32(command.pan) / MaxValue)
-		c.servos.tilt.Fraction(float32(command.tilt) / MaxValue)
+		err := c.servos.esc.Fraction(float32(command.esc) / MaxValue)
+		if err != nil {
+			log.Printf("failed sending esc command: %s\n", err.Error())
+			return err
+		}
+
+		err = c.servos.steer.Fraction(float32(command.steer) / MaxValue)
+		if err != nil {
+			log.Printf("failed sending steer command: %s\n", err.Error())
+			return err
+		}
+
+		err = c.servos.pan.Fraction(float32(command.pan) / MaxValue)
+		if err != nil {
+			log.Printf("failed sending pan command: %s\n", err.Error())
+			return err
+		}
+
+		err = c.servos.tilt.Fraction(float32(command.tilt) / MaxValue)
+		if err != nil {
+			log.Printf("failed sending tilt command: %s\n", err.Error())
+			return err
+		}
 	}
+	return nil
 }
 
 func (c *CarCommand) mapToRange(value, min, max, minReturn, maxReturn uint32) uint32 {
