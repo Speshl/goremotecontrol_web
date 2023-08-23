@@ -1,7 +1,7 @@
 #!/bin/sh
 
 rm ./goremotecontrol_web
-
+echo Compiling...
 go build .
 
 export $(grep -v '^#' alpha_car.env | xargs)

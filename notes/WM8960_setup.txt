@@ -1,12 +1,4 @@
-gst-launch-1.0 -v audiotestsrc wave=sine num-buffers=100 ! audioconvert ! opusenc ! oggmux ! filesink location=sine.ogg
-
-gst-launch-1.0 audiotestsrc wave=sine ! opusenc ! oggmux ! filesink location=test.ogg
-
-gst-launch-1.0 pulsesrc ! audioconvert ! opusenc ! oggmux ! filesink location=mic.ogg
-
-
-
-
+Get Video/Audio Working
 
 Must do below to run pulseaudio with sudo
 
@@ -22,3 +14,27 @@ systemctl --system enable pulseaudio.service
 systemctl --system start pulseaudio.service       
 sudo cp ./client.conf /etc/pulse/client.conf        
 sudo sed -i '/^pulse-access:/ s/$/root,pi/' /etc/group    
+
+
+
+
+
+https://www.waveshare.com/wiki/WM8960_Audio_HAT
+
+cd ~
+
+git clone https://github.com/waveshare/WM8960-Audio-HAT
+
+cd WM8960-Audio-HAT
+
+sudo ./install.sh 
+
+sudo reboot
+
+//Check if driver is installed
+sudo dkms status
+
+sudo raspi-config
+//Use GUI to set WM8960 as default audio device
+
+//aplay should function and be able to play wav files through the speakers
