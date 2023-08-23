@@ -1,6 +1,11 @@
 #!/bin/sh
 
-rm ./goremotecontrol_web
+file="./goremotecontrol_web"
+
+if [ -f "$file" ] ; then
+    rm "$file"
+fi
+
 echo Compiling...
 go build .
 
