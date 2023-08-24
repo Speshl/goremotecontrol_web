@@ -14,7 +14,7 @@ import (
 func (c *Connection) PlayTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
 	log.Println("start playing client track")
 	defer log.Println("done playing client track")
-	// Send a PLI on an interval so that the publisher is pushing a keyframe every rtcpPLIInterval
+	// Send a PLI on an interval so that the publisher is pushing a keyframe every rtcpPLIInterval. Not sure what this means or if I need it?
 	go func() {
 		ticker := time.NewTicker(time.Second * 3)
 		for range ticker.C {
@@ -40,7 +40,7 @@ func (c *Connection) PlayTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPRe
 			log.Printf("stopping client audio - error reading client audio track buffer - %w\n", err)
 			return
 		}
-		log.Printf("Pushing %d bytes to pipeline", i)
+		//log.Printf("Pushing %d bytes to pipeline", i)
 		pipeline.Push(buf[:i])
 	}
 }
