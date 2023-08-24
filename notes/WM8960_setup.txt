@@ -39,3 +39,10 @@ sudo raspi-config
 //Use GUI to set WM8960 as default audio device
 
 //aplay should function and be able to play wav files through the speakers
+
+
+
+#optional noise filter
+https://askubuntu.com/questions/18958/realtime-noise-removal-with-pulseaudio
+
+wget -qO - https://gist.githubusercontent.com/grigio/cb93c3e8710a6f045a3dd9456ec01799/raw/94f07c7d75bcf5dd9b08a9c3034844223ec6fbe1/fix-microphone-background-noise.sh | sudo bash && pulseaudio -k
