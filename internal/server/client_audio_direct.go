@@ -40,7 +40,7 @@ func (c *Connection) PlayTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPRe
 			log.Printf("stopping client audio - error reading client audio track buffer - %w\n", err)
 			return
 		}
-		//log.Printf("Pushing %d bytes to pipeline", i)
+		log.Printf("Pushing %d bytes to pipeline", i)
 		pipeline.Push(buf[:i])
 	}
 }
