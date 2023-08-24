@@ -31,13 +31,13 @@ type RecievePipeline struct {
 }
 
 // CreatePipeline creates a GStreamer Pipeline
-func CreateRecievePipeline(payloadType webrtc.PayloadType, codecName string, volume string) *RecievePipeline {
+func CreateRecievePipeline(payloadType webrtc.PayloadType, codecName string, device int, volume string) *RecievePipeline {
 	pipelineStr := "appsrc format=time is-live=true do-timestamp=true name=src ! application/x-rtp"
 	switch strings.ToLower(codecName) {
 	// case "vp8":
 	// 	pipelineStr += fmt.Sprintf(", payload=%d, encoding-name=VP8-DRAFT-IETF-01 ! rtpvp8depay ! decodebin ! autovideosink", payloadType)
 	case "opus":
-		pipelineStr += fmt.Sprintf(", payload=%d, encoding-name=OPUS ! rtpopusdepay ! decodebin ! pulsesink device=1 volume=%s", payloadType, volume)
+		pipelineStr += fmt.Sprintf(", payload=%d, encoding-name=OPUS ! rtpopusdepay ! decodebin ! pulsesink device=%s volume=%s", payloadType, device, volume)
 	// case "vp9":
 	// 	pipelineStr += " ! rtpvp9depay ! decodebin ! autovideosink"
 	// case "h264":

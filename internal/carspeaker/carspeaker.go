@@ -11,6 +11,7 @@ import (
 
 const DelayBetweenSounds = 2 * time.Second
 
+const DefaultDevice = "0"
 const DefaultVolume = "5.0"
 
 var soundMap = map[string]string{
@@ -49,6 +50,7 @@ type CarSpeaker struct {
 }
 
 type SpeakerOptions struct {
+	Device string
 	Volume string
 }
 
@@ -57,6 +59,7 @@ func NewCarSpeaker(options *SpeakerOptions) (*CarSpeaker, error) {
 		SpeakerChannel: make(chan string, 10),
 		options: SpeakerOptions{
 			Volume: DefaultVolume,
+			Device: DefaultDevice,
 		},
 	}
 

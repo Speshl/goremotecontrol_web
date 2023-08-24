@@ -4,7 +4,8 @@ Must do below to run pulseaudio with sudo
 
 https://github.com/shivasiddharth/PulseAudio-System-Wide
 
-sudo apt-get update     
+sudo apt-get update   
+sudo apt-get install pulseaudio  
 sudo apt-get install git    
 cd /home/${USER}/       
 git clone https://github.com/shivasiddharth/PulseAudio-System-Wide       

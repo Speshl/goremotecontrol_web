@@ -28,9 +28,11 @@ const DefaultProfile = "high"
 const disableVideo = false //used for debug, starting cam can fail without a restart
 
 // Default Mic Options
+const DefaultMicDevice = "0"
 const DefaultMicVolume = "5.0"
 
 // Default Speaker Options
+const DefaultSpeakerDevice = "0"
 const DefaultSpeakerVolume = "5.0"
 
 // Default Command Options
@@ -106,6 +108,12 @@ func GetServerConfig(ctx context.Context) ServerConfig {
 func GetMicConfig(ctx context.Context) carmic.MicOptions {
 	micConfig := carmic.MicOptions{}
 
+	device, found := os.LookupEnv("CARCAM_MICDEVICE")
+	if !found {
+		device = DefaultMicDevice
+	}
+	micConfig.Device = device
+
 	volume, found := os.LookupEnv("CARCAM_MICVOLUME")
 	if !found {
 		volume = DefaultMicVolume
@@ -117,6 +125,12 @@ func GetMicConfig(ctx context.Context) carmic.MicOptions {
 
 func GetSpeakerConfig(ctx context.Context) carspeaker.SpeakerOptions {
 	speakerConfig := carspeaker.SpeakerOptions{}
+
+	device, found := os.LookupEnv("CARCAM_SPEAKERDEVICE")
+	if !found {
+		device = DefaultSpeakerDevice
+	}
+	speakerConfig.Device = device
 
 	volume, found := os.LookupEnv("CARCAM_SPEAKERVOLUME")
 	if !found {

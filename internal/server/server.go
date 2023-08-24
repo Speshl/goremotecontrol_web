@@ -20,6 +20,7 @@ type Server struct {
 	speakerChannel chan string
 
 	clientAudioVolume string
+	clientAudioDevice string
 
 	socketio        *socketio.Server
 	connections     map[string]*Connection
@@ -30,7 +31,7 @@ var allowOriginFunc = func(r *http.Request) bool {
 	return true
 }
 
-func NewServer(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample, commandChannel chan []byte, speakerChannel chan string, volume string) *Server {
+func NewServer(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample, commandChannel chan []byte, speakerChannel chan string, device string, volume string) *Server {
 	socketioServer := socketio.NewServer(&engineio.Options{
 		Transports: []transport.Transport{
 			&polling.Transport{
@@ -51,6 +52,7 @@ func NewServer(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.Tra
 		carAudioTrack:     audioTrack,
 		carVideoTrack:     videoTrack,
 		clientAudioVolume: volume,
+		clientAudioDevice: device,
 	}
 }
 
@@ -67,7 +69,7 @@ func (s *Server) GetHandler() *socketio.Server {
 }
 
 func (s *Server) NewClientConn(socketConn socketio.Conn) (*Connection, error) {
-	clientConn, err := NewConnection(socketConn, s.clientAudioVolume)
+	clientConn, err := NewConnection(socketConn, s.clientAudioDevice, s.clientAudioVolume)
 	if err != nil {
 		return nil, err
 	}

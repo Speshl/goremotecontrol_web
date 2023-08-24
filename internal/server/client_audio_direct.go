@@ -31,7 +31,7 @@ func (c *Connection) PlayTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPRe
 
 	codecName := strings.Split(track.Codec().RTPCodecCapability.MimeType, "/")[1]
 	fmt.Printf("Track has started, of type %d: %s \n", track.PayloadType(), codecName)
-	pipeline := gst.CreateRecievePipeline(track.PayloadType(), strings.ToLower(codecName), c.Volume)
+	pipeline := gst.CreateRecievePipeline(track.PayloadType(), strings.ToLower(codecName), c.Device, c.Volume)
 	pipeline.Start()
 	buf := make([]byte, 1400)
 	for {

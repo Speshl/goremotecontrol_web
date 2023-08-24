@@ -8,6 +8,7 @@ import (
 	"github.com/pion/webrtc/v3"
 )
 
+const DefaultDevice = "0"
 const DefaultVolume = "5.0"
 
 type CarMic struct {
@@ -16,6 +17,7 @@ type CarMic struct {
 }
 
 type MicOptions struct {
+	Device string
 	Volume string
 }
 
@@ -30,6 +32,7 @@ func NewCarMic(options *MicOptions) (*CarMic, error) {
 		AudioTrack: audioTrack,
 		options: MicOptions{
 			Volume: DefaultVolume,
+			Device: DefaultDevice,
 		},
 	}
 
