@@ -31,7 +31,7 @@ type RecievePipeline struct {
 }
 
 // CreatePipeline creates a GStreamer Pipeline
-func CreateRecievePipeline(payloadType webrtc.PayloadType, codecName string, device int, volume string) *RecievePipeline {
+func CreateRecievePipeline(payloadType webrtc.PayloadType, codecName string, device string, volume string) *RecievePipeline {
 	pipelineStr := "appsrc format=time is-live=true do-timestamp=true name=src ! application/x-rtp"
 	switch strings.ToLower(codecName) {
 	// case "vp8":
