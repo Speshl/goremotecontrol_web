@@ -233,7 +233,7 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 	}
 
 	if parsedCommand.pan > MaxValue {
-		log.Printf("MAX VALUE TO HIGH: %d\n", parsedCommand.pan)
+		log.Printf("MAX VALUE TO HIGH BEFORE INVERT: %d\n", parsedCommand.pan)
 	}
 
 	if c.options.ESCInvert {
@@ -252,7 +252,17 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 		parsedCommand.tilt = c.invertCommand(parsedCommand.tilt, MidValue)
 	}
 
-	return c.applyDeadZone(parsedCommand), nil
+	if parsedCommand.pan > MaxValue {
+		log.Printf("MAX VALUE TO HIGH AFTER INVERT: %d\n", parsedCommand.pan)
+	}
+
+	withDeadzones := c.applyDeadZone(parsedCommand)
+
+	if parsedCommand.pan > MaxValue {
+		log.Printf("MAX VALUE TO HIGH AFTER Deadzones: %d\n", parsedCommand.pan)
+	}
+
+	return withDeadzones, nil
 }
 
 func (c *CarCommand) sendNeutral() error {
