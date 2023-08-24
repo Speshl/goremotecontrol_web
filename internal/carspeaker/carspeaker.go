@@ -46,9 +46,9 @@ var soundGroups = map[string][]string{
 
 type CarSpeaker struct {
 	SpeakerChannel chan string
-	lastPlayedAt   time.Time
 	options        SpeakerOptions
-	locked         sync.Mutex
+	lock           sync.RWMutex
+	playing        bool
 }
 
 type SpeakerOptions struct {
@@ -84,13 +84,13 @@ func (c *CarSpeaker) Start(ctx context.Context) error {
 				return nil
 			}
 
-			gotLock := c.locked.TryLock() //Only allows one through while ignoring the rest. Unlocks once sound stops playing and is ready for another sound
+			gotLock := c.lock.TryLock()
 			if !gotLock {
-				continue //locked so skip
+				continue
 			}
 
-			c.lastPlayedAt = time.Now()
 			go func() {
+				defer c.lock.Unlock()
 				err := c.PlayFromGroup(ctx, data)
 				if err != nil {
 					log.Printf("failed to play sound from group - %s\n", err.Error())
@@ -111,11 +111,9 @@ func (c *CarSpeaker) PlayFromGroup(ctx context.Context, group string) error {
 }
 
 func (c *CarSpeaker) Play(ctx context.Context, sound string) error {
-	defer func() {
-		log.Printf("finished playing %s sound\n", sound)
-		c.locked.Unlock()
-	}()
+
 	log.Printf("start playing %s sound\n", sound)
+	defer log.Printf("finished playing %s sound\n", sound)
 
 	soundPath, ok := soundMap[sound]
 	if !ok {
