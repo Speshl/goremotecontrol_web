@@ -2,15 +2,21 @@ package main
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/Speshl/goremotecontrol_web/internal/carcam"
+	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	"github.com/Speshl/goremotecontrol_web/internal/carmic"
 	"github.com/Speshl/goremotecontrol_web/internal/carspeaker"
 	"github.com/Speshl/goremotecontrol_web/internal/gst"
+	"github.com/Speshl/goremotecontrol_web/internal/server"
 )
 
 func main() {
@@ -59,7 +65,7 @@ func main() {
 	carMic.Start() //TODO: Figure out why starting mic stop client audio
 	log.Println("Mic Started")
 
-	Temp way to connect client to server before splitting client out to separate repo
+	//Temp way to connect client to server before splitting client out to separate repo
 	carCam, err := carcam.NewCarCam(carConfig.camConfig)
 	if err != nil {
 		log.Printf("error creating carcam: %s\n", err)
@@ -92,7 +98,7 @@ func main() {
 		log.Println("Stopping due to carcommand stopping unexpectedly")
 	}()
 
-	socketServer := server.NewServer(carMic.AudioTrack, carCam.VideoTrack, carCommand.CommandChannel, carSpeaker.SpeakerChannel,carConfig.speakerConfig.Device, carConfig.speakerConfig.Volume)
+	socketServer := server.NewServer(carMic.AudioTrack, carCam.VideoTrack, carCommand.CommandChannel, carSpeaker.SpeakerChannel, carConfig.speakerConfig.Device, carConfig.speakerConfig.Volume)
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()
 
