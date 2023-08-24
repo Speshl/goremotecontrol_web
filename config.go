@@ -41,21 +41,25 @@ const DefaultDeadZone = 2
 
 const ESCChannel = 2
 const ESCLimit = 50 //Percent of range
+const ESCInvert = false
 const MaxESCPulse = pca9685.ServoMaxPulseDef
 const MinESCPulse = pca9685.ServoMinPulseDef
 
 const SteerChannel = 3
 const SteerLimit = 50 //Percent of range
+const SteerInvert = false
 const MaxSteerPulse = pca9685.ServoMaxPulseDef
 const MinSteerPulse = pca9685.ServoMinPulseDef
 
 const PanChannel = 1
 const PanLimit = 0 //Percent of range
+const PanInvert = false
 const MaxPanPulse = pca9685.ServoMaxPulseDef
 const MinPanPulse = pca9685.ServoMinPulseDef
 
 const TiltChannel = 0
 const TiltLimit = 0 //Percent of range
+const TiltInvert = false
 const MaxTiltPulse = pca9685.ServoMaxPulseDef
 const MinTiltPulse = pca9685.ServoMinPulseDef
 
@@ -156,13 +160,13 @@ func GetCamConfig(ctx context.Context) carcam.CameraOptions {
 	}
 	camConfig.Height = height
 
-	fps, found := os.LookupEnv("CARMCAM_FPS")
+	fps, found := os.LookupEnv("CARCAM_FPS")
 	if !found {
 		fps = DefaultFPS
 	}
 	camConfig.Fps = fps
 
-	vFlip, found := os.LookupEnv("CARMCAM_VFLIP")
+	vFlip, found := os.LookupEnv("CARCAM_VFLIP")
 	if !found {
 		camConfig.VerticalFlip = DefaultVerticalFlip
 	} else {
@@ -174,7 +178,7 @@ func GetCamConfig(ctx context.Context) carcam.CameraOptions {
 		camConfig.VerticalFlip = boolValue
 	}
 
-	hFlip, found := os.LookupEnv("CARMCAM_HFLIP")
+	hFlip, found := os.LookupEnv("CARCAM_HFLIP")
 	if !found {
 		camConfig.HorizontalFlip = DefaultHorizontalFlip
 	} else {
@@ -198,7 +202,7 @@ func GetCamConfig(ctx context.Context) carcam.CameraOptions {
 func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 	commandConfig := carcommand.CommandOptions{}
 
-	refreshRate, found := os.LookupEnv("CARMCAM_REFRESH")
+	refreshRate, found := os.LookupEnv("CARCAM_REFRESH")
 	if !found {
 		commandConfig.RefreshRate = DefaultRefreshRate
 	} else {
@@ -211,7 +215,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	deadZone, found := os.LookupEnv("CARMCAM_DEADZONE")
+	deadZone, found := os.LookupEnv("CARCAM_DEADZONE")
 	if !found {
 		commandConfig.DeadZone = int(DefaultDeadZone)
 	} else {
@@ -225,7 +229,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 	}
 
 	//ESC Settings
-	escChannel, found := os.LookupEnv("CARMCAM_ESCCHANNEL")
+	escChannel, found := os.LookupEnv("CARCAM_ESCCHANNEL")
 	if !found {
 		commandConfig.ESCChannel = ESCChannel
 	} else {
@@ -238,7 +242,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	escLimit, found := os.LookupEnv("CARMCAM_ESCLIMIT")
+	escLimit, found := os.LookupEnv("CARCAM_ESCLIMIT")
 	if !found {
 		commandConfig.ESCLimit = ESCLimit
 	} else {
@@ -251,7 +255,20 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	maxESCPulse, found := os.LookupEnv("CARMCAM_MAXESC")
+	escInvert, found := os.LookupEnv("CARCAM_ESCINVERT")
+	if !found {
+		commandConfig.ESCInvert = ESCInvert
+	} else {
+		boolValue, err := strconv.ParseBool(escInvert)
+		if err != nil {
+			log.Printf("warning: esc invert not parsed - error: %s\n", err)
+			commandConfig.ESCInvert = ESCInvert
+		} else {
+			commandConfig.ESCInvert = boolValue
+		}
+	}
+
+	maxESCPulse, found := os.LookupEnv("CARCAM_MAXESC")
 	if !found {
 		commandConfig.MaxESCPulse = MaxESCPulse
 	} else {
@@ -264,7 +281,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	minESCPulse, found := os.LookupEnv("CARMCAM_MINESC")
+	minESCPulse, found := os.LookupEnv("CARCAM_MINESC")
 	if !found {
 		commandConfig.MinESCPulse = MinESCPulse
 	} else {
@@ -278,7 +295,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 	}
 
 	//Steer Settings
-	steerChannel, found := os.LookupEnv("CARMCAM_STEERCHANNEL")
+	steerChannel, found := os.LookupEnv("CARCAM_STEERCHANNEL")
 	if !found {
 		commandConfig.SteerChannel = SteerChannel
 	} else {
@@ -291,7 +308,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	steerLimit, found := os.LookupEnv("CARMCAM_STEERLIMIT")
+	steerLimit, found := os.LookupEnv("CARCAM_STEERLIMIT")
 	if !found {
 		commandConfig.SteerLimit = SteerLimit
 	} else {
@@ -304,7 +321,20 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	maxSteerPulse, found := os.LookupEnv("CARMCAM_MAXSTEER")
+	steerInvert, found := os.LookupEnv("CARCAM_STEERINVERT")
+	if !found {
+		commandConfig.SteerInvert = SteerInvert
+	} else {
+		boolValue, err := strconv.ParseBool(steerInvert)
+		if err != nil {
+			log.Printf("warning: steer invert not parsed - error: %s\n", err)
+			commandConfig.SteerInvert = SteerInvert
+		} else {
+			commandConfig.SteerInvert = boolValue
+		}
+	}
+
+	maxSteerPulse, found := os.LookupEnv("CARCAM_MAXSTEER")
 	if !found {
 		commandConfig.MaxSteerPulse = MaxSteerPulse
 	} else {
@@ -317,7 +347,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	minSteerPulse, found := os.LookupEnv("CARMCAM_MINSTEER")
+	minSteerPulse, found := os.LookupEnv("CARCAM_MINSTEER")
 	if !found {
 		commandConfig.MinSteerPulse = MinSteerPulse
 	} else {
@@ -331,7 +361,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 	}
 
 	//Pan Settings
-	panChannel, found := os.LookupEnv("CARMCAM_PANCHANNEL")
+	panChannel, found := os.LookupEnv("CARCAM_PANCHANNEL")
 	if !found {
 		commandConfig.PanChannel = PanChannel
 	} else {
@@ -344,7 +374,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	panLimit, found := os.LookupEnv("CARMCAM_PANLIMIT")
+	panLimit, found := os.LookupEnv("CARCAM_PANLIMIT")
 	if !found {
 		commandConfig.PanLimit = PanLimit
 	} else {
@@ -357,7 +387,20 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	maxPanPulse, found := os.LookupEnv("CARMCAM_MAXPAN")
+	panInvert, found := os.LookupEnv("CARCAM_PANINVERT")
+	if !found {
+		commandConfig.PanInvert = PanInvert
+	} else {
+		boolValue, err := strconv.ParseBool(panInvert)
+		if err != nil {
+			log.Printf("warning: pan invert not parsed - error: %s\n", err)
+			commandConfig.PanInvert = PanInvert
+		} else {
+			commandConfig.PanInvert = boolValue
+		}
+	}
+
+	maxPanPulse, found := os.LookupEnv("CARCAM_MAXPAN")
 	if !found {
 		commandConfig.MaxPanPulse = MaxPanPulse
 	} else {
@@ -370,7 +413,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	minPanPulse, found := os.LookupEnv("CARMCAM_MINPAN")
+	minPanPulse, found := os.LookupEnv("CARCAM_MINPAN")
 	if !found {
 		commandConfig.MinPanPulse = MinPanPulse
 	} else {
@@ -384,7 +427,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 	}
 
 	//Tilt Settings
-	tiltChannel, found := os.LookupEnv("CARMCAM_TILTCHANNEL")
+	tiltChannel, found := os.LookupEnv("CARCAM_TILTCHANNEL")
 	if !found {
 		commandConfig.TiltChannel = TiltChannel
 	} else {
@@ -397,7 +440,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	tiltLimit, found := os.LookupEnv("CARMCAM_TILTLIMIT")
+	tiltLimit, found := os.LookupEnv("CARCAM_TILTLIMIT")
 	if !found {
 		commandConfig.TiltLimit = TiltLimit
 	} else {
@@ -410,7 +453,20 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	maxTiltPulse, found := os.LookupEnv("CARMCAM_MAXTILT")
+	tiltInvert, found := os.LookupEnv("CARCAM_TILTINVERT")
+	if !found {
+		commandConfig.TiltInvert = TiltInvert
+	} else {
+		boolValue, err := strconv.ParseBool(tiltInvert)
+		if err != nil {
+			log.Printf("warning: tilt invert not parsed - error: %s\n", err)
+			commandConfig.TiltInvert = TiltInvert
+		} else {
+			commandConfig.TiltInvert = boolValue
+		}
+	}
+
+	maxTiltPulse, found := os.LookupEnv("CARCAM_MAXTILT")
 	if !found {
 		commandConfig.MaxTiltPulse = MaxTiltPulse
 	} else {
@@ -423,7 +479,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	minTiltPulse, found := os.LookupEnv("CARMCAM_MINTILT")
+	minTiltPulse, found := os.LookupEnv("CARCAM_MINTILT")
 	if !found {
 		commandConfig.MinTiltPulse = MinTiltPulse
 	} else {

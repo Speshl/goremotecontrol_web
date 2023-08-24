@@ -43,21 +43,25 @@ type CommandOptions struct {
 	MaxESCPulse float32
 	MinESCPulse float32
 	ESCLimit    uint32 //Subtracted from max, and added to min to keep off servo endpoints
+	ESCInvert   bool
 
 	SteerChannel  int
 	MaxSteerPulse float32
 	MinSteerPulse float32
 	SteerLimit    uint32 //Subtracted from max, and added to min to keep off servo endpoints
+	SteerInvert   bool
 
 	PanChannel  int
 	MaxPanPulse float32
 	MinPanPulse float32
 	PanLimit    uint32 //Subtracted from max, and added to min to keep off servo endpoints
+	PanInvert   bool
 
 	TiltChannel  int
 	MaxTiltPulse float32
 	MinTiltPulse float32
 	TiltLimit    uint32 //Subtracted from max, and added to min to keep off servo endpoints
+	TiltInvert   bool
 }
 
 type LatestCommand struct {
@@ -86,21 +90,25 @@ func NewCarCommand(options *CommandOptions) (*CarCommand, error) {
 
 			ESCChannel:  3,
 			ESCLimit:    50,
+			ESCInvert:   false,
 			MaxESCPulse: pca9685.ServoMaxPulseDef,
 			MinESCPulse: pca9685.ServoMinPulseDef,
 
 			SteerChannel:  4,
 			SteerLimit:    50,
+			SteerInvert:   false,
 			MaxSteerPulse: pca9685.ServoMaxPulseDef,
 			MinSteerPulse: pca9685.ServoMinPulseDef,
 
 			PanChannel:  2,
 			PanLimit:    0,
+			PanInvert:   false,
 			MaxPanPulse: pca9685.ServoMaxPulseDef,
 			MinPanPulse: pca9685.ServoMinPulseDef,
 
 			TiltChannel:  1,
 			TiltLimit:    0,
+			TiltInvert:   false,
 			MaxTiltPulse: pca9685.ServoMaxPulseDef,
 			MinTiltPulse: pca9685.ServoMinPulseDef,
 		},
@@ -224,6 +232,22 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 		tilt:  c.mapToRange(uint32(command[3]), MinValue, MaxValue, MinValue+c.options.TiltLimit, MaxValue-c.options.TiltLimit),
 	}
 
+	if c.options.ESCInvert {
+		parsedCommand.esc = c.invertCommand(parsedCommand.esc, MidValue)
+	}
+
+	if c.options.SteerInvert {
+		parsedCommand.steer = c.invertCommand(parsedCommand.steer, MidValue)
+	}
+
+	if c.options.PanInvert {
+		parsedCommand.pan = c.invertCommand(parsedCommand.pan, MidValue)
+	}
+
+	if c.options.TiltInvert {
+		parsedCommand.tilt = c.invertCommand(parsedCommand.tilt, MidValue)
+	}
+
 	return c.applyDeadZone(parsedCommand), nil
 }
 
@@ -287,6 +311,19 @@ func (c *CarCommand) sendCommand(command Command) error {
 
 func (c *CarCommand) mapToRange(value, min, max, minReturn, maxReturn uint32) uint32 {
 	return (maxReturn-minReturn)*(value-min)/(max-min) + minReturn
+}
+
+func (c *CarCommand) invertCommand(value, mid uint32) uint32 {
+	var invertedDistance uint32
+	if value > mid {
+		distanceFromMiddle := value - mid
+		invertedDistance = mid - distanceFromMiddle
+	} else {
+		distanceFromMiddle := mid - value
+		invertedDistance = mid + distanceFromMiddle
+	}
+
+	return invertedDistance
 }
 
 func (c *CarCommand) applyDeadZone(command Command) Command {
