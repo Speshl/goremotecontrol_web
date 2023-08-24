@@ -232,10 +232,6 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 		tilt:  c.mapToRange(uint32(command[3]), MinValue, MaxValue, MinValue+c.options.TiltLimit, MaxValue-c.options.TiltLimit),
 	}
 
-	if parsedCommand.pan > MaxValue {
-		log.Printf("MAX VALUE TO HIGH BEFORE INVERT: %d\n", parsedCommand.pan)
-	}
-
 	if c.options.ESCInvert {
 		parsedCommand.esc = c.invertCommand(parsedCommand.esc, MidValue)
 	}
@@ -252,17 +248,7 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 		parsedCommand.tilt = c.invertCommand(parsedCommand.tilt, MidValue)
 	}
 
-	if parsedCommand.pan > MaxValue {
-		log.Printf("MAX VALUE TO HIGH AFTER INVERT: %d\n", parsedCommand.pan)
-	}
-
-	withDeadzones := c.applyDeadZone(parsedCommand)
-
-	if parsedCommand.pan > MaxValue {
-		log.Printf("MAX VALUE TO HIGH AFTER Deadzones: %d\n", parsedCommand.pan)
-	}
-
-	return withDeadzones, nil
+	return c.applyDeadZone(parsedCommand), nil
 }
 
 func (c *CarCommand) sendNeutral() error {
@@ -331,16 +317,16 @@ func (c *CarCommand) invertCommand(value, mid uint32) uint32 {
 	var invertedDistance uint32
 	if value > mid {
 		distanceFromMiddle := value - mid
-		invertedDistance = mid - distanceFromMiddle
-		if invertedDistance > MaxValue {
-			log.Printf("info - value: %d mid: %d distanceFromMiddle: %d\n", value, mid, distanceFromMiddle)
+		if distanceFromMiddle > mid {
+			distanceFromMiddle = mid
 		}
+		invertedDistance = mid - distanceFromMiddle
 	} else {
 		distanceFromMiddle := mid - value
-		invertedDistance = mid + distanceFromMiddle
-		if invertedDistance > MaxValue {
-			log.Printf("info - value: %d mid: %d distanceFromMiddle: %d\n", value, mid, distanceFromMiddle)
+		if distanceFromMiddle > mid {
+			distanceFromMiddle = mid
 		}
+		invertedDistance = mid + distanceFromMiddle
 	}
 
 	return invertedDistance
