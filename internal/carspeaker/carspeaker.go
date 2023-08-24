@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"os/exec"
+	"sync"
 	"time"
 )
 
@@ -47,6 +48,7 @@ type CarSpeaker struct {
 	SpeakerChannel chan string
 	lastPlayedAt   time.Time
 	options        SpeakerOptions
+	locked         sync.Mutex
 }
 
 type SpeakerOptions struct {
@@ -77,13 +79,14 @@ func (c *CarSpeaker) Start(ctx context.Context) error {
 			log.Println("speaker listener done due to ctx")
 			return nil
 		case data, ok := <-c.SpeakerChannel:
-			log.Printf("Got sound %s\n", data)
 			if !ok {
 				log.Println("speaker listener channel closed, stopping")
 				return nil
 			}
-			if c.lastPlayedAt.Add(DelayBetweenSounds).Compare(time.Now()) == 1 {
-				continue //Skip playing sound so we don't spam
+
+			gotLock := c.locked.TryLock() //Only allows one through while ignoring the rest. Unlocks once sound stops playing and is ready for another sound
+			if !gotLock {
+				continue //locked so skip
 			}
 
 			c.lastPlayedAt = time.Now()
@@ -108,14 +111,17 @@ func (c *CarSpeaker) PlayFromGroup(ctx context.Context, group string) error {
 }
 
 func (c *CarSpeaker) Play(ctx context.Context, sound string) error {
+	defer func() {
+		log.Printf("finished playing %s sound\n", sound)
+		c.locked.Unlock()
+	}()
+	log.Printf("start playing %s sound\n", sound)
 
 	soundPath, ok := soundMap[sound]
 	if !ok {
 		return fmt.Errorf("error: sound not found")
 	}
 
-	log.Printf("start playing %s sound\n", sound)
-	defer log.Printf("finished playing %s sound\n", sound)
 	args := []string{
 		"-D", "hw:CARD=wm8960soundcard,DEV=0", //TODO: Make these changeable by environment variable
 		soundPath,

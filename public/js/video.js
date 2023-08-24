@@ -78,7 +78,7 @@ class CamPlayer {
                 const el = document.createElement("audio");
                 el.id = "audioTrack";
                 el.srcObject = event.streams[0];
-                el.autoplay = false;
+                el.autoplay = true;
                 el.muted = false;
                 el.playsinline = true;
                 el.controls = false;
