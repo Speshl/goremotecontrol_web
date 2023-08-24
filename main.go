@@ -20,6 +20,9 @@ import (
 )
 
 func main() {
+	done := make(chan os.Signal, 1)
+	defer close(done)
+
 	log.Println("starting server...")
 	defer log.Println("server stopped")
 	ctx, cancel := context.WithCancel(context.Background())
@@ -46,6 +49,7 @@ func main() {
 			log.Printf("carspeaker error: %s\n", err.Error())
 		}
 		cancel() //stop anything else on this context because mic stopped
+		done <- os.Kill
 		log.Println("Stopping due to carspeaker stopping unexpectedly")
 	}()
 
@@ -60,6 +64,7 @@ func main() {
 	if err != nil {
 		log.Printf("error creating carmic: %s\n", err)
 		cancel() //stop anything else on this context because mic stopped
+		done <- os.Kill
 	}
 
 	carMic.Start() //TODO: Figure out why starting mic stop client audio
@@ -69,6 +74,7 @@ func main() {
 	carCam, err := carcam.NewCarCam(carConfig.camConfig)
 	if err != nil {
 		log.Printf("error creating carcam: %s\n", err)
+		done <- os.Kill
 		cancel() //stop anything else on this context because camera stopped
 	}
 
@@ -78,6 +84,7 @@ func main() {
 			log.Printf("carcam error: %s\n", err.Error())
 		}
 		cancel() //stop anything else on this context because camera stopped
+		done <- os.Kill
 		log.Println("Stopping due to carcam stopping unexpectedly")
 	}()
 
@@ -88,6 +95,7 @@ func main() {
 	if err != nil {
 		log.Printf("error creating carcommand: %s\n", err)
 		cancel() //stop anything else on this context because camera stopped
+		done <- os.Kill
 	}
 	go func() {
 		err := carCommand.Start(ctx)
@@ -95,6 +103,7 @@ func main() {
 			log.Printf("carcommand error: %s\n", err.Error())
 		}
 		cancel() //stop anything else on this context because the gpio output stopped
+		done <- os.Kill
 		log.Println("Stopping due to carcommand stopping unexpectedly")
 	}()
 
@@ -110,6 +119,7 @@ func main() {
 			log.Printf("socketio listen error: %s\n", err)
 		}
 		cancel() //stop anything else on this context because the socker server stopped
+		done <- os.Kill
 		log.Println("Stopping due to socker server stopping unexpectedly")
 	}()
 
@@ -121,13 +131,12 @@ func main() {
 			log.Printf("HTTP server error: %v", err)
 		}
 		cancel() //stop anything else on this context because the http server stopped
+		done <- os.Kill
 		log.Println("Stopping due to http server stopping unexpectedly")
 	}()
 
 	//Handle shutdown signals
 	signal.Ignore(os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	done := make(chan os.Signal, 1)
-	defer close(done)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	for {
 		select {

@@ -255,25 +255,25 @@ func (c *CarCommand) sendNeutral() error {
 	if !c.options.DisableCommands {
 		err := c.servos.esc.Fraction(0.5)
 		if err != nil {
-			log.Printf("failed sending esc command: %s\n", err.Error())
+			log.Printf("failed sending esc neutral command: %s\n", err.Error())
 			return err
 		}
 
 		err = c.servos.steer.Fraction(0.5)
 		if err != nil {
-			log.Printf("failed sending steer command: %s\n", err.Error())
+			log.Printf("failed sending steer neutral command: %s\n", err.Error())
 			return err
 		}
 
 		err = c.servos.pan.Fraction(0.5)
 		if err != nil {
-			log.Printf("failed sending pan command: %s\n", err.Error())
+			log.Printf("failed sending pan neutral command: %s\n", err.Error())
 			return err
 		}
 
 		err = c.servos.tilt.Fraction(0.5)
 		if err != nil {
-			log.Printf("failed sending tilt command: %s\n", err.Error())
+			log.Printf("failed sending tilt neutral command: %s\n", err.Error())
 			return err
 		}
 	}
@@ -284,25 +284,25 @@ func (c *CarCommand) sendCommand(command Command) error {
 	if !c.options.DisableCommands {
 		err := c.servos.esc.Fraction(float32(command.esc) / MaxValue)
 		if err != nil {
-			log.Printf("failed sending esc command: %s\n", err.Error())
+			log.Printf("failed sending esc command (value: %d, fraction: %f): %s\n", command.esc, float32(command.esc)/MaxValue, err.Error())
 			return err
 		}
 
 		err = c.servos.steer.Fraction(float32(command.steer) / MaxValue)
 		if err != nil {
-			log.Printf("failed sending steer command: %s\n", err.Error())
+			log.Printf("failed sending steer command (value: %d, fraction: %f): %s\n", command.steer, float32(command.steer)/MaxValue, err.Error())
 			return err
 		}
 
 		err = c.servos.pan.Fraction(float32(command.pan) / MaxValue)
 		if err != nil {
-			log.Printf("failed sending pan command: %s\n", err.Error())
+			log.Printf("failed sending pan command (value: %d, fraction: %f): %s\n", command.pan, float32(command.pan)/MaxValue, err.Error())
 			return err
 		}
 
 		err = c.servos.tilt.Fraction(float32(command.tilt) / MaxValue)
 		if err != nil {
-			log.Printf("failed sending tilt command: %s\n", err.Error())
+			log.Printf("failed sending tilt command (value: %d, fraction: %f): %s\n", command.tilt, float32(command.tilt)/MaxValue, err.Error())
 			return err
 		}
 	}
