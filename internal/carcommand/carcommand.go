@@ -332,9 +332,15 @@ func (c *CarCommand) invertCommand(value, mid uint32) uint32 {
 	if value > mid {
 		distanceFromMiddle := value - mid
 		invertedDistance = mid - distanceFromMiddle
+		if invertedDistance > MaxValue {
+			log.Printf("info - value: %d mid: %d distanceFromMiddle: %d\n", value, mid, distanceFromMiddle)
+		}
 	} else {
 		distanceFromMiddle := mid - value
 		invertedDistance = mid + distanceFromMiddle
+		if invertedDistance > MaxValue {
+			log.Printf("info - value: %d mid: %d distanceFromMiddle: %d\n", value, mid, distanceFromMiddle)
+		}
 	}
 
 	return invertedDistance
