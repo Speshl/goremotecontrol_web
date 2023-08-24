@@ -214,7 +214,7 @@ func (c *CarCommand) Start(ctx context.Context) error {
 				command := c.latestCommand.command
 				err := c.sendCommand(command)
 				if err != nil {
-					return fmt.Errorf("error sending neutral command: %w", err)
+					return fmt.Errorf("error sending command: %w", err)
 				}
 			}
 		}
@@ -230,6 +230,10 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 		steer: c.mapToRange(uint32(command[1]), MinValue, MaxValue, MinValue+c.options.SteerLimit, MaxValue-c.options.SteerLimit),
 		pan:   c.mapToRange(uint32(command[2]), MinValue, MaxValue, MinValue+c.options.PanLimit, MaxValue-c.options.PanLimit),
 		tilt:  c.mapToRange(uint32(command[3]), MinValue, MaxValue, MinValue+c.options.TiltLimit, MaxValue-c.options.TiltLimit),
+	}
+
+	if parsedCommand.pan > MaxValue {
+		log.Printf("MAX VALUE TO HIGH: %d\n", parsedCommand.pan)
 	}
 
 	if c.options.ESCInvert {
