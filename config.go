@@ -411,7 +411,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 			log.Printf("warning: tilt mid offset not parsed - error: %s\n", err)
 			commandConfig.PanMidOffset = PanMidOffset
 		} else {
-			commandConfig.PanMidOffset = intValue
+			commandConfig.PanMidOffset = int(intValue)
 		}
 	}
 
@@ -490,7 +490,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 			log.Printf("warning: tilt mid offset not parsed - error: %s\n", err)
 			commandConfig.TiltMidOffset = TiltMidOffset
 		} else {
-			commandConfig.TiltMidOffset = intValue
+			commandConfig.TiltMidOffset = int(intValue)
 		}
 	}
 
