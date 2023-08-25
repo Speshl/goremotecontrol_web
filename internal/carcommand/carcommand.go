@@ -51,17 +51,19 @@ type CommandOptions struct {
 	SteerLimit    uint32 //Subtracted from max, and added to min to keep off servo endpoints
 	SteerInvert   bool
 
-	PanChannel  int
-	MaxPanPulse float32
-	MinPanPulse float32
-	PanLimit    uint32 //Subtracted from max, and added to min to keep off servo endpoints
-	PanInvert   bool
+	PanChannel   int
+	MaxPanPulse  float32
+	MinPanPulse  float32
+	PanMidOffset int
+	PanLimit     uint32 //Subtracted from max, and added to min to keep off servo endpoints
+	PanInvert    bool
 
-	TiltChannel  int
-	MaxTiltPulse float32
-	MinTiltPulse float32
-	TiltLimit    uint32 //Subtracted from max, and added to min to keep off servo endpoints
-	TiltInvert   bool
+	TiltChannel   int
+	MaxTiltPulse  float32
+	MinTiltPulse  float32
+	TiltMidOffset int
+	TiltLimit     uint32 //Subtracted from max, and added to min to keep off servo endpoints
+	TiltInvert    bool
 }
 
 type LatestCommand struct {
@@ -101,13 +103,13 @@ func NewCarCommand(options *CommandOptions) (*CarCommand, error) {
 			MinSteerPulse: pca9685.ServoMinPulseDef,
 
 			PanChannel:  2,
-			PanLimit:    0,
+			PanLimit:    50,
 			PanInvert:   false,
 			MaxPanPulse: pca9685.ServoMaxPulseDef,
 			MinPanPulse: pca9685.ServoMinPulseDef,
 
 			TiltChannel:  1,
-			TiltLimit:    0,
+			TiltLimit:    50,
 			TiltInvert:   false,
 			MaxTiltPulse: pca9685.ServoMaxPulseDef,
 			MinTiltPulse: pca9685.ServoMinPulseDef,
@@ -248,6 +250,16 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 		parsedCommand.tilt = c.invertCommand(parsedCommand.tilt, MidValue)
 	}
 
+	parsedCommand = c.applyDeadZone(parsedCommand)
+
+	if parsedCommand.pan == MidValue {
+		parsedCommand.pan = uint32(MidValue + c.options.PanMidOffset)
+	}
+
+	if parsedCommand.tilt == MidValue {
+		parsedCommand.tilt = uint32(MidValue + c.options.TiltMidOffset)
+	}
+
 	return c.applyDeadZone(parsedCommand), nil
 }
 
@@ -265,13 +277,13 @@ func (c *CarCommand) sendNeutral() error {
 			return err
 		}
 
-		err = c.servos.pan.Fraction(0.5)
+		err = c.servos.pan.Fraction(float32(MidValue+c.options.PanMidOffset) / MaxValue)
 		if err != nil {
 			log.Printf("failed sending pan neutral command: %s\n", err.Error())
 			return err
 		}
 
-		err = c.servos.tilt.Fraction(0.5)
+		err = c.servos.tilt.Fraction(float32(MidValue+c.options.TiltMidOffset) / MaxValue)
 		if err != nil {
 			log.Printf("failed sending tilt neutral command: %s\n", err.Error())
 			return err
@@ -294,7 +306,7 @@ func (c *CarCommand) sendCommand(command Command) error {
 			return err
 		}
 
-		err = c.servos.pan.Fraction(float32(command.pan) / MaxValue)
+		err = c.servos.pan.Fraction(float32(command.pan+uint32(c.options.PanMidOffset)) / MaxValue)
 		if err != nil {
 			log.Printf("failed sending pan command (value: %d, fraction: %f): %s\n", command.pan, float32(command.pan)/MaxValue, err.Error())
 			return err

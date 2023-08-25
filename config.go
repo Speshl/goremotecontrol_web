@@ -40,26 +40,28 @@ const DefaultRefreshRate = 60 //command refresh rate
 const DefaultDeadZone = 2
 
 const ESCChannel = 2
-const ESCLimit = 50 //Percent of range
+const ESCLimit = 0
 const ESCInvert = false
 const MaxESCPulse = pca9685.ServoMaxPulseDef
 const MinESCPulse = pca9685.ServoMinPulseDef
 
 const SteerChannel = 3
-const SteerLimit = 50 //Percent of range
+const SteerLimit = 0
 const SteerInvert = false
 const MaxSteerPulse = pca9685.ServoMaxPulseDef
 const MinSteerPulse = pca9685.ServoMinPulseDef
 
 const PanChannel = 1
-const PanLimit = 0 //Percent of range
+const PanLimit = 0
 const PanInvert = false
+const PanMidOffset = 0
 const MaxPanPulse = pca9685.ServoMaxPulseDef
 const MinPanPulse = pca9685.ServoMinPulseDef
 
 const TiltChannel = 0
-const TiltLimit = 0 //Percent of range
+const TiltLimit = 0
 const TiltInvert = false
+const TiltMidOffset = 0
 const MaxTiltPulse = pca9685.ServoMaxPulseDef
 const MinTiltPulse = pca9685.ServoMinPulseDef
 
@@ -400,6 +402,19 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
+	panMidOffset, found := os.LookupEnv("CARCAM_PANMIDOFFSET")
+	if !found {
+		commandConfig.PanMidOffset = PanMidOffset
+	} else {
+		intValue, err := strconv.ParseInt(panMidOffset, 10, 32)
+		if err != nil {
+			log.Printf("warning: tilt mid offset not parsed - error: %s\n", err)
+			commandConfig.PanMidOffset = PanMidOffset
+		} else {
+			commandConfig.PanMidOffset = intValue
+		}
+	}
+
 	maxPanPulse, found := os.LookupEnv("CARCAM_MAXPAN")
 	if !found {
 		commandConfig.MaxPanPulse = MaxPanPulse
@@ -463,6 +478,19 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 			commandConfig.TiltInvert = TiltInvert
 		} else {
 			commandConfig.TiltInvert = boolValue
+		}
+	}
+
+	tiltMidOffset, found := os.LookupEnv("CARCAM_TILTMIDOFFSET")
+	if !found {
+		commandConfig.TiltMidOffset = TiltMidOffset
+	} else {
+		intValue, err := strconv.ParseInt(tiltMidOffset, 10, 32)
+		if err != nil {
+			log.Printf("warning: tilt mid offset not parsed - error: %s\n", err)
+			commandConfig.TiltMidOffset = TiltMidOffset
+		} else {
+			commandConfig.TiltMidOffset = intValue
 		}
 	}
 

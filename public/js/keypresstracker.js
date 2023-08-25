@@ -4,8 +4,8 @@ class KeyPressTracker {
         this.midPosition = 127;
         this.minPosition = 0;
 
-        this.panSpeed = 5;
-        this.tiltSpeed = 5;
+        this.panSpeed = 1;
+        this.tiltSpeed = 1;
 
         this.neutralCommand = [this.midPosition,this.midPosition,this.midPosition,this.midPosition,0];
         this.panPos = this.midPosition;
@@ -104,17 +104,18 @@ class KeyPressTracker {
                 this.panPos = this.maxPosition;
             }
         }else{
-            if(this.panPos > this.midPosition){
-                this.panPos -= this.panSpeed;
-            }
-            if(this.panPos < this.midPosition){
-                this.panPos += this.panSpeed;
-            }
+            //auto recenter
+            // if(this.panPos > this.midPosition){
+            //     this.panPos -= this.panSpeed;
+            // }
+            // if(this.panPos < this.midPosition){
+            //     this.panPos += this.panSpeed;
+            // }
             
-            let diffrence = this.panPos - this.midPosition
-            if(Math.abs(diffrence) > this.panSpeed){
-                this.panPos = this.midPosition
-            }
+            // let diffrence = this.panPos - this.midPosition
+            // if(Math.abs(diffrence) > this.panSpeed){
+            //     this.panPos = this.midPosition
+            // }
         }
 
         if(this.pressedKeys['ArrowDown'] === true) {
@@ -128,17 +129,18 @@ class KeyPressTracker {
                 this.tiltPos = this.maxPosition;
             }
         }else{
-            if(this.tiltPos > this.midPosition){
-                this.tiltPos -= this.tiltSpeed;
-            }
-            if(this.tiltPos < this.midPosition){
-                this.tiltPos += this.tiltSpeed;
-            }
+            //autorecenter
+            // if(this.tiltPos > this.midPosition){
+            //     this.tiltPos -= this.tiltSpeed;
+            // }
+            // if(this.tiltPos < this.midPosition){
+            //     this.tiltPos += this.tiltSpeed;
+            // }
             
-            let diffrence = this.tiltPos - this.midPosition
-            if(Math.abs(diffrence) > this.tiltSpeed){
-                this.tiltPos = this.midPosition
-            }
+            // let diffrence = this.tiltPos - this.midPosition
+            // if(Math.abs(diffrence) > this.tiltSpeed){
+            //     this.tiltPos = this.midPosition
+            // }
         }
 
         //Resent camera on spacebar
