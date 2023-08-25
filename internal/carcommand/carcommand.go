@@ -307,7 +307,7 @@ func (c *CarCommand) sendCommand(command Command) error {
 			return err
 		}
 
-		err = c.servos.pan.Fraction(float32(command.pan+uint32(c.options.PanMidOffset)) / MaxValue)
+		err = c.servos.pan.Fraction(float32(command.pan) / MaxValue)
 		if err != nil {
 			log.Printf("failed sending pan command (value: %d, fraction: %f): %s\n", command.pan, float32(command.pan)/MaxValue, err.Error())
 			return err
