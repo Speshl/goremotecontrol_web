@@ -1,0 +1,48 @@
+Get Video/Audio Working
+
+Must do below to run pulseaudio with sudo
+
+https://github.com/shivasiddharth/PulseAudio-System-Wide
+
+sudo apt-get update   
+sudo apt-get install pulseaudio  
+sudo apt-get install git    
+cd /home/${USER}/       
+git clone https://github.com/shivasiddharth/PulseAudio-System-Wide       
+cd ./PulseAudio-System-Wide/      
+sudo cp ./pulseaudio.service /etc/systemd/system/pulseaudio.service    
+systemctl --system enable pulseaudio.service       
+systemctl --system start pulseaudio.service       
+sudo cp ./client.conf /etc/pulse/client.conf        
+sudo sed -i '/^pulse-access:/ s/$/root,pi/' /etc/group    
+
+
+
+
+
+https://www.waveshare.com/wiki/WM8960_Audio_HAT
+
+cd ~
+
+git clone https://github.com/waveshare/WM8960-Audio-HAT
+
+cd WM8960-Audio-HAT
+
+sudo ./install.sh 
+
+sudo reboot
+
+//Check if driver is installed
+sudo dkms status
+
+sudo raspi-config
+//Use GUI to set WM8960 as default audio device
+
+//aplay should function and be able to play wav files through the speakers
+
+
+
+#optional noise filter
+https://askubuntu.com/questions/18958/realtime-noise-removal-with-pulseaudio
+
+wget -qO - https://gist.githubusercontent.com/grigio/cb93c3e8710a6f045a3dd9456ec01799/raw/94f07c7d75bcf5dd9b08a9c3034844223ec6fbe1/fix-microphone-background-noise.sh | sudo bash && pulseaudio -k

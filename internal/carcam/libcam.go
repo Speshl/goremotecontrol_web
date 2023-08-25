@@ -3,6 +3,7 @@ package carcam
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"log"
 	"os/exec"
 )
@@ -61,12 +62,12 @@ func (c *CarCam) StartStreaming(ctx context.Context) error {
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed getting std out pipe: %w", err)
 	}
 
 	err = cmd.Start()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed starting camera: %w", err)
 	}
 
 	log.Println("started libcamera-vid", cmd.Args)
@@ -86,7 +87,7 @@ func (c *CarCam) StartStreaming(ctx context.Context) error {
 				// if err == io.EOF {
 				// 	return fmt.Errorf("[libcamera-vid] EOF")
 				// }
-				return err
+				return fmt.Errorf("failed reading camera from std out: %w", err)
 			}
 
 			copied := copy(buffer[currentPos:], p[:n])

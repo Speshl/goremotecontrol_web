@@ -1,6 +1,16 @@
 class KeyPressTracker {
     constructor() {
-        this.neutralCommand = [127,127,127,127,0];
+        this.maxPosition = 255;
+        this.midPosition = 127;
+        this.minPosition = 0;
+
+        this.panSpeed = 1;
+        this.tiltSpeed = 1;
+
+        this.neutralCommand = [this.midPosition,this.midPosition,this.midPosition,this.midPosition,0];
+        this.panPos = this.midPosition;
+        this.tiltPos = this.midPosition;
+
         this.pressedKeys = {};
         this.steeringTrim = 0;
 
@@ -37,21 +47,21 @@ class KeyPressTracker {
     getCommand() {
         let command = this.neutralCommand;
         if(this.pressedKeys['s'] === true) {
-            command[0] = 0;
+            command[0] = this.minPosition;
         }else if(this.pressedKeys['w'] === true) {
-            command[0] = 255;
+            command[0] = this.maxPosition;
         }else{
-            command[0] = 127;
+            command[0] = this.midPosition;
         }
 
 
         let steerCommand = command[1];
         if(this.pressedKeys['a'] === true) {
-            steerCommand = 0;
+            steerCommand = this.minPosition;
         }else if(this.pressedKeys['d'] === true) {
-            steerCommand = 255;
+            steerCommand = this.maxPosition;
         }else{
-            steerCommand = 127;
+            steerCommand = this.midPosition;
         }
 
         //steering trim
@@ -73,10 +83,10 @@ class KeyPressTracker {
             this.rightTrimPress = false;
         }
         
-        if(steerCommand + this.steeringTrim > 255){
-            steerCommand = 255;
-        }else if(steerCommand + this.steeringTrim < 0) {
-            steerCommand = 0;
+        if(steerCommand + this.steeringTrim > this.maxPosition){
+            steerCommand = this.maxPosition;
+        }else if(steerCommand + this.steeringTrim < this.minPosition) {
+            steerCommand = this.minPosition;
         }else{
             steerCommand = steerCommand + this.steeringTrim;
         }
@@ -84,20 +94,65 @@ class KeyPressTracker {
 
 
         if(this.pressedKeys['ArrowLeft'] === true) {
-            command[2] = 0;
+            this.panPos -= this.panSpeed;
+            if(this.panPos < this.minPosition){
+                this.panPos = this.minPosition;
+            }
         }else if(this.pressedKeys['ArrowRight'] === true) {
-            command[2] = 255;
+            this.panPos += this.panSpeed;
+            if(this.panPos > this.maxPosition){
+                this.panPos = this.maxPosition;
+            }
         }else{
-            command[2] = 127;
+            //auto recenter
+            // if(this.panPos > this.midPosition){
+            //     this.panPos -= this.panSpeed;
+            // }
+            // if(this.panPos < this.midPosition){
+            //     this.panPos += this.panSpeed;
+            // }
+            
+            // let diffrence = this.panPos - this.midPosition
+            // if(Math.abs(diffrence) > this.panSpeed){
+            //     this.panPos = this.midPosition
+            // }
         }
 
-        if(this.pressedKeys['ArrowUp'] === true) {
-            command[3] = 255;
-        }else if(this.pressedKeys['ArrowDown'] === true) {
-            command[3] = 0;
+        if(this.pressedKeys['ArrowDown'] === true) {
+            this.tiltPos -= this.tiltSpeed;
+            if(this.tiltPos < this.minPosition){
+                this.tiltPos = this.minPosition;
+            }
+        }else if(this.pressedKeys['ArrowUp'] === true) {
+            this.tiltPos += this.tiltSpeed;
+            if(this.tiltPos > this.maxPosition){
+                this.tiltPos = this.maxPosition;
+            }
         }else{
-            command[3] = 127;
+            //autorecenter
+            // if(this.tiltPos > this.midPosition){
+            //     this.tiltPos -= this.tiltSpeed;
+            // }
+            // if(this.tiltPos < this.midPosition){
+            //     this.tiltPos += this.tiltSpeed;
+            // }
+            
+            // let diffrence = this.tiltPos - this.midPosition
+            // if(Math.abs(diffrence) > this.tiltSpeed){
+            //     this.tiltPos = this.midPosition
+            // }
         }
+
+        //Resent camera on spacebar
+        if(this.pressedKeys['Space'] === true) {
+            this.tiltPos = this.midPosition;
+            this.panPos = this.midPosition;
+        }
+
+        command[2] = this.panPos;
+        command[3] = this.tiltPos;
+
+
 
         return command
     }

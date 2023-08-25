@@ -6,10 +6,14 @@ import (
 	"log"
 	"math/rand"
 	"os/exec"
+	"sync"
 	"time"
 )
 
-const delayBetweenSounds = 2 * time.Second
+const DelayBetweenSounds = 2 * time.Second
+
+const DefaultDevice = "0"
+const DefaultVolume = "5.0"
 
 var soundMap = map[string]string{
 	//Affirmatives
@@ -42,19 +46,30 @@ var soundGroups = map[string][]string{
 
 type CarSpeaker struct {
 	SpeakerChannel chan string
-	lastPlayedAt   time.Time
 	options        SpeakerOptions
+	lock           sync.RWMutex
+	playing        bool
 }
 
 type SpeakerOptions struct {
-	Name string
+	Device string
+	Volume string
 }
 
-func NewCarSpeaker(options SpeakerOptions) (*CarSpeaker, error) {
-	return &CarSpeaker{
+func NewCarSpeaker(options *SpeakerOptions) (*CarSpeaker, error) {
+	carSpeaker := CarSpeaker{
 		SpeakerChannel: make(chan string, 10),
-		options:        options,
-	}, nil
+		options: SpeakerOptions{
+			Volume: DefaultVolume,
+			Device: DefaultDevice,
+		},
+	}
+
+	if options != nil {
+		carSpeaker.options = *options
+	}
+
+	return &carSpeaker, nil
 }
 
 func (c *CarSpeaker) Start(ctx context.Context) error {
@@ -64,17 +79,18 @@ func (c *CarSpeaker) Start(ctx context.Context) error {
 			log.Println("speaker listener done due to ctx")
 			return nil
 		case data, ok := <-c.SpeakerChannel:
-			log.Printf("Got sound %s\n", data)
 			if !ok {
 				log.Println("speaker listener channel closed, stopping")
 				return nil
 			}
-			if c.lastPlayedAt.Add(delayBetweenSounds).Compare(time.Now()) == 1 {
-				continue //Skip playing sound so we don't spam
+
+			gotLock := c.lock.TryLock()
+			if !gotLock {
+				continue
 			}
 
-			c.lastPlayedAt = time.Now()
 			go func() {
+				defer c.lock.Unlock()
 				err := c.PlayFromGroup(ctx, data)
 				if err != nil {
 					log.Printf("failed to play sound from group - %s\n", err.Error())
@@ -96,15 +112,16 @@ func (c *CarSpeaker) PlayFromGroup(ctx context.Context, group string) error {
 
 func (c *CarSpeaker) Play(ctx context.Context, sound string) error {
 
+	log.Printf("start playing %s sound\n", sound)
+	defer log.Printf("finished playing %s sound\n", sound)
+
 	soundPath, ok := soundMap[sound]
 	if !ok {
 		return fmt.Errorf("error: sound not found")
 	}
 
-	log.Printf("start playing %s sound\n", sound)
-	defer log.Printf("finished playing %s sound\n", sound)
 	args := []string{
-		"-D", "hw:CARD=wm8960soundcard,DEV=0",
+		"-D", "hw:CARD=wm8960soundcard,DEV=0", //TODO: Make these changeable by environment variable
 		soundPath,
 	}
 	cmd := exec.CommandContext(ctx, "aplay", args...)

@@ -10,9 +10,12 @@ import (
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	"github.com/Speshl/goremotecontrol_web/internal/carmic"
 	"github.com/Speshl/goremotecontrol_web/internal/carspeaker"
+	"github.com/googolgl/go-pca9685"
 )
 
-const DefaultCarName = "Car-Alpha"
+const DefaultCarName = "Default-Car"
+
+const DefaultPort = "8181"
 
 // Default Camera Options
 const DefaultWidth = "640"
@@ -24,21 +27,54 @@ const DefaultProfile = "high"
 
 const disableVideo = false //used for debug, starting cam can fail without a restart
 
+// Default Mic Options
+const DefaultMicDevice = "0"
+const DefaultMicVolume = "5.0"
+
+// Default Speaker Options
+const DefaultSpeakerDevice = "0"
+const DefaultSpeakerVolume = "5.0"
+
 // Default Command Options
 const DefaultRefreshRate = 60 //command refresh rate
 const DefaultDeadZone = 2
 
-const Default_ESC_MaxValue_Limited = 200
-const Default_ESC_MidValue = 150
-const Default_ESC_MinValue_limited = 100
+const ESCChannel = 2
+const ESCLimit = 0
+const ESCInvert = false
+const MaxESCPulse = pca9685.ServoMaxPulseDef
+const MinESCPulse = pca9685.ServoMinPulseDef
 
-const Default_Servo_MaxValue_Limited = 200
-const Default_Servo_MidValue = 150
-const Default_Servo_MinValue_limited = 100
+const SteerChannel = 3
+const SteerLimit = 0
+const SteerInvert = false
+const SteerMidOffset = 0
+const MaxSteerPulse = pca9685.ServoMaxPulseDef
+const MinSteerPulse = pca9685.ServoMinPulseDef
+
+const PanChannel = 1
+const PanLimit = 0
+const PanInvert = false
+const PanMidOffset = 0
+const MaxPanPulse = pca9685.ServoMaxPulseDef
+const MinPanPulse = pca9685.ServoMinPulseDef
+
+const TiltChannel = 0
+const TiltLimit = 0
+const TiltInvert = false
+const TiltMidOffset = 0
+const MaxTiltPulse = pca9685.ServoMaxPulseDef
+const MinTiltPulse = pca9685.ServoMinPulseDef
 
 const disableCommands = false //used for debug, when commands are sent pi needs to be restarted after each app start/stop cycle
 
+type ServerConfig struct {
+	Name string
+	Port string
+}
+
 type CarConfig struct {
+	serverConfig  ServerConfig
 	camConfig     carcam.CameraOptions
 	commandConfig carcommand.CommandOptions
 	speakerConfig carspeaker.SpeakerOptions
@@ -48,25 +84,72 @@ type CarConfig struct {
 func GetConfig(ctx context.Context) CarConfig {
 	carConfig := CarConfig{}
 
-	name, found := os.LookupEnv("CARCAM_NAME")
-	if !found {
-		log.Printf("no name env variable found, others most likely not loaded...")
-		name = DefaultCarName
-	} else {
-		log.Printf("found value For CARCAM_NAME: %s\n")
-	}
-
-	carConfig.camConfig = GetCamConfig(ctx, name)
-	carConfig.commandConfig = GetCommandConfig(ctx, name)
+	carConfig.serverConfig = GetServerConfig(ctx)
+	carConfig.camConfig = GetCamConfig(ctx)
+	carConfig.commandConfig = GetCommandConfig(ctx)
+	carConfig.micConfig = GetMicConfig(ctx)
+	carConfig.speakerConfig = GetSpeakerConfig(ctx)
 
 	log.Printf("Using Config: \n\n%+v\n\n", carConfig)
 	return carConfig
 }
 
-func GetCamConfig(ctx context.Context, name string) carcam.CameraOptions {
-	camConfig := carcam.CameraOptions{
-		Name: name,
+func GetServerConfig(ctx context.Context) ServerConfig {
+	serverConfig := ServerConfig{}
+
+	name, found := os.LookupEnv("CARCAM_NAME")
+	if !found {
+		name = DefaultCarName
 	}
+	serverConfig.Name = name
+
+	port, found := os.LookupEnv("CARCAM_PORT")
+	if !found {
+		port = DefaultPort
+	}
+	serverConfig.Port = port
+
+	return serverConfig
+}
+
+func GetMicConfig(ctx context.Context) carmic.MicOptions {
+	micConfig := carmic.MicOptions{}
+
+	device, found := os.LookupEnv("CARCAM_MICDEVICE")
+	if !found {
+		device = DefaultMicDevice
+	}
+	micConfig.Device = device
+
+	volume, found := os.LookupEnv("CARCAM_MICVOLUME")
+	if !found {
+		volume = DefaultMicVolume
+	}
+	micConfig.Volume = volume
+
+	return micConfig
+}
+
+func GetSpeakerConfig(ctx context.Context) carspeaker.SpeakerOptions {
+	speakerConfig := carspeaker.SpeakerOptions{}
+
+	device, found := os.LookupEnv("CARCAM_SPEAKERDEVICE")
+	if !found {
+		device = DefaultSpeakerDevice
+	}
+	speakerConfig.Device = device
+
+	volume, found := os.LookupEnv("CARCAM_SPEAKERVOLUME")
+	if !found {
+		volume = DefaultMicVolume
+	}
+	speakerConfig.Volume = volume
+
+	return speakerConfig
+}
+
+func GetCamConfig(ctx context.Context) carcam.CameraOptions {
+	camConfig := carcam.CameraOptions{}
 
 	width, found := os.LookupEnv("CARCAM_WIDTH")
 	if !found {
@@ -80,13 +163,13 @@ func GetCamConfig(ctx context.Context, name string) carcam.CameraOptions {
 	}
 	camConfig.Height = height
 
-	fps, found := os.LookupEnv("CARMCAM_FPS")
+	fps, found := os.LookupEnv("CARCAM_FPS")
 	if !found {
 		fps = DefaultFPS
 	}
 	camConfig.Fps = fps
 
-	vFlip, found := os.LookupEnv("CARMCAM_VFLIP")
+	vFlip, found := os.LookupEnv("CARCAM_VFLIP")
 	if !found {
 		camConfig.VerticalFlip = DefaultVerticalFlip
 	} else {
@@ -98,7 +181,7 @@ func GetCamConfig(ctx context.Context, name string) carcam.CameraOptions {
 		camConfig.VerticalFlip = boolValue
 	}
 
-	hFlip, found := os.LookupEnv("CARMCAM_HFLIP")
+	hFlip, found := os.LookupEnv("CARCAM_HFLIP")
 	if !found {
 		camConfig.HorizontalFlip = DefaultHorizontalFlip
 	} else {
@@ -119,12 +202,10 @@ func GetCamConfig(ctx context.Context, name string) carcam.CameraOptions {
 	return camConfig
 }
 
-func GetCommandConfig(ctx context.Context, name string) carcommand.CommandOptions {
-	commandConfig := carcommand.CommandOptions{
-		Name: name,
-	}
+func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
+	commandConfig := carcommand.CommandOptions{}
 
-	refreshRate, found := os.LookupEnv("CARMCAM_REFRESH")
+	refreshRate, found := os.LookupEnv("CARCAM_REFRESH")
 	if !found {
 		commandConfig.RefreshRate = DefaultRefreshRate
 	} else {
@@ -137,7 +218,7 @@ func GetCommandConfig(ctx context.Context, name string) carcommand.CommandOption
 		}
 	}
 
-	deadZone, found := os.LookupEnv("CARMCAM_DEADZONE")
+	deadZone, found := os.LookupEnv("CARCAM_DEADZONE")
 	if !found {
 		commandConfig.DeadZone = int(DefaultDeadZone)
 	} else {
@@ -150,81 +231,306 @@ func GetCommandConfig(ctx context.Context, name string) carcommand.CommandOption
 		}
 	}
 
-	maxESC, found := os.LookupEnv("CARMCAM_MAXESC")
+	//ESC Settings
+	escChannel, found := os.LookupEnv("CARCAM_ESCCHANNEL")
 	if !found {
-		commandConfig.MaxESC = int(Default_ESC_MaxValue_Limited)
+		commandConfig.ESCChannel = ESCChannel
 	} else {
-		intValue, err := strconv.ParseInt(maxESC, 10, 32)
+		intValue, err := strconv.ParseInt(escChannel, 10, 32)
+		if err != nil {
+			log.Printf("warning: esc channel not parsed - error: %s\n", err)
+			commandConfig.ESCChannel = ESCChannel
+		} else {
+			commandConfig.ESCChannel = int(intValue)
+		}
+	}
+
+	escLimit, found := os.LookupEnv("CARCAM_ESCLIMIT")
+	if !found {
+		commandConfig.ESCLimit = ESCLimit
+	} else {
+		intValue, err := strconv.ParseInt(escLimit, 10, 32)
+		if err != nil {
+			log.Printf("warning: esc limit not parsed - error: %s\n", err)
+			commandConfig.ESCLimit = ESCLimit
+		} else {
+			commandConfig.ESCLimit = uint32(intValue)
+		}
+	}
+
+	escInvert, found := os.LookupEnv("CARCAM_ESCINVERT")
+	if !found {
+		commandConfig.ESCInvert = ESCInvert
+	} else {
+		boolValue, err := strconv.ParseBool(escInvert)
+		if err != nil {
+			log.Printf("warning: esc invert not parsed - error: %s\n", err)
+			commandConfig.ESCInvert = ESCInvert
+		} else {
+			commandConfig.ESCInvert = boolValue
+		}
+	}
+
+	maxESCPulse, found := os.LookupEnv("CARCAM_MAXESCPULSE")
+	if !found {
+		commandConfig.MaxESCPulse = MaxESCPulse
+	} else {
+		intValue, err := strconv.ParseInt(maxESCPulse, 10, 32)
 		if err != nil {
 			log.Printf("warning: max esc not parsed - error: %s\n", err)
-			commandConfig.MaxESC = Default_ESC_MaxValue_Limited
+			commandConfig.MaxESCPulse = MaxESCPulse
 		} else {
-			commandConfig.MaxESC = int(intValue)
+			commandConfig.MaxESCPulse = float32(intValue)
 		}
 	}
 
-	midESC, found := os.LookupEnv("CARMCAM_MIDESC")
+	minESCPulse, found := os.LookupEnv("CARCAM_MINESCPULSE")
 	if !found {
-		commandConfig.MidESC = int(Default_ESC_MidValue)
+		commandConfig.MinESCPulse = MinESCPulse
 	} else {
-		intValue, err := strconv.ParseInt(midESC, 10, 32)
-		if err != nil {
-			log.Printf("warning: mid esc not parsed - error: %s\n", err)
-			commandConfig.MidESC = Default_ESC_MidValue
-		} else {
-			commandConfig.MidESC = int(intValue)
-		}
-	}
-
-	minESC, found := os.LookupEnv("CARMCAM_MINESC")
-	if !found {
-		commandConfig.MinESC = int(Default_ESC_MinValue_limited)
-	} else {
-		intValue, err := strconv.ParseInt(minESC, 10, 32)
+		intValue, err := strconv.ParseInt(minESCPulse, 10, 32)
 		if err != nil {
 			log.Printf("warning: min esc not parsed - error: %s\n", err)
-			commandConfig.MinESC = Default_ESC_MinValue_limited
+			commandConfig.MinESCPulse = MinESCPulse
 		} else {
-			commandConfig.MinESC = int(intValue)
+			commandConfig.MinESCPulse = float32(intValue)
 		}
 	}
 
-	maxServo, found := os.LookupEnv("CARMCAM_MAXSERVO")
+	//Steer Settings
+	steerChannel, found := os.LookupEnv("CARCAM_STEERCHANNEL")
 	if !found {
-		commandConfig.MaxServo = int(Default_Servo_MaxValue_Limited)
+		commandConfig.SteerChannel = SteerChannel
 	} else {
-		intValue, err := strconv.ParseInt(maxServo, 10, 32)
+		intValue, err := strconv.ParseInt(steerChannel, 10, 32)
 		if err != nil {
-			log.Printf("warning: max servo not parsed - error: %s\n", err)
-			commandConfig.MaxServo = Default_Servo_MaxValue_Limited
+			log.Printf("warning: steer channel not parsed - error: %s\n", err)
+			commandConfig.SteerChannel = SteerChannel
 		} else {
-			commandConfig.MaxServo = int(intValue)
+			commandConfig.SteerChannel = int(intValue)
 		}
 	}
 
-	midServo, found := os.LookupEnv("CARMCAM_MIDSERVO")
+	steerLimit, found := os.LookupEnv("CARCAM_STEERLIMIT")
 	if !found {
-		commandConfig.MidServo = int(Default_Servo_MidValue)
+		commandConfig.SteerLimit = SteerLimit
 	} else {
-		intValue, err := strconv.ParseInt(midServo, 10, 32)
+		intValue, err := strconv.ParseInt(steerLimit, 10, 32)
 		if err != nil {
-			log.Printf("warning: mid servo not parsed - error: %s\n", err)
-			commandConfig.MidServo = Default_ESC_MidValue
+			log.Printf("warning: steer limit not parsed - error: %s\n", err)
+			commandConfig.SteerLimit = SteerLimit
 		} else {
-			commandConfig.MidServo = int(intValue)
+			commandConfig.SteerLimit = uint32(intValue)
 		}
 	}
 
-	minServo, found := os.LookupEnv("CARMCAM_MINSERVO")
+	steerInvert, found := os.LookupEnv("CARCAM_STEERINVERT")
 	if !found {
-		commandConfig.MinServo = int(Default_Servo_MinValue_limited)
+		commandConfig.SteerInvert = SteerInvert
 	} else {
-		intValue, err := strconv.ParseInt(minServo, 10, 32)
+		boolValue, err := strconv.ParseBool(steerInvert)
 		if err != nil {
-			log.Printf("warning: min servo not parsed - error: %s\n", err)
-			commandConfig.MinServo = Default_Servo_MinValue_limited
+			log.Printf("warning: steer invert not parsed - error: %s\n", err)
+			commandConfig.SteerInvert = SteerInvert
 		} else {
-			commandConfig.MinServo = int(intValue)
+			commandConfig.SteerInvert = boolValue
+		}
+	}
+
+	steerMidOffset, found := os.LookupEnv("CARCAM_STEERMIDOFFSET")
+	if !found {
+		commandConfig.SteerMidOffset = SteerMidOffset
+	} else {
+		intValue, err := strconv.ParseInt(steerMidOffset, 10, 32)
+		if err != nil {
+			log.Printf("warning: steer mid offset not parsed - error: %s\n", err)
+			commandConfig.SteerMidOffset = SteerMidOffset
+		} else {
+			commandConfig.SteerMidOffset = int(intValue)
+		}
+	}
+
+	maxSteerPulse, found := os.LookupEnv("CARCAM_MAXSTEERPULSE")
+	if !found {
+		commandConfig.MaxSteerPulse = MaxSteerPulse
+	} else {
+		intValue, err := strconv.ParseInt(maxSteerPulse, 10, 32)
+		if err != nil {
+			log.Printf("warning: max steer not parsed - error: %s\n", err)
+			commandConfig.MaxSteerPulse = MaxSteerPulse
+		} else {
+			commandConfig.MaxSteerPulse = float32(intValue)
+		}
+	}
+
+	minSteerPulse, found := os.LookupEnv("CARCAM_MINSTEERPULSE")
+	if !found {
+		commandConfig.MinSteerPulse = MinSteerPulse
+	} else {
+		intValue, err := strconv.ParseInt(minSteerPulse, 10, 32)
+		if err != nil {
+			log.Printf("warning: min steer not parsed - error: %s\n", err)
+			commandConfig.MinSteerPulse = MinSteerPulse
+		} else {
+			commandConfig.MinSteerPulse = float32(intValue)
+		}
+	}
+
+	//Pan Settings
+	panChannel, found := os.LookupEnv("CARCAM_PANCHANNEL")
+	if !found {
+		commandConfig.PanChannel = PanChannel
+	} else {
+		intValue, err := strconv.ParseInt(panChannel, 10, 32)
+		if err != nil {
+			log.Printf("warning: pan channel not parsed - error: %s\n", err)
+			commandConfig.PanChannel = PanChannel
+		} else {
+			commandConfig.PanChannel = int(intValue)
+		}
+	}
+
+	panLimit, found := os.LookupEnv("CARCAM_PANLIMIT")
+	if !found {
+		commandConfig.PanLimit = PanLimit
+	} else {
+		intValue, err := strconv.ParseInt(panLimit, 10, 32)
+		if err != nil {
+			log.Printf("warning: pan limit not parsed - error: %s\n", err)
+			commandConfig.PanLimit = PanLimit
+		} else {
+			commandConfig.PanLimit = uint32(intValue)
+		}
+	}
+
+	panInvert, found := os.LookupEnv("CARCAM_PANINVERT")
+	if !found {
+		commandConfig.PanInvert = PanInvert
+	} else {
+		boolValue, err := strconv.ParseBool(panInvert)
+		if err != nil {
+			log.Printf("warning: pan invert not parsed - error: %s\n", err)
+			commandConfig.PanInvert = PanInvert
+		} else {
+			commandConfig.PanInvert = boolValue
+		}
+	}
+
+	panMidOffset, found := os.LookupEnv("CARCAM_PANMIDOFFSET")
+	if !found {
+		commandConfig.PanMidOffset = PanMidOffset
+	} else {
+		intValue, err := strconv.ParseInt(panMidOffset, 10, 32)
+		if err != nil {
+			log.Printf("warning: tilt mid offset not parsed - error: %s\n", err)
+			commandConfig.PanMidOffset = PanMidOffset
+		} else {
+			commandConfig.PanMidOffset = int(intValue)
+		}
+	}
+
+	maxPanPulse, found := os.LookupEnv("CARCAM_MAXPANPULSE")
+	if !found {
+		commandConfig.MaxPanPulse = MaxPanPulse
+	} else {
+		intValue, err := strconv.ParseInt(maxPanPulse, 10, 32)
+		if err != nil {
+			log.Printf("warning: max pan not parsed - error: %s\n", err)
+			commandConfig.MaxPanPulse = MaxPanPulse
+		} else {
+			commandConfig.MaxPanPulse = float32(intValue)
+		}
+	}
+
+	minPanPulse, found := os.LookupEnv("CARCAM_MINPANPULSE")
+	if !found {
+		commandConfig.MinPanPulse = MinPanPulse
+	} else {
+		intValue, err := strconv.ParseInt(minPanPulse, 10, 32)
+		if err != nil {
+			log.Printf("warning: min pan not parsed - error: %s\n", err)
+			commandConfig.MinPanPulse = MinPanPulse
+		} else {
+			commandConfig.MinPanPulse = float32(intValue)
+		}
+	}
+
+	//Tilt Settings
+	tiltChannel, found := os.LookupEnv("CARCAM_TILTCHANNEL")
+	if !found {
+		commandConfig.TiltChannel = TiltChannel
+	} else {
+		intValue, err := strconv.ParseInt(tiltChannel, 10, 32)
+		if err != nil {
+			log.Printf("warning: pan channel not parsed - error: %s\n", err)
+			commandConfig.TiltChannel = TiltChannel
+		} else {
+			commandConfig.TiltChannel = int(intValue)
+		}
+	}
+
+	tiltLimit, found := os.LookupEnv("CARCAM_TILTLIMIT")
+	if !found {
+		commandConfig.TiltLimit = TiltLimit
+	} else {
+		intValue, err := strconv.ParseInt(tiltLimit, 10, 32)
+		if err != nil {
+			log.Printf("warning: esc limit not parsed - error: %s\n", err)
+			commandConfig.TiltLimit = TiltLimit
+		} else {
+			commandConfig.TiltLimit = uint32(intValue)
+		}
+	}
+
+	tiltInvert, found := os.LookupEnv("CARCAM_TILTINVERT")
+	if !found {
+		commandConfig.TiltInvert = TiltInvert
+	} else {
+		boolValue, err := strconv.ParseBool(tiltInvert)
+		if err != nil {
+			log.Printf("warning: tilt invert not parsed - error: %s\n", err)
+			commandConfig.TiltInvert = TiltInvert
+		} else {
+			commandConfig.TiltInvert = boolValue
+		}
+	}
+
+	tiltMidOffset, found := os.LookupEnv("CARCAM_TILTMIDOFFSET")
+	if !found {
+		commandConfig.TiltMidOffset = TiltMidOffset
+	} else {
+		intValue, err := strconv.ParseInt(tiltMidOffset, 10, 32)
+		if err != nil {
+			log.Printf("warning: tilt mid offset not parsed - error: %s\n", err)
+			commandConfig.TiltMidOffset = TiltMidOffset
+		} else {
+			commandConfig.TiltMidOffset = int(intValue)
+		}
+	}
+
+	maxTiltPulse, found := os.LookupEnv("CARCAM_MAXTILTPULSE")
+	if !found {
+		commandConfig.MaxTiltPulse = MaxTiltPulse
+	} else {
+		intValue, err := strconv.ParseInt(maxTiltPulse, 10, 32)
+		if err != nil {
+			log.Printf("warning: max esc not parsed - error: %s\n", err)
+			commandConfig.MaxTiltPulse = MaxTiltPulse
+		} else {
+			commandConfig.MaxTiltPulse = float32(intValue)
+		}
+	}
+
+	minTiltPulse, found := os.LookupEnv("CARCAM_MINTILTPULSE")
+	if !found {
+		commandConfig.MinTiltPulse = MinTiltPulse
+	} else {
+		intValue, err := strconv.ParseInt(minTiltPulse, 10, 32)
+		if err != nil {
+			log.Printf("warning: min esc not parsed - error: %s\n", err)
+			commandConfig.MinTiltPulse = MinTiltPulse
+		} else {
+			commandConfig.MinTiltPulse = float32(intValue)
 		}
 	}
 

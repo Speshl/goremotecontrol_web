@@ -1,0 +1,6 @@
+sudo raspi-config
+//use GUI to go to interfaces and enable i2c
+
+sudo reboot
+
+sudo apt-get install i2c-tools

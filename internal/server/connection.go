@@ -15,9 +15,11 @@ type Connection struct {
 	PeerConnection *webrtc.PeerConnection
 	Cancel         context.CancelFunc
 	CTX            context.Context
+	Volume         string
+	Device         string
 }
 
-func NewConnection(socketConn socketio.Conn) (*Connection, error) {
+func NewConnection(socketConn socketio.Conn, device string, volume string) (*Connection, error) {
 	log.Printf("Creating Client %s\n", socketConn.ID())
 
 	peerConnection, err := webrtc.NewPeerConnection(webrtc.Configuration{
@@ -38,6 +40,8 @@ func NewConnection(socketConn socketio.Conn) (*Connection, error) {
 		PeerConnection: peerConnection,
 		Cancel:         cancelCTX,
 		CTX:            ctx,
+		Volume:         volume,
+		Device:         device,
 	}
 	return conn, nil
 }
@@ -48,6 +52,7 @@ func (c *Connection) Disconnect() {
 }
 
 func (c *Connection) RegisterHandlers(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample) error {
+
 	_, err := c.PeerConnection.AddTrack(audioTrack)
 	if err != nil {
 		return fmt.Errorf("error adding audio track: %w", err)
@@ -79,7 +84,7 @@ func (c *Connection) RegisterHandlers(audioTrack *webrtc.TrackLocalStaticSample,
 		}
 	})
 
-	c.PeerConnection.OnTrack(c.StartClientAudio)
+	c.PeerConnection.OnTrack(c.PlayTrack) //TODO: Uncomment to play client audio
 
 	// // Add the data channel to the peer connection
 	// dataChannel, err := peerConnection.CreateDataChannel("data", nil)

@@ -1,0 +1,23 @@
+gst-launch-1.0 -v audiotestsrc wave=sine num-buffers=100 ! audioconvert ! opusenc ! oggmux ! filesink location=sine.ogg
+
+gst-launch-1.0 audiotestsrc wave=sine ! opusenc ! oggmux ! filesink location=test.ogg
+
+gst-launch-1.0 pulsesrc ! audioconvert ! opusenc ! oggmux ! filesink location=mic.ogg
+
+
+Setup gstreamer
+https://qengineering.eu/install-gstreamer-1.18-on-raspberry-pi-4.html
+
+sudo apt-get install libx264-dev libjpeg-dev
+
+sudo apt-get install libgstreamer1.0-dev \
+     libgstreamer-plugins-base1.0-dev \
+     libgstreamer-plugins-bad1.0-dev \
+     gstreamer1.0-plugins-ugly \
+     gstreamer1.0-tools \
+     gstreamer1.0-gl \
+     gstreamer1.0-gtk3
+
+sudo apt-get install gstreamer1.0-qt5
+
+sudo apt-get install gstreamer1.0-pulseaudio
