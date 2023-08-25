@@ -270,7 +270,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	maxESCPulse, found := os.LookupEnv("CARCAM_MAXESC")
+	maxESCPulse, found := os.LookupEnv("CARCAM_MAXESCPULSE")
 	if !found {
 		commandConfig.MaxESCPulse = MaxESCPulse
 	} else {
@@ -283,7 +283,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	minESCPulse, found := os.LookupEnv("CARCAM_MINESC")
+	minESCPulse, found := os.LookupEnv("CARCAM_MINESCPULSE")
 	if !found {
 		commandConfig.MinESCPulse = MinESCPulse
 	} else {
@@ -336,7 +336,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	maxSteerPulse, found := os.LookupEnv("CARCAM_MAXSTEER")
+	maxSteerPulse, found := os.LookupEnv("CARCAM_MAXSTEERPULSE")
 	if !found {
 		commandConfig.MaxSteerPulse = MaxSteerPulse
 	} else {
@@ -349,7 +349,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	minSteerPulse, found := os.LookupEnv("CARCAM_MINSTEER")
+	minSteerPulse, found := os.LookupEnv("CARCAM_MINSTEERPULSE")
 	if !found {
 		commandConfig.MinSteerPulse = MinSteerPulse
 	} else {
@@ -415,7 +415,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	maxPanPulse, found := os.LookupEnv("CARCAM_MAXPAN")
+	maxPanPulse, found := os.LookupEnv("CARCAM_MAXPANPULSE")
 	if !found {
 		commandConfig.MaxPanPulse = MaxPanPulse
 	} else {
@@ -428,7 +428,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	minPanPulse, found := os.LookupEnv("CARCAM_MINPAN")
+	minPanPulse, found := os.LookupEnv("CARCAM_MINPANPULSE")
 	if !found {
 		commandConfig.MinPanPulse = MinPanPulse
 	} else {
@@ -494,7 +494,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	maxTiltPulse, found := os.LookupEnv("CARCAM_MAXTILT")
+	maxTiltPulse, found := os.LookupEnv("CARCAM_MAXTILTPULSE")
 	if !found {
 		commandConfig.MaxTiltPulse = MaxTiltPulse
 	} else {
@@ -507,7 +507,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 		}
 	}
 
-	minTiltPulse, found := os.LookupEnv("CARCAM_MINTILT")
+	minTiltPulse, found := os.LookupEnv("CARCAM_MINTILTPULSE")
 	if !found {
 		commandConfig.MinTiltPulse = MinTiltPulse
 	} else {
