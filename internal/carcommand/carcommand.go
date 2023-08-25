@@ -272,7 +272,7 @@ func (c *CarCommand) sendNeutral() error {
 			return err
 		}
 
-		err = c.servos.steer.Fraction(float32(MidValue+c.options.PanMidOffset) / MaxValue)
+		err = c.servos.steer.Fraction(float32(MidValue+c.options.SteerMidOffset) / MaxValue)
 		if err != nil {
 			log.Printf("failed sending steer neutral command: %s\n", err.Error())
 			return err
