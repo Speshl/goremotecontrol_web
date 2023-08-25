@@ -253,7 +253,7 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 
 	parsedCommand = c.applyDeadZone(parsedCommand)
 
-	parsedCommand.steer += uint32(int(parsedCommand.steer) + c.options.SteerMidOffset) //Default steering trim
+	parsedCommand.steer = uint32(int(parsedCommand.steer) + c.options.SteerMidOffset) //Default steering trim
 
 	if parsedCommand.pan == MidValue {
 		parsedCommand.pan = uint32(MidValue + c.options.PanMidOffset)
@@ -274,7 +274,7 @@ func (c *CarCommand) sendNeutral() error {
 			return err
 		}
 
-		err = c.servos.steer.Fraction(0.5)
+		err = c.servos.steer.Fraction(float32(MidValue+c.options.PanMidOffset) / MaxValue)
 		if err != nil {
 			log.Printf("failed sending steer neutral command: %s\n", err.Error())
 			return err
