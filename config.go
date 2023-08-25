@@ -48,6 +48,7 @@ const MinESCPulse = pca9685.ServoMinPulseDef
 const SteerChannel = 3
 const SteerLimit = 0
 const SteerInvert = false
+const SteerMidOffset = 0
 const MaxSteerPulse = pca9685.ServoMaxPulseDef
 const MinSteerPulse = pca9685.ServoMinPulseDef
 
@@ -333,6 +334,19 @@ func GetCommandConfig(ctx context.Context) carcommand.CommandOptions {
 			commandConfig.SteerInvert = SteerInvert
 		} else {
 			commandConfig.SteerInvert = boolValue
+		}
+	}
+
+	steerMidOffset, found := os.LookupEnv("CARCAM_STEERMIDOFFSET")
+	if !found {
+		commandConfig.SteerMidOffset = SteerMidOffset
+	} else {
+		intValue, err := strconv.ParseInt(steerMidOffset, 10, 32)
+		if err != nil {
+			log.Printf("warning: steer mid offset not parsed - error: %s\n", err)
+			commandConfig.SteerMidOffset = SteerMidOffset
+		} else {
+			commandConfig.SteerMidOffset = int(intValue)
 		}
 	}
 

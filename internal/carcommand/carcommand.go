@@ -45,11 +45,12 @@ type CommandOptions struct {
 	ESCLimit    uint32 //Subtracted from max, and added to min to keep off servo endpoints
 	ESCInvert   bool
 
-	SteerChannel  int
-	MaxSteerPulse float32
-	MinSteerPulse float32
-	SteerLimit    uint32 //Subtracted from max, and added to min to keep off servo endpoints
-	SteerInvert   bool
+	SteerChannel   int
+	MaxSteerPulse  float32
+	MinSteerPulse  float32
+	SteerMidOffset int
+	SteerLimit     uint32 //Subtracted from max, and added to min to keep off servo endpoints
+	SteerInvert    bool
 
 	PanChannel   int
 	MaxPanPulse  float32
@@ -251,6 +252,8 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 	}
 
 	parsedCommand = c.applyDeadZone(parsedCommand)
+
+	parsedCommand.steer += uint32(int(parsedCommand.steer) + c.options.SteerMidOffset) //Default steering trim
 
 	if parsedCommand.pan == MidValue {
 		parsedCommand.pan = uint32(MidValue + c.options.PanMidOffset)
