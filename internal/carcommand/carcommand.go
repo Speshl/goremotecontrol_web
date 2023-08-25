@@ -255,13 +255,9 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 
 	parsedCommand.steer = uint32(int(parsedCommand.steer) + c.options.SteerMidOffset) //Default steering trim
 
-	if parsedCommand.pan == MidValue {
-		parsedCommand.pan = uint32(MidValue + c.options.PanMidOffset)
-	}
+	parsedCommand.pan = uint32(int(parsedCommand.pan) + c.options.PanMidOffset) //Default pan trim
 
-	if parsedCommand.tilt == MidValue {
-		parsedCommand.tilt = uint32(MidValue + c.options.TiltMidOffset)
-	}
+	parsedCommand.tilt = uint32(int(parsedCommand.tilt) + c.options.TiltMidOffset) //Default tilt trim
 
 	return c.applyDeadZone(parsedCommand), nil
 }
