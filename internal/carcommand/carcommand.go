@@ -11,9 +11,9 @@ import (
 )
 
 const ESCByteCommandPos = 0
-const SteerByteCommandPos = 0
-const PanByteCommandPos = 0
-const TiltByteCommandPos = 0
+const SteerByteCommandPos = 1
+const PanByteCommandPos = 2
+const TiltByteCommandPos = 3
 
 const MaxValue = 255
 const MinValue = 0
