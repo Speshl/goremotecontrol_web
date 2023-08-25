@@ -10,6 +10,11 @@ import (
 	"github.com/googolgl/go-pca9685"
 )
 
+const ESCByteCommandPos = 0
+const SteerByteCommandPos = 0
+const PanByteCommandPos = 0
+const TiltByteCommandPos = 0
+
 const MaxValue = 255
 const MinValue = 0
 const MidValue = (MaxValue - MinValue) / 2
@@ -228,11 +233,16 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 	if len(command) < 4 {
 		return Command{}, fmt.Errorf("incorrect command length - %d", len(command))
 	}
+	//stop fucking around and actually make proper fucking trim
+
+	//
+	command = c.applyTrim(command)
+
 	parsedCommand := Command{
-		esc:   c.mapToRange(uint32(command[0]), MinValue, MaxValue, MinValue+c.options.ESCLimit, MaxValue-c.options.ESCLimit),
-		steer: c.mapToRange(uint32(command[1]), MinValue, MaxValue, MinValue+c.options.SteerLimit, MaxValue-c.options.SteerLimit),
-		pan:   c.mapToRange(uint32(command[2]), MinValue, MaxValue, MinValue+c.options.PanLimit, MaxValue-c.options.PanLimit),
-		tilt:  c.mapToRange(uint32(command[3]), MinValue, MaxValue, MinValue+c.options.TiltLimit, MaxValue-c.options.TiltLimit),
+		esc:   c.mapToRange(uint32(command[ESCByteCommandPos]), MinValue, MaxValue, MinValue+c.options.ESCLimit, MaxValue-c.options.ESCLimit),
+		steer: c.mapToRange(uint32(command[SteerByteCommandPos]), MinValue, MaxValue, MinValue+c.options.SteerLimit, MaxValue-c.options.SteerLimit),
+		pan:   c.mapToRange(uint32(command[PanByteCommandPos]), MinValue, MaxValue, MinValue+c.options.PanLimit, MaxValue-c.options.PanLimit),
+		tilt:  c.mapToRange(uint32(command[TiltByteCommandPos]), MinValue, MaxValue, MinValue+c.options.TiltLimit, MaxValue-c.options.TiltLimit),
 	}
 
 	if c.options.ESCInvert {
@@ -250,14 +260,6 @@ func (c *CarCommand) parseCommand(command []byte) (Command, error) {
 	if c.options.TiltInvert {
 		parsedCommand.tilt = c.invertCommand(parsedCommand.tilt, MidValue)
 	}
-
-	parsedCommand = c.applyDeadZone(parsedCommand)
-
-	parsedCommand.steer = uint32(int(parsedCommand.steer) + c.options.SteerMidOffset) //Default steering trim
-
-	parsedCommand.pan = uint32(int(parsedCommand.pan) + c.options.PanMidOffset) //Default pan trim
-
-	parsedCommand.tilt = uint32(int(parsedCommand.tilt) + c.options.TiltMidOffset) //Default tilt trim
 
 	return c.applyDeadZone(parsedCommand), nil
 }
@@ -341,6 +343,36 @@ func (c *CarCommand) invertCommand(value, mid uint32) uint32 {
 	}
 
 	return invertedDistance
+}
+
+func (c *CarCommand) applyTrim(command []byte) []byte {
+	steerCommand := int(command[SteerByteCommandPos]) + c.options.SteerMidOffset
+	if steerCommand < MinValue {
+		steerCommand = MinValue
+	} else if steerCommand > MaxValue {
+		steerCommand = MaxValue
+	}
+
+	panCommand := int(command[PanByteCommandPos]) + c.options.PanMidOffset
+	if panCommand < MinValue {
+		panCommand = MinValue
+	} else if panCommand > MaxValue {
+		panCommand = MaxValue
+	}
+
+	tiltCommand := int(command[TiltByteCommandPos]) + c.options.TiltMidOffset
+	if tiltCommand < MinValue {
+		tiltCommand = MinValue
+	} else if tiltCommand > MaxValue {
+		tiltCommand = MaxValue
+	}
+
+	return []byte{
+		command[ESCByteCommandPos],
+		byte(steerCommand),
+		byte(panCommand),
+		byte(tiltCommand),
+	}
 }
 
 func (c *CarCommand) applyDeadZone(command Command) Command {
