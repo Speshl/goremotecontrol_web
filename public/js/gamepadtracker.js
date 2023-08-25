@@ -295,22 +295,22 @@ class GamePadTracker {
     commandFromXbox(myGamepad) {
         let command = this.neutralCommand;
         //esc
-        if(myGamepad.buttons[6].value > .05 &&  myGamepad.buttons[6].value >= myGamepad.buttons[7].value){
+        if(myGamepad.buttons[6].value > .1 &&  myGamepad.buttons[6].value >= myGamepad.buttons[7].value){
             //brake
-            command[0] = this.midPosition - this.mapToRange(myGamepad.buttons[6].value, .05, 1, this.minPosition, this.midPosition);
-        }else if(myGamepad.buttons[7].value > .05){
+            command[0] = this.midPosition - this.mapToRange(myGamepad.buttons[6].value, .1, 1, this.minPosition, this.midPosition);
+        }else if(myGamepad.buttons[7].value > .1){
             //gas
-            command[0] = this.mapToRange(myGamepad.buttons[7].value, .05, 1, this.midPosition, this.maxPosition);
+            command[0] = this.mapToRange(myGamepad.buttons[7].value, .1, 1, this.midPosition, this.maxPosition);
         }else{
             //neutral
             command[0] = this.midPosition;
         }
         //servo
         let steerCommand = command[1];
-        if(myGamepad.axes[0] > .05){
-            steerCommand = this.mapToRange(myGamepad.axes[0], .05, 1, this.midPosition, this.maxPosition);
+        if(myGamepad.axes[0] > .1){
+            steerCommand = this.mapToRange(myGamepad.axes[0], .1, 1, this.midPosition, this.maxPosition);
         }else if(myGamepad.axes[0] < -.1){
-            steerCommand = this.mapToRange(myGamepad.axes[0], -1, -.05, this.minPosition, this.midPosition);
+            steerCommand = this.mapToRange(myGamepad.axes[0], -1, -.1, this.minPosition, this.midPosition);
         }else{
             steerCommand = this.midPosition;
         }
@@ -343,10 +343,10 @@ class GamePadTracker {
         }
         command[1] = steerCommand;
 
-        if(myGamepad.axes[2] > .05 || myGamepad.axes[2] < -.05){
+        if(myGamepad.axes[2] > .1 || myGamepad.axes[2] < -.1){
             this.panPos += this.mapToRange(myGamepad.axes[2], -1, 1, -1*this.panSpeed, this.panSpeed);
         }
-        if(myGamepad.axes[3] > .05 || myGamepad.axes[3] < -.05){
+        if(myGamepad.axes[3] > .1 || myGamepad.axes[3] < -.1){
             this.tiltPos -= this.mapToRange(myGamepad.axes[3], -1, 1, -1*this.tiltSpeed, this.tiltSpeed);
         }
 
