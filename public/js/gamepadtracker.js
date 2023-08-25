@@ -4,8 +4,8 @@ class GamePadTracker {
         this.midPosition = 127;
         this.minPosition = 0;
 
-        this.panSpeed = 3;
-        this.tiltSpeed = 3;
+        this.panSpeed = 2;
+        this.tiltSpeed = 2;
 
         this.neutralCommand = [this.midPosition,this.midPosition,this.midPosition,this.midPosition,0];
         this.panPos = this.midPosition;
@@ -343,10 +343,10 @@ class GamePadTracker {
         }
         command[1] = steerCommand;
 
-        if(myGamepad.axes[2] > .1 || myGamepad.axes[2] < -.1){
+        if(myGamepad.axes[2] > .15 || myGamepad.axes[2] < -.15){
             this.panPos += this.mapToRange(myGamepad.axes[2], -1, 1, -1*this.panSpeed, this.panSpeed);
         }
-        if(myGamepad.axes[3] > .1 || myGamepad.axes[3] < -.1){
+        if(myGamepad.axes[3] > .15 || myGamepad.axes[3] < -.15){
             this.tiltPos -= this.mapToRange(myGamepad.axes[3], -1, 1, -1*this.tiltSpeed, this.tiltSpeed);
         }
 
