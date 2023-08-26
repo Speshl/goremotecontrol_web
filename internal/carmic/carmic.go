@@ -13,15 +13,15 @@ const DefaultVolume = "5.0"
 
 type CarMic struct {
 	AudioTrack *webrtc.TrackLocalStaticSample
-	options    MicOptions
+	config     MicConfig
 }
 
-type MicOptions struct {
+type MicConfig struct {
 	Device string
 	Volume string
 }
 
-func NewCarMic(options *MicOptions) (*CarMic, error) {
+func NewCarMic(cfg MicConfig) (*CarMic, error) {
 	// Create a audio track
 	audioTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: "audio/opus"}, "audio", "pion1")
 	if err != nil {
@@ -30,14 +30,7 @@ func NewCarMic(options *MicOptions) (*CarMic, error) {
 
 	carMic := CarMic{
 		AudioTrack: audioTrack,
-		options: MicOptions{
-			Volume: DefaultVolume,
-			Device: DefaultDevice,
-		},
-	}
-
-	if options != nil {
-		carMic.options = *options
+		config:     cfg,
 	}
 
 	return &carMic, nil

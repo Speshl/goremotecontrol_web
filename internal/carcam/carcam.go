@@ -10,13 +10,15 @@ import (
 	"github.com/pion/webrtc/v3/pkg/media"
 )
 
+const DefaultLevel = "4.2"
+
 type CarCam struct {
 	VideoTrack   *webrtc.TrackLocalStaticSample
 	videoChannel chan []byte
-	options      CameraOptions
+	config       CamConfig
 }
 
-type CameraOptions struct {
+type CamConfig struct {
 	Width          string
 	Height         string
 	Fps            string
@@ -29,28 +31,20 @@ type CameraOptions struct {
 	Profile        string
 }
 
-func NewCarCam(options CameraOptions) (*CarCam, error) {
+func NewCarCam(cfg CamConfig) (*CarCam, error) {
 	// Create a video track
 	videoTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: webrtc.MimeTypeH264}, "video", "pion")
 	if err != nil {
 		return nil, fmt.Errorf("error creating first video track: %w", err)
 	}
 
-	return &CarCam{
+	carCam := CarCam{
 		VideoTrack:   videoTrack,
 		videoChannel: make(chan []byte, 5),
-		options: CameraOptions{
-			Width:          options.Width,
-			Height:         options.Height,
-			Fps:            options.Fps,
-			HorizontalFlip: options.HorizontalFlip,
-			VerticalFlip:   options.VerticalFlip,
-			DeNoise:        options.DeNoise,
-			Rotation:       options.Rotation,
-			Level:          "4.2",
-			Profile:        options.Profile, //baseline, main or high
-		},
-	}, nil
+		config:       cfg,
+	}
+	carCam.config.Level = DefaultLevel
+	return &carCam, nil
 }
 
 func (c *CarCam) Start(ctx context.Context) error {

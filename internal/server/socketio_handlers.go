@@ -3,7 +3,9 @@ package server
 import (
 	"fmt"
 	"log"
+	"strconv"
 
+	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/pion/webrtc/v3"
 )
@@ -75,14 +77,41 @@ func (s *Server) onError(socketConn socketio.Conn, err error) {
 }
 
 func (s *Server) commandParser(msg []byte) {
-	if len(msg) != 5 {
+	if len(msg) != 6 {
 		log.Println("error: command is incorrect length")
 	}
 
-	s.commandChannel <- msg[0:4] //first 4 bytes go to carCommand
+	commandGroup := carcommand.CommandGroup{}
+
+	gear := "N"
+	if msg[1] == 255 {
+		gear = "R"
+	} else if msg[1] == 0 {
+		gear = "N"
+	} else if msg[1] > 0 && msg[1] < 7 {
+		gear = strconv.Itoa(int(msg[1]))
+	}
+	commandGroup.Commands["esc"] = carcommand.Command{
+		Value: int(msg[0]),
+		Gear:  gear,
+	}
+
+	commandGroup.Commands["steer"] = carcommand.Command{
+		Value: int(msg[2]),
+	}
+
+	commandGroup.Commands["pan"] = carcommand.Command{
+		Value: int(msg[3]),
+	}
+
+	commandGroup.Commands["tilt"] = carcommand.Command{
+		Value: int(msg[4]),
+	}
+
+	s.commandChannel <- commandGroup //first 4 bytes go to carCommand
 
 	//5th byte is a sound signal
-	switch msg[4] {
+	switch msg[5] {
 	case 0:
 		break
 	case 1:

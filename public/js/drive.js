@@ -17,7 +17,7 @@ setInterval(() => {
     gamePad = gamePadTracker.getGamePad();
     trim = 0;
     
-    let command = [127,127,127,127];
+    let command = [127,0,127,127,127,0];
     if(gamePad != null){
         command = gamePadTracker.getCommand(gamePad);
         trim = gamePadTracker.getTrim();
@@ -26,7 +26,7 @@ setInterval(() => {
         trim = keyPressTracker.getTrim();
     }
 
-    document.getElementById('currentCommand').innerHTML = 'Esc: '+command[0] + ' Servo: '+command[1] + ' Pan: ' + command[2] + ' Tilt: ' + command[3];
+    document.getElementById('currentCommand').innerHTML = 'Esc: '+command[0] + 'Gear: ' + command[1]+' Steer: '+command[2] + ' Pan: ' + command[3] + ' Tilt: ' + command[4];
     document.getElementById('steeringTrim').innerHTML = trim;
 
     //Send the command we generated

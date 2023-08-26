@@ -7,12 +7,19 @@ class KeyPressTracker {
         this.panSpeed = 1;
         this.tiltSpeed = 1;
 
-        this.neutralCommand = [this.midPosition,this.midPosition,this.midPosition,this.midPosition,0];
+        this.neutralGear = 0
+        this.reverseGear = 255
+
+        this.neutralCommand = [this.midPosition,this.neutralGear,this.midPosition,this.midPosition,this.midPosition,0];
         this.panPos = this.midPosition;
         this.tiltPos = this.midPosition;
+        this.currentGear = this.neutralGear
 
         this.pressedKeys = {};
         this.steeringTrim = 0;
+
+        this.upShiftPress = false;
+        this.downShiftPress = false;
 
         this.leftTrimPress = false;
         this.rightTrimPress = false;
@@ -44,6 +51,27 @@ class KeyPressTracker {
         return this.steeringTrim;
     }
 
+    upShift() {
+        if(this.currentGear == this.reverseGear){
+            this.currentGear = this.neutralGear;
+        }else if(this.currentGear == this.neutralGear){
+            this.currentGear = 1;
+        }else if(this.currentGear >=0 && this.currentGear <this.maxGears){
+            this.currentGear = this.currentGear++;
+        }
+    }
+
+    downShift() {
+        if(this.currentGear == this.neutralGear){
+            this.currentGear == this.reverseGear;
+        }else if(this.currentGear == 1){
+            this.currentGear == this.neutralGear;
+        }
+        else if(this.currentGear > 1 && this.currentGear <= this.maxGears){
+            this.currentGear = this.currentGear--;
+        }
+    }
+
     getCommand() {
         let command = this.neutralCommand;
         if(this.pressedKeys['s'] === true) {
@@ -55,7 +83,7 @@ class KeyPressTracker {
         }
 
 
-        let steerCommand = command[1];
+        let steerCommand = command[2];
         if(this.pressedKeys['a'] === true) {
             steerCommand = this.minPosition;
         }else if(this.pressedKeys['d'] === true) {
@@ -64,22 +92,41 @@ class KeyPressTracker {
             steerCommand = this.midPosition;
         }
 
+        //Upshift
+        if(this.pressedKeys['e'] && this.upShiftPress == false){ //new press
+            this.upShiftPress = true;
+            this.upShift();
+            
+        }else if (!this.pressedKeys['e'] && this.upShiftPress == true){
+            this.upShiftPress = false;
+        }
+
+         //Downshift
+         if(this.pressedKeys['e'] && this.upShiftPress == false){ //new press
+            this.upShiftPress = true;
+            this.downShift();
+        }else if (!this.pressedKeys['e'] && this.upShiftPress == true){
+            this.upShiftPress = false;
+        }
+
+        command[1] = this.currentGear;
+
         //steering trim
-        if(this.pressedKeys['q'] && this.leftTrimPress == false){ //new press
+        if(this.pressedKeys[','] && this.leftTrimPress == false){ //new press
             this.leftTrimPress = true;
             if(this.steeringTrim > this.minTrim){
                 this.steeringTrim-=2;
             }
-        }else if (!this.pressedKeys['q'] && this.leftTrimPress == true){
+        }else if (!this.pressedKeys[','] && this.leftTrimPress == true){
             this.leftTrimPress = false;
         }
 
-        if(this.pressedKeys['e'] && this.rightTrimPress == false){ //new press
+        if(this.pressedKeys['.'] && this.rightTrimPress == false){ //new press
             this.rightTrimPress = true;
             if(this.steeringTrim < this.maxTrim){
                 this.steeringTrim+=2;
             }
-        }else if (!this.pressedKeys['e'] && this.rightTrimPress == true){
+        }else if (!this.pressedKeys['.'] && this.rightTrimPress == true){
             this.rightTrimPress = false;
         }
         
@@ -90,7 +137,7 @@ class KeyPressTracker {
         }else{
             steerCommand = steerCommand + this.steeringTrim;
         }
-        command[1] = steerCommand;
+        command[2] = steerCommand;
 
 
         if(this.pressedKeys['ArrowLeft'] === true) {
@@ -149,8 +196,8 @@ class KeyPressTracker {
             this.panPos = this.midPosition;
         }
 
-        command[2] = this.panPos;
-        command[3] = this.tiltPos;
+        command[3] = this.panPos;
+        command[4] = this.tiltPos;
 
 
 
