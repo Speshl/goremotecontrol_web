@@ -70,7 +70,7 @@ func NewServo(cfg ServoConfig, servoController *pca9685.PCA9685) *Servo {
 		MaxPulse: cfg.MaxPulse,
 	})
 
-	log.Println("New Servo (%s): %+v\n\n", servo.config.Name, servo)
+	log.Printf("New Servo (%s): %+v\n\n", servo.config.Name, servo)
 	return &servo
 }
 
