@@ -23,6 +23,7 @@ type ServoControllerConfig struct {
 func NewServoController(cfg ServoControllerConfig) *ServoController {
 	return &ServoController{
 		config: cfg,
+		servos: make(map[string]*Servo, MaxSupportedServos),
 	}
 }
 
