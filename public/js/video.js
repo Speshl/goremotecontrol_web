@@ -56,6 +56,7 @@ class CamPlayer {
                 el.muted = true;
                 el.playsinline = true;
                 el.controls = true;
+                el.height = "80vh";
                 document.getElementById('videoDiv').appendChild(el);
 
                 el.addEventListener("play", () => {
