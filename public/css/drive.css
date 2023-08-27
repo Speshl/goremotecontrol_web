@@ -20,6 +20,13 @@
     aspect-ratio: 5/4;
 }
 
+.videoTrack {
+    height: 80vh;
+    /* margin: 0 auto;
+    border: 1px solid; */
+    aspect-ratio: 5/4;
+}
+
 #infoContainer {
     display: grid;
     grid-template-columns: repeat(5, 1fr);

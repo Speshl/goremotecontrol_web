@@ -25,8 +25,7 @@ func (s *Server) RegisterSocketIOHandlers() {
 }
 
 func (s *Server) onConnect(socketConn socketio.Conn) error {
-	log.Printf("socketio connected: %s\n", socketConn.ID())
-	log.Printf("socketio FULL CONNECTION DETAILS: \nID: %s\nLocal: %s\nRemote: %s\n", socketConn.ID(), socketConn.LocalAddr().String(), socketConn.RemoteAddr().String())
+	log.Printf("socketio connected %s - Local: %s - Remote: %s\n", socketConn.ID(), socketConn.LocalAddr().String(), socketConn.RemoteAddr().String())
 	id := socketConn.ID()
 	// Create a new Client for the connected socket
 	conn, err := s.NewClientConn(socketConn)
@@ -84,7 +83,9 @@ func (s *Server) commandParser(msg []byte) {
 		return
 	}
 
-	commandGroup := carcommand.CommandGroup{}
+	commandGroup := carcommand.CommandGroup{
+		Commands: make(map[string]carcommand.Command, 4),
+	}
 
 	gear := "N"
 	if msg[1] == 255 {
