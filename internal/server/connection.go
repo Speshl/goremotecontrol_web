@@ -53,15 +53,15 @@ func (c *Connection) Disconnect() {
 
 func (c *Connection) RegisterHandlers(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample) error {
 
-	_, err := c.PeerConnection.AddTrack(audioTrack)
-	if err != nil {
-		return fmt.Errorf("error adding audio track: %w", err)
+	// _, err := c.PeerConnection.AddTrack(audioTrack)
+	// if err != nil {
+	// 	return fmt.Errorf("error adding audio track: %w", err)
 	}
 
-	_, err = c.PeerConnection.AddTrack(videoTrack)
-	if err != nil {
-		return fmt.Errorf("error adding video track: %w", err)
-	}
+	// _, err = c.PeerConnection.AddTrack(videoTrack)
+	// if err != nil {
+	// 	return fmt.Errorf("error adding video track: %w", err)
+	// }
 
 	// Set the handler for ICE connection state
 	// This will notify you when the peer has connected/disconnected
@@ -84,7 +84,7 @@ func (c *Connection) RegisterHandlers(audioTrack *webrtc.TrackLocalStaticSample,
 		}
 	})
 
-	c.PeerConnection.OnTrack(c.PlayTrack) //TODO: Uncomment to play client audio
+	//c.PeerConnection.OnTrack(c.PlayTrack) //TODO: Uncomment to play client audio
 
 	// // Add the data channel to the peer connection
 	// dataChannel, err := peerConnection.CreateDataChannel("data", nil)
