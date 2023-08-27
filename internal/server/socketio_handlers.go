@@ -26,7 +26,7 @@ func (s *Server) RegisterSocketIOHandlers() {
 
 func (s *Server) onConnect(socketConn socketio.Conn) error {
 	log.Printf("socketio connected: %s\n", socketConn.ID())
-	log.Printf("socketio FULL CONNECTION DETAILS: \n ID: %s\nLocal: %s\nRemote: %s\n", socketConn.ID(), socketConn.LocalAddr().String(), socketConn.RemoteAddr().String())
+	log.Printf("socketio FULL CONNECTION DETAILS: \nID: %s\nLocal: %s\nRemote: %s\n", socketConn.ID(), socketConn.LocalAddr().String(), socketConn.RemoteAddr().String())
 	id := socketConn.ID()
 	// Create a new Client for the connected socket
 	conn, err := s.NewClientConn(socketConn)
@@ -61,10 +61,11 @@ func (s *Server) onOffer(socketConn socketio.Conn, msg string) {
 }
 
 func (s *Server) onICECandidate(socketConn socketio.Conn, msg []byte) {
-	log.Println("candidate recieved from client: %s", socketConn.ID())
+	log.Printf("candidate recieved from client: %s", socketConn.ID())
 }
 
 func (s *Server) onCommand(socketConn socketio.Conn, msg []byte) {
+	log.Printf("candidate recieved from client: %s", socketConn.ID())
 	s.commandParser(msg)
 }
 
@@ -80,6 +81,7 @@ func (s *Server) onError(socketConn socketio.Conn, err error) {
 func (s *Server) commandParser(msg []byte) {
 	if len(msg) != 6 {
 		log.Println("error: command is incorrect length")
+		return
 	}
 
 	commandGroup := carcommand.CommandGroup{}
