@@ -38,6 +38,6 @@ setInterval(() => {
 
     //Send the command we generated
     if (camPlayer.gotRemoteDescription()) {
-        //camPlayer.getSocket().emit('command', command);
+        camPlayer.getSocket().emit('command', command);
     }
 }, 10);
