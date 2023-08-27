@@ -97,12 +97,13 @@ func (s *Server) NewClientConn(socketConn socketio.Conn) (*Connection, error) {
 }
 
 func (s *Server) RemoveClient(id string) {
-	log.Printf("Remove Client %s\n", id)
+	log.Printf("Removing Client: %s\n", id)
 	s.connectionsLock.Lock()
 	client, ok := s.connections[id]
 	if ok {
 		client.Disconnect()
 		delete(s.connections, id)
+		log.Println("Client Removed: %s\n", id)
 	}
 	s.connectionsLock.Unlock()
 }

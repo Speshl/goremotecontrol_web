@@ -89,12 +89,12 @@ class CamPlayer {
         }
         
         //Offer to receive 1 audio, and 1 video track
-        this.pc.addTransceiver('video', {
-            direction: 'recvonly'
-        })
-        this.pc.addTransceiver('audio', {
-            direction: 'recvonly'
-        })
+        // this.pc.addTransceiver('video', {
+        //     direction: 'recvonly'
+        // })
+        // this.pc.addTransceiver('audio', {
+        //     direction: 'recvonly'
+        // })
 
         this.socket.on('answer', (answer) => {
             let decodedAnswer = JSON.parse(atob(answer));
