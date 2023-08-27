@@ -51,6 +51,7 @@ const DefaultMaxPulse = pca9685.ServoMaxPulseDef
 const DefaultMinPulse = pca9685.ServoMinPulseDef
 const DefaultMaxValue = 255
 const DefaultMinValue = 0
+const DefaultNumGears = 1
 
 type ServerConfig struct {
 	Name string
@@ -74,7 +75,11 @@ func GetConfig(ctx context.Context) CarConfig {
 		SpeakerConfig: GetSpeakerConfig(ctx),
 	}
 
-	log.Printf("Using Config: \n\n%+v\n\n", carConfig)
+	log.Printf("Server Config: \n%+v\n", carConfig.ServerConfig)
+	log.Printf("Cam Config: \n%+v\n", carConfig.CamConfig)
+	log.Printf("Mic Config: \n%+v\n", carConfig.MicConfig)
+	log.Printf("Speaker Config: \n%+v\n", carConfig.SpeakerConfig)
+	log.Printf("Command Config: \n%+v\n", carConfig.ServerConfig)
 	return carConfig
 }
 
@@ -132,6 +137,7 @@ func GetCommandConfig(ctx context.Context) carcommand.CarCommandConfig {
 			Inverted:  GetBoolEnv(envPrefix+"INVERTED", DefaultInverted),
 			MidOffset: GetIntEnv(envPrefix+"MIDOFFSET", DefaultMidOffset),
 			DeadZone:  GetIntEnv(envPrefix+"DEADZONE", DefaultDeadZone),
+			NumGears:  GetIntEnv(envPrefix+"NUMGEARS", DefaultNumGears),
 		}
 		servoCfg.MidValue = (servoCfg.MaxValue - servoCfg.MinValue) / 2
 

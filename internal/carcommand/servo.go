@@ -70,7 +70,7 @@ func NewServo(cfg ServoConfig, servoController *pca9685.PCA9685) *Servo {
 		MaxPulse: cfg.MaxPulse,
 	})
 
-	log.Printf("New Servo (%s): %+v\n\n", servo.config.Name, servo)
+	log.Printf("New Servo (%s): %+v\n", servo.config.Name, servo)
 	return &servo
 }
 
@@ -195,7 +195,7 @@ func (s *Servo) DownShift() {
 }
 
 func (s *Servo) SetGear(gear string) error {
-	if gear == "" {
+	if gear == "" || s.config.Type != "esc" {
 		return nil
 	}
 	if gear == ReverseKey || gear == NeutralKey {

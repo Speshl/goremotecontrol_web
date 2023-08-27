@@ -7,8 +7,9 @@ class GamePadTracker {
         this.panSpeed = 2;
         this.tiltSpeed = 2;
 
-        this.neutralGear = 0
-        this.reverseGear = 255
+        this.neutralGear = 0;
+        this.reverseGear = 255;
+        this.maxGears = 6;
 
         this.neutralCommand = [this.midPosition, this.neutralGear, this.midPosition, this.midPosition, this.midPosition, 0];
         this.panPos = this.midPosition;
@@ -34,6 +35,10 @@ class GamePadTracker {
             } else {
                 console.log("Got event from null gamepad: ", event.gamepad.index);
             }
+        });
+
+        window.addEventListener('gamepaddisconnected', (evnet) => {
+            this.gamepadIndex = -1;
         });
 
     }
@@ -67,8 +72,6 @@ class GamePadTracker {
     getCommand(myGamepad) {
         let command = this.neutralCommand;
         if (myGamepad != null) {
-            document.getElementById('controllerType').innerHTML = myGamepad.id; //show gamepad type
-
             if (myGamepad.id.toLowerCase().includes("xbox")) {
                 command = this.commandFromXbox(myGamepad);
             }
@@ -88,6 +91,28 @@ class GamePadTracker {
         return this.steeringTrim;
     }
 
+    getGearString() {
+        if(this.currentGear == this.neutralGear){
+            return "N";
+        }else if(this.currentGear == this.reverseGear){
+            return "R";
+        }else{
+            return ""+this.currentGear;
+        }
+    }
+
+    getControllerName(myGamepad){
+        if (myGamepad.id.toLowerCase().includes("xbox")) {
+            return "Xbox"
+        } else if (myGamepad.id.toLowerCase().includes("g27")) {
+            return "G27"
+        } else if (myGamepad.id.toLowerCase().includes("b684")) { //TGT wheel
+            return "TGT"
+        }else{
+            return "Unsupported"
+        }
+    }
+
     mapToRange(value, min, max, minReturn, maxReturn) {
         return Math.floor((maxReturn - minReturn) * (value - min) / (max - min) + minReturn)
     }
@@ -98,18 +123,18 @@ class GamePadTracker {
         }else if(this.currentGear == this.neutralGear){
             this.currentGear = 1;
         }else if(this.currentGear >=0 && this.currentGear <this.maxGears){
-            this.currentGear = this.currentGear++;
+            this.currentGear++;
         }
     }
 
     downShift() {
         if(this.currentGear == this.neutralGear){
-            this.currentGear == this.reverseGear;
+            this.currentGear = this.reverseGear;
         }else if(this.currentGear == 1){
-            this.currentGear == this.neutralGear;
+            this.currentGear = this.neutralGear;
         }
         else if(this.currentGear > 1 && this.currentGear <= this.maxGears){
-            this.currentGear = this.currentGear--;
+            this.currentGear--;
         }
     }
 
@@ -128,17 +153,17 @@ class GamePadTracker {
         }
 
         //Upshift
-        if (myGamepad.buttons[14].pressed && this.upShiftPress == false) { //new press
+        if (myGamepad.buttons[5].pressed && this.upShiftPress == false) { //new press
             this.upShiftPress = true;
             this.upShift();
-        } else if (!myGamepad.buttons[14].pressed && this.upShiftPress == true) {
+        } else if (!myGamepad.buttons[5].pressed && this.upShiftPress == true) {
             this.upShiftPress = false;
         }
 
-        if (myGamepad.buttons[15].pressed && this.downShiftPress == false) { //new press
+        if (myGamepad.buttons[4].pressed && this.downShiftPress == false) { //new press
             this.downShiftPress = true;
             this.downShift();
-        } else if (!myGamepad.buttons[15].pressed && this.downShiftPress == true) {
+        } else if (!myGamepad.buttons[4].pressed && this.downShiftPress == true) {
             this.downShiftPress = false;
         }
 
@@ -232,7 +257,7 @@ class GamePadTracker {
 
 
 
-
+    //TODO Update for gears
     commandFromG27(myGamepad) {
         let command = this.neutralCommand;
         //esc
@@ -347,7 +372,8 @@ class GamePadTracker {
         command[3] = this.tiltPos;
         return command;
     }
-
+    
+    //TODO Update for gears
     commandFromTGT(myGamepad) {
         let command = this.neutralCommand;
         //esc

@@ -7,13 +7,14 @@ class KeyPressTracker {
         this.panSpeed = 1;
         this.tiltSpeed = 1;
 
-        this.neutralGear = 0
-        this.reverseGear = 255
+        this.neutralGear = 0;
+        this.reverseGear = 255;
+        this.maxGears = 6;
 
         this.neutralCommand = [this.midPosition,this.neutralGear,this.midPosition,this.midPosition,this.midPosition,0];
         this.panPos = this.midPosition;
         this.tiltPos = this.midPosition;
-        this.currentGear = this.neutralGear
+        this.currentGear = this.neutralGear;
 
         this.pressedKeys = {};
         this.steeringTrim = 0;
@@ -31,7 +32,7 @@ class KeyPressTracker {
         document.addEventListener('keydown', (event) => {
             const key = event.key;
             this.pressedKeys[key] = true;
-            if(key == "ArrowUp" || key == "ArrowDown" || key == "ArrowLeft" || key == "ArrowRight"){
+            if(key == "ArrowUp" || key == "ArrowDown" || key == "ArrowLeft" || key == "ArrowRight" || key == " "){
                 event.preventDefault();
             }
         });
@@ -51,24 +52,34 @@ class KeyPressTracker {
         return this.steeringTrim;
     }
 
+    getGearString() {
+        if(this.currentGear == this.neutralGear){
+            return "N";
+        }else if(this.currentGear == this.reverseGear){
+            return "R";
+        }else{
+            return ""+this.currentGear;
+        }
+    }
+
     upShift() {
         if(this.currentGear == this.reverseGear){
             this.currentGear = this.neutralGear;
         }else if(this.currentGear == this.neutralGear){
             this.currentGear = 1;
         }else if(this.currentGear >=0 && this.currentGear <this.maxGears){
-            this.currentGear = this.currentGear++;
+            this.currentGear ++;
         }
     }
 
     downShift() {
         if(this.currentGear == this.neutralGear){
-            this.currentGear == this.reverseGear;
+            this.currentGear = this.reverseGear;
         }else if(this.currentGear == 1){
-            this.currentGear == this.neutralGear;
+            this.currentGear = this.neutralGear;
         }
         else if(this.currentGear > 1 && this.currentGear <= this.maxGears){
-            this.currentGear = this.currentGear--;
+            this.currentGear--;
         }
     }
 
@@ -102,11 +113,11 @@ class KeyPressTracker {
         }
 
          //Downshift
-         if(this.pressedKeys['e'] && this.upShiftPress == false){ //new press
-            this.upShiftPress = true;
+         if(this.pressedKeys['q'] && this.downShiftPress == false){ //new press
+            this.downShiftPress = true;
             this.downShift();
-        }else if (!this.pressedKeys['e'] && this.upShiftPress == true){
-            this.upShiftPress = false;
+        }else if (!this.pressedKeys['q'] && this.downShiftPress == true){
+            this.downShiftPress = false;
         }
 
         command[1] = this.currentGear;
@@ -191,7 +202,7 @@ class KeyPressTracker {
         }
 
         //Resent camera on spacebar
-        if(this.pressedKeys['Space'] === true) {
+        if(this.pressedKeys[' '] === true) {
             this.tiltPos = this.midPosition;
             this.panPos = this.midPosition;
         }
