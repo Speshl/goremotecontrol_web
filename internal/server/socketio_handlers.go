@@ -25,7 +25,8 @@ func (s *Server) RegisterSocketIOHandlers() {
 }
 
 func (s *Server) onConnect(socketConn socketio.Conn) error {
-	log.Printf("Connected: %s\n", socketConn.ID())
+	log.Printf("socketio connected: %s\n", socketConn.ID())
+	log.Printf("socketio FULL CONNECTION DETAILS: \n ID: %s\nLocal: %s\nRemote: %s\n", socketConn.ID(), socketConn.LocalAddr().String(), socketConn.RemoteAddr().String())
 	id := socketConn.ID()
 	// Create a new Client for the connected socket
 	conn, err := s.NewClientConn(socketConn)
@@ -60,7 +61,7 @@ func (s *Server) onOffer(socketConn socketio.Conn, msg string) {
 }
 
 func (s *Server) onICECandidate(socketConn socketio.Conn, msg []byte) {
-	log.Println("candidate recieved from client")
+	log.Println("candidate recieved from client: %s", socketConn.ID())
 }
 
 func (s *Server) onCommand(socketConn socketio.Conn, msg []byte) {
@@ -68,12 +69,12 @@ func (s *Server) onCommand(socketConn socketio.Conn, msg []byte) {
 }
 
 func (s *Server) OnDisconnect(socketConn socketio.Conn, reason string) {
-	log.Printf("connection disconnected (%s): %s\n", reason, socketConn.ID())
+	log.Printf("socketio connection disconnected (%s): %s\n", reason, socketConn.ID())
 	s.RemoveClient(socketConn.ID())
 }
 
 func (s *Server) onError(socketConn socketio.Conn, err error) {
-	log.Printf("connection %s error: %s\n", socketConn.ID(), err.Error())
+	log.Printf("socketio connection %s error: %s\n", socketConn.ID(), err.Error())
 }
 
 func (s *Server) commandParser(msg []byte) {
