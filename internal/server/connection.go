@@ -56,7 +56,7 @@ func (c *Connection) RegisterHandlers(audioTrack *webrtc.TrackLocalStaticSample,
 	// _, err := c.PeerConnection.AddTrack(audioTrack)
 	// if err != nil {
 	// 	return fmt.Errorf("error adding audio track: %w", err)
-	}
+	//}
 
 	// _, err = c.PeerConnection.AddTrack(videoTrack)
 	// if err != nil {
