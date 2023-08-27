@@ -59,6 +59,10 @@ func (c *CarCommand) Start(ctx context.Context) error {
 	commandDuration := time.Duration(int64(time.Millisecond) * int64(commandRate))
 	commandTicker := time.NewTicker(commandDuration)
 
+	limitCyclesWithoutCommand := 20
+	cyclesWithoutCommand := 0
+	gettingCommands := false
+
 	var latestCommand CommandGroup
 	for {
 		select {
@@ -73,15 +77,25 @@ func (c *CarCommand) Start(ctx context.Context) error {
 
 		case <-commandTicker.C: //time to send command
 			if latestCommand.Commands != nil {
+				cyclesWithoutCommand = 0
+				gettingCommands = true
 				err := c.DoCommand(latestCommand)
 				if err != nil {
 					return err
 				}
 				latestCommand.Commands = nil
 			} else {
-				err := c.servoController.Neutral()
-				if err != nil {
-					return err
+				cyclesWithoutCommand++
+				if cyclesWithoutCommand > limitCyclesWithoutCommand {
+					if gettingCommands {
+						gettingCommands = false
+						log.Printf("warning: stopped getting commands, start sendin neutral")
+					}
+					err := c.servoController.Neutral()
+					if err != nil {
+						return err
+					}
+					cyclesWithoutCommand = limitCyclesWithoutCommand //keep from overflowing
 				}
 			}
 		}
