@@ -79,7 +79,7 @@ func GetConfig(ctx context.Context) CarConfig {
 	log.Printf("Cam Config: \n%+v\n", carConfig.CamConfig)
 	log.Printf("Mic Config: \n%+v\n", carConfig.MicConfig)
 	log.Printf("Speaker Config: \n%+v\n", carConfig.SpeakerConfig)
-	log.Printf("Command Config: \n%+v\n", carConfig.ServerConfig)
+	log.Printf("Command Config: \n%+v\n", carConfig.CommandConfig)
 	return carConfig
 }
 
