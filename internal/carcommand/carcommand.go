@@ -79,7 +79,10 @@ func (c *CarCommand) Start(ctx context.Context) error {
 				}
 				latestCommand.Commands = nil
 			} else {
-				c.Neutral()
+				err := c.servoController.Neutral()
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
