@@ -284,26 +284,31 @@ func (s *Servo) getValueWithOffset(value int) (int, error) {
 
 func (s *Servo) SetValue(value int) error {
 	var (
-		finalValue int
-		err        error
+		err error
 	)
 
 	switch s.config.Type {
 	case "esc":
-		finalValue, err = s.getValueWithGear(value)
+		value, err = s.getValueWithGear(value)
 		if err != nil {
 			return fmt.Errorf("error setting value with gear - %w", err)
 		}
 	case "servo":
 		fallthrough
 	default:
-		finalValue, err = s.getValueWithOffset(value)
+		value, err = s.getValueWithOffset(value)
 		if err != nil {
 			return fmt.Errorf("error getting value with offset - %w", err)
 		}
 	}
 
-	err = s.servo.Fraction(float32(finalValue) / float32(s.config.MaxValue))
+	finalValue := float32(value) / float32(s.config.MaxValue)
+
+	if s.config.Name == "steer" {
+		log.Println("Steer Pos: %f\n", finalValue)
+	}
+
+	err = s.servo.Fraction(finalValue)
 	if err != nil {
 		return fmt.Errorf("failed sending command: (value %d | final - %f) - error:  %w\n", value, finalValue, err)
 	}

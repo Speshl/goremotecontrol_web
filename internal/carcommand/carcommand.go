@@ -78,6 +78,8 @@ func (c *CarCommand) Start(ctx context.Context) error {
 					return err
 				}
 				latestCommand.Commands = nil
+			} else {
+				c.Neutral()
 			}
 		}
 	}

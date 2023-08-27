@@ -60,3 +60,12 @@ func (s *ServoController) SendCommand(name string, value int) error {
 	}
 	return servo.SetValue(value)
 }
+
+func (s *ServoController) Neutral() error {
+	for _, servo := range s.servos {
+		err := servo.SetNeutral()
+		if err != nil {
+			return fmt.Errorf("error setting %s servo to neutral: %w", servo.config.Name, err)
+		}
+	}
+}
