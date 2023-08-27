@@ -92,9 +92,9 @@ class CamPlayer {
         this.pc.addTransceiver('video', {
             direction: 'recvonly'
         })
-        // this.pc.addTransceiver('audio', {
-        //     direction: 'recvonly'
-        // })
+        this.pc.addTransceiver('audio', {
+            direction: 'recvonly'
+        })
 
         this.socket.on('answer', (answer) => {
             let decodedAnswer = JSON.parse(atob(answer));
