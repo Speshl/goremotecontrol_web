@@ -3,6 +3,7 @@ package carcommand
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 )
 
@@ -44,6 +45,7 @@ func (c *CarCommand) Init() error {
 		return fmt.Errorf("failed initializing servo controller - %w", err)
 	}
 
+	log.Printf("Adding Servos...\n\n")
 	for _, servoCfg := range c.config.ServoConfigs {
 		c.servoController.AddServo(servoCfg)
 	}

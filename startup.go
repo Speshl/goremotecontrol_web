@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/Speshl/goremotecontrol_web/internal/carcam"
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
@@ -37,7 +36,6 @@ func (a *App) StartSpeaker() (*carspeaker.CarSpeaker, error) {
 			log.Printf("carspeaker error: %s\n", err.Error())
 		}
 		a.cancel() //stop anything else on this context because mic stopped
-		a.done <- os.Kill
 		log.Println("Stopping due to carspeaker stopping unexpectedly")
 	}()
 
@@ -66,7 +64,6 @@ func (a *App) StartCam() (*carcam.CarCam, error) {
 			log.Printf("carcam error: %s\n", err.Error())
 		}
 		a.cancel() //stop anything else on this context because camera stopped
-		a.done <- os.Kill
 		log.Println("Stopping due to carcam stopping unexpectedly")
 	}()
 	return carCam, nil
@@ -80,7 +77,6 @@ func (a *App) StartCommand() *carcommand.CarCommand {
 			log.Printf("carcommand error: %s\n", err.Error())
 		}
 		a.cancel() //stop anything else on this context because the gpio output stopped
-		a.done <- os.Kill
 		log.Println("Stopping due to carcommand stopping unexpectedly")
 	}()
 
@@ -105,7 +101,6 @@ func (a *App) StartSocketServer() *server.Server {
 			log.Printf("socketio listen error: %s\n", err)
 		}
 		a.cancel() //stop anything else on this context because the socker server stopped
-		a.done <- os.Kill
 		log.Println("Stopping due to socker server stopping unexpectedly")
 	}()
 
@@ -121,7 +116,6 @@ func (a *App) StartHTTPServer() {
 			log.Printf("HTTP server error: %v", err)
 		}
 		a.cancel() //stop anything else on this context because the http server stopped
-		a.done <- os.Kill
 		log.Println("Stopping due to http server stopping unexpectedly")
 	}()
 }
