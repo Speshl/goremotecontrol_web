@@ -103,7 +103,7 @@ func (s *Server) RemoveClient(id string) {
 	if ok {
 		client.Disconnect()
 		delete(s.connections, id)
-		log.Println("Client Removed: %s\n", id)
+		log.Printf("Client Removed: %s\n", id)
 	}
 	s.connectionsLock.Unlock()
 }
