@@ -68,4 +68,5 @@ func (s *ServoController) Neutral() error {
 			return fmt.Errorf("error setting %s servo to neutral: %w", servo.config.Name, err)
 		}
 	}
+	return nil
 }
