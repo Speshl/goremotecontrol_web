@@ -21,6 +21,7 @@ const AppEnvBase = "GORRC_"
 // Default Server Config
 const DefaultPort = "8181"
 const DefaultCarName = "GORRC"
+const DefaultSilentStart = false
 
 // Default Mic Config
 const DefaultMicDevice = "0"
@@ -54,8 +55,9 @@ const DefaultMinValue = 0
 const DefaultNumGears = 1
 
 type ServerConfig struct {
-	Name string
-	Port string
+	Name        string
+	Port        string
+	SilentStart bool
 }
 
 type CarConfig struct {
@@ -85,8 +87,9 @@ func GetConfig(ctx context.Context) CarConfig {
 
 func GetServerConfig(ctx context.Context) ServerConfig {
 	return ServerConfig{
-		Name: GetStringEnv("NAME", DefaultCarName),
-		Port: GetStringEnv("PORT", DefaultPort),
+		Name:        GetStringEnv("NAME", DefaultCarName),
+		Port:        GetStringEnv("PORT", DefaultPort),
+		SilentStart: GetBoolEnv("SILENTSTART", DefaultSilentStart),
 	}
 }
 
