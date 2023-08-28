@@ -256,7 +256,7 @@ func (s *Servo) getValueWithGear(value int) (int, error) {
 		}
 	}
 
-	log.Println("ESC - Start: %d - End: %d - Gear: %s - Ratio: %+v\n", value, valueRatio, s.transmission.gear, s.transmission.gearRatios[s.transmission.gear])
+	log.Printf("ESC - Start: %d - End: %d - Gear: %s - Ratio: %+v\n", value, valueRatio, s.transmission.gear, s.transmission.gearRatios[s.transmission.gear])
 	return valueRatio, nil
 }
 
