@@ -84,7 +84,7 @@ func (c *Connection) RegisterHandlers(audioTrack *webrtc.TrackLocalStaticSample,
 		}
 	})
 
-	//c.PeerConnection.OnTrack(c.PlayTrack) //TODO: Uncomment to play client audio
+	c.PeerConnection.OnTrack(c.PlayTrack) //TODO: Uncomment to play client audio
 
 	// // Add the data channel to the peer connection
 	// dataChannel, err := peerConnection.CreateDataChannel("data", nil)

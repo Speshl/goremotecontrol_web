@@ -104,7 +104,7 @@ func makeGearRatios(numGears, minValue, maxValue int, inverted bool) map[string]
 
 		for i := 1; i <= numGears; i++ {
 			gearRatio := GearRatio{
-				max: midValue, //Use midvalue here so that gear ratio only has upper limit but not lower limit
+				max: getInvertedValue(currentMin, midValue), //Use midvalue here so that gear ratio only has upper limit but not lower limit
 				min: currentMin,
 			}
 			if i == numGears {
@@ -137,7 +137,7 @@ func makeGearRatios(numGears, minValue, maxValue int, inverted bool) map[string]
 		for i := 1; i <= numGears; i++ {
 			gearRatio := GearRatio{
 				max: currentMax,
-				min: midValue, //Use midvalue here so that gear ratio only has upper limit but not lower limit
+				min: getInvertedValue(currentMax, midValue), //Use midvalue here so that gear ratio only has upper limit but not lower limit
 			}
 			if i == numGears {
 				gearRatio.max = maxValue
@@ -226,9 +226,9 @@ func (s *Servo) getValueWithGear(value int) (int, error) {
 		if value > s.config.MidValue {
 			log.Println("Reverse And Brakes")
 			if s.config.Inverted {
-				valueRatio = mapToRange(getInvertedValue(value, s.config.MidValue), s.config.MinValue, s.config.MaxValue, s.config.MinValue, s.config.MaxValue)
+				valueRatio = mapToRange(getInvertedValue(value, s.config.MidValue), s.config.MinValue, s.config.MaxValue, s.transmission.gearRatios[s.transmission.gear].min, s.transmission.gearRatios[s.transmission.gear].max)
 			} else {
-				valueRatio = mapToRange(value, s.config.MinValue, s.config.MaxValue, s.config.MinValue, s.config.MaxValue)
+				valueRatio = mapToRange(value, s.config.MinValue, s.config.MaxValue, s.transmission.gearRatios[s.transmission.gear].min, s.transmission.gearRatios[s.transmission.gear].max)
 			}
 		} else {
 			log.Println("Reverse")
@@ -242,9 +242,9 @@ func (s *Servo) getValueWithGear(value int) (int, error) {
 		if value < s.config.MidValue {
 			log.Println("Forward And Brakes")
 			if s.config.Inverted {
-				valueRatio = mapToRange(getInvertedValue(value, s.config.MidValue), s.config.MinValue, s.config.MaxValue, s.config.MinValue, s.config.MaxValue)
+				valueRatio = mapToRange(getInvertedValue(value, s.config.MidValue), s.config.MinValue, s.config.MaxValue, s.transmission.gearRatios[s.transmission.gear].min, s.transmission.gearRatios[s.transmission.gear].max)
 			} else {
-				valueRatio = mapToRange(value, s.config.MinValue, s.config.MaxValue, s.config.MinValue, s.config.MaxValue)
+				valueRatio = mapToRange(value, s.config.MinValue, s.config.MaxValue, s.transmission.gearRatios[s.transmission.gear].min, s.transmission.gearRatios[s.transmission.gear].max)
 			}
 		} else {
 			log.Println("Forward")
