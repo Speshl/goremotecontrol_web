@@ -14,7 +14,8 @@ class GamePadTracker {
         this.neutralCommand = [this.midPosition, this.neutralGear, this.midPosition, this.midPosition, this.midPosition, 0];
         this.panPos = this.midPosition;
         this.tiltPos = this.midPosition;
-        this.currentGear = this.neutralGear
+        this.currentGear = this.neutralGear;
+        this.inManualGear = false;
 
         this.gamepadIndex = -1;
         this.steeringTrim = 0;
@@ -160,6 +161,7 @@ class GamePadTracker {
             this.upShiftPress = false;
         }
 
+        //Downshift
         if (myGamepad.buttons[4].pressed && this.downShiftPress == false) { //new press
             this.downShiftPress = true;
             this.downShift();
@@ -269,6 +271,59 @@ class GamePadTracker {
         } else {
             command[0] = this.midPosition;
         }
+
+        //gear
+        //TODO: Update gear buttons And test manual gear shifting
+        //Upshift
+        if (myGamepad.buttons[5].pressed && this.upShiftPress == false) { //new press
+            this.upShiftPress = true;
+            this.upShift();
+        } else if (!myGamepad.buttons[5].pressed && this.upShiftPress == true) {
+            this.upShiftPress = false;
+        }
+
+        //Downshift
+        if (myGamepad.buttons[4].pressed && this.downShiftPress == false) { //new press
+            this.downShiftPress = true;
+            this.downShift();
+        } else if (!myGamepad.buttons[4].pressed && this.downShiftPress == true) {
+            this.downShiftPress = false;
+        }
+
+        let inManualGear = false;
+        if (myGamepad.buttons[0].pressed){
+            this.currentGear = this.reverseGear
+            inManualGear = true;
+        }else if (myGamepad.buttons[0].pressed){
+            this.currentGear = 1
+            inManualGear = true;
+        }else if (myGamepad.buttons[0].pressed){
+            this.currentGear = 2
+            inManualGear = true;
+        }else if (myGamepad.buttons[0].pressed){
+            this.currentGear = 3
+            inManualGear = true;
+        }else if (myGamepad.buttons[0].pressed){
+            this.currentGear = 4
+            inManualGear = true;
+        }else if (myGamepad.buttons[0].pressed){
+            this.currentGear = 5
+            inManualGear = true;
+        }else if (myGamepad.buttons[0].pressed){
+            this.currentGear = 6
+            inManualGear = true;
+        }
+
+        if(inManualGear){
+            this.inManualGear = true;
+        }
+
+        if (!inManualGear && this.inManualGear){
+            this.inManualGear = false;
+            this.currentGear = this.neutralGear;
+        }
+
+        command[1] = this.currentGear;
 
         //servo
         let steerCommand = command[1];
