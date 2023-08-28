@@ -167,6 +167,7 @@ class GamePadTracker {
             this.downShiftPress = false;
         }
 
+        command[0] = this.currentGear;
 
         //servo
         let steerCommand = command[1];
