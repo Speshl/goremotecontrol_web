@@ -4,19 +4,23 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/pion/webrtc/v3"
 	"github.com/pion/webrtc/v3/pkg/media"
 )
 
+const DefaultLevel = "4.2"
+const DefaultFPS = 30
+
 type CarCam struct {
 	VideoTrack   *webrtc.TrackLocalStaticSample
 	videoChannel chan []byte
-	options      CameraOptions
+	config       CamConfig
 }
 
-type CameraOptions struct {
+type CamConfig struct {
 	Width          string
 	Height         string
 	Fps            string
@@ -29,28 +33,20 @@ type CameraOptions struct {
 	Profile        string
 }
 
-func NewCarCam(options CameraOptions) (*CarCam, error) {
+func NewCarCam(cfg CamConfig) (*CarCam, error) {
 	// Create a video track
 	videoTrack, err := webrtc.NewTrackLocalStaticSample(webrtc.RTPCodecCapability{MimeType: webrtc.MimeTypeH264}, "video", "pion")
 	if err != nil {
 		return nil, fmt.Errorf("error creating first video track: %w", err)
 	}
 
-	return &CarCam{
+	carCam := CarCam{
 		VideoTrack:   videoTrack,
 		videoChannel: make(chan []byte, 5),
-		options: CameraOptions{
-			Width:          options.Width,
-			Height:         options.Height,
-			Fps:            options.Fps,
-			HorizontalFlip: options.HorizontalFlip,
-			VerticalFlip:   options.VerticalFlip,
-			DeNoise:        options.DeNoise,
-			Rotation:       options.Rotation,
-			Level:          "4.2",
-			Profile:        options.Profile, //baseline, main or high
-		},
-	}, nil
+		config:       cfg,
+	}
+	carCam.config.Level = DefaultLevel
+	return &carCam, nil
 }
 
 func (c *CarCam) Start(ctx context.Context) error {
@@ -59,6 +55,12 @@ func (c *CarCam) Start(ctx context.Context) error {
 }
 
 func (c *CarCam) StartVideoDataListener(ctx context.Context) {
+	fps, err := strconv.ParseInt(c.config.Fps, 10, 32)
+	if err != nil {
+		fps = DefaultFPS
+	}
+
+	duration := int(1000 / fps)
 	for {
 		select {
 		case <-ctx.Done():
@@ -69,7 +71,8 @@ func (c *CarCam) StartVideoDataListener(ctx context.Context) {
 				log.Println("video data channel closed, stopping")
 				return
 			}
-			err := c.VideoTrack.WriteSample(media.Sample{Data: data, Duration: time.Millisecond * 17}) //TODO: Tie this to FPS
+
+			err := c.VideoTrack.WriteSample(media.Sample{Data: data, Duration: time.Millisecond * time.Duration(duration)})
 			if err != nil {
 				log.Printf("error writing sample to track: %s\n", err.Error())
 				return

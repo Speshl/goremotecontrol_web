@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/googollee/go-socket.io/engineio"
 	"github.com/googollee/go-socket.io/engineio/transport"
@@ -16,7 +17,7 @@ import (
 type Server struct {
 	carAudioTrack  *webrtc.TrackLocalStaticSample
 	carVideoTrack  *webrtc.TrackLocalStaticSample
-	commandChannel chan []byte
+	commandChannel chan carcommand.CommandGroup
 	speakerChannel chan string
 
 	clientAudioVolume string
@@ -31,7 +32,7 @@ var allowOriginFunc = func(r *http.Request) bool {
 	return true
 }
 
-func NewServer(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample, commandChannel chan []byte, speakerChannel chan string, device string, volume string) *Server {
+func NewSocketServer(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample, commandChannel chan carcommand.CommandGroup, speakerChannel chan string, device string, volume string) *Server {
 	socketioServer := socketio.NewServer(&engineio.Options{
 		Transports: []transport.Transport{
 			&polling.Transport{
@@ -96,12 +97,13 @@ func (s *Server) NewClientConn(socketConn socketio.Conn) (*Connection, error) {
 }
 
 func (s *Server) RemoveClient(id string) {
-	log.Printf("Remove Client %s\n", id)
+	log.Printf("Removing Client: %s\n", id)
 	s.connectionsLock.Lock()
 	client, ok := s.connections[id]
 	if ok {
 		client.Disconnect()
 		delete(s.connections, id)
+		log.Printf("Client Removed: %s\n", id)
 	}
 	s.connectionsLock.Unlock()
 }

@@ -20,28 +20,28 @@ func (c *CarCam) StartStreaming(ctx context.Context) error {
 		"-t", "0",  // Disable timeout
 		"-o", "-", // Output to stdout
 		"--flush", // Flush output files immediately
-		"--width", c.options.Width,
-		"--height", c.options.Height,
-		"--framerate", c.options.Fps,
-		"-n",                           // Do not show a preview window
-		"--profile", c.options.Profile, // H264 profile baseline, main or high
-		//"--level", c.options.level,
+		"--width", c.config.Width,
+		"--height", c.config.Height,
+		"--framerate", c.config.Fps,
+		"-n",                          // Do not show a preview window
+		"--profile", c.config.Profile, // H264 profile baseline, main or high
+		//"--level", c.config.level,
 	}
-	if c.options.HorizontalFlip {
+	if c.config.HorizontalFlip {
 		args = append(args, "--hflip")
 	}
-	if c.options.VerticalFlip {
+	if c.config.VerticalFlip {
 		args = append(args, "--vflip")
 	}
-	// if !c.options.deNoise {
+	// if !c.config.deNoise {
 	// 	args = append(args, "--denoise", "cdn_off")
 	// }
-	// if c.options.rotation != 0 {
+	// if c.config.rotation != 0 {
 	// 	args = append(args, "--rotation")
-	// 	args = append(args, strconv.Itoa(c.options.rotation))
+	// 	args = append(args, strconv.Itoa(c.config.rotation))
 	// }
 
-	if c.options.DisableVideo {
+	if c.config.DisableVideo {
 		return c.noVideoLoop(ctx)
 	}
 

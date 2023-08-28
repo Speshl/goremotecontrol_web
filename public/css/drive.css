@@ -10,19 +10,26 @@
 #mainContainer {
     text-align: center;
     padding: 20px;
-    max-width: 800px;
+    /* max-width: 800px; */
 }
 
 #videoDiv {
-    width: 640px;
-    height: 480px;
+    height: 80vh;
     margin: 0 auto;
     border: 1px solid;
+    aspect-ratio: 5/4;
+}
+
+.videoTrack {
+    height: 80vh;
+    /* margin: 0 auto;
+    border: 1px solid; */
+    aspect-ratio: 5/4;
 }
 
 #infoContainer {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 5px;
     margin-top: 20px;
 }

@@ -3,7 +3,9 @@ package server
 import (
 	"fmt"
 	"log"
+	"strconv"
 
+	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/pion/webrtc/v3"
 )
@@ -23,7 +25,7 @@ func (s *Server) RegisterSocketIOHandlers() {
 }
 
 func (s *Server) onConnect(socketConn socketio.Conn) error {
-	log.Printf("Connected: %s\n", socketConn.ID())
+	log.Printf("socketio connected %s - Local: %s - Remote: %s\n", socketConn.ID(), socketConn.LocalAddr().String(), socketConn.RemoteAddr().String())
 	id := socketConn.ID()
 	// Create a new Client for the connected socket
 	conn, err := s.NewClientConn(socketConn)
@@ -58,31 +60,62 @@ func (s *Server) onOffer(socketConn socketio.Conn, msg string) {
 }
 
 func (s *Server) onICECandidate(socketConn socketio.Conn, msg []byte) {
-	log.Println("candidate recieved from client")
+	log.Printf("candidate recieved from client: %s", socketConn.ID())
 }
 
 func (s *Server) onCommand(socketConn socketio.Conn, msg []byte) {
+	//log.Printf("candidate recieved from client: %s", socketConn.ID())
 	s.commandParser(msg)
 }
 
 func (s *Server) OnDisconnect(socketConn socketio.Conn, reason string) {
-	log.Printf("connection disconnected (%s): %s\n", reason, socketConn.ID())
+	log.Printf("socketio connection disconnected (%s): %s\n", reason, socketConn.ID())
 	s.RemoveClient(socketConn.ID())
 }
 
 func (s *Server) onError(socketConn socketio.Conn, err error) {
-	log.Printf("connection %s error: %s\n", socketConn.ID(), err.Error())
+	log.Printf("socketio connection %s error: %s\n", socketConn.ID(), err.Error())
 }
 
 func (s *Server) commandParser(msg []byte) {
-	if len(msg) != 5 {
+	if len(msg) != 6 {
 		log.Println("error: command is incorrect length")
+		return
 	}
 
-	s.commandChannel <- msg[0:4] //first 4 bytes go to carCommand
+	commandGroup := carcommand.CommandGroup{
+		Commands: make(map[string]carcommand.Command, 4),
+	}
+
+	gear := "N"
+	if msg[1] == 255 {
+		gear = "R"
+	} else if msg[1] == 0 {
+		gear = "N"
+	} else if msg[1] > 0 && msg[1] < 7 {
+		gear = strconv.Itoa(int(msg[1]))
+	}
+	commandGroup.Commands["esc"] = carcommand.Command{
+		Value: int(msg[0]),
+		Gear:  gear,
+	}
+
+	commandGroup.Commands["steer"] = carcommand.Command{
+		Value: int(msg[2]),
+	}
+
+	commandGroup.Commands["pan"] = carcommand.Command{
+		Value: int(msg[3]),
+	}
+
+	commandGroup.Commands["tilt"] = carcommand.Command{
+		Value: int(msg[4]),
+	}
+
+	s.commandChannel <- commandGroup //first 4 bytes go to carCommand
 
 	//5th byte is a sound signal
-	switch msg[4] {
+	switch msg[5] {
 	case 0:
 		break
 	case 1:

@@ -46,29 +46,21 @@ var soundGroups = map[string][]string{
 
 type CarSpeaker struct {
 	SpeakerChannel chan string
-	options        SpeakerOptions
+	config         SpeakerConfig
 	lock           sync.RWMutex
 	playing        bool
 }
 
-type SpeakerOptions struct {
+type SpeakerConfig struct {
 	Device string
 	Volume string
 }
 
-func NewCarSpeaker(options *SpeakerOptions) (*CarSpeaker, error) {
+func NewCarSpeaker(cfg SpeakerConfig) (*CarSpeaker, error) {
 	carSpeaker := CarSpeaker{
 		SpeakerChannel: make(chan string, 10),
-		options: SpeakerOptions{
-			Volume: DefaultVolume,
-			Device: DefaultDevice,
-		},
+		config:         cfg,
 	}
-
-	if options != nil {
-		carSpeaker.options = *options
-	}
-
 	return &carSpeaker, nil
 }
 

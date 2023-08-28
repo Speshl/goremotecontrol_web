@@ -56,6 +56,8 @@ class CamPlayer {
                 el.muted = true;
                 el.playsinline = true;
                 el.controls = true;
+                el.style.setProperty("height", "80vh");
+                
                 document.getElementById('videoDiv').appendChild(el);
 
                 el.addEventListener("play", () => {
@@ -88,7 +90,7 @@ class CamPlayer {
             
         }
         
-        //Offer to receive 1 audio, and 1 video track
+        // Offer to receive 1 audio, and 1 video track
         this.pc.addTransceiver('video', {
             direction: 'recvonly'
         })
