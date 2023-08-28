@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/pion/webrtc/v3"
@@ -11,6 +12,7 @@ import (
 )
 
 const DefaultLevel = "4.2"
+const DefaultFPS = 30
 
 type CarCam struct {
 	VideoTrack   *webrtc.TrackLocalStaticSample
@@ -53,6 +55,12 @@ func (c *CarCam) Start(ctx context.Context) error {
 }
 
 func (c *CarCam) StartVideoDataListener(ctx context.Context) {
+	fps, err := strconv.ParseInt(c.config.Fps, 10, 32)
+	if err != nil {
+		fps = DefaultFPS
+	}
+
+	duration := int(1000 / fps)
 	for {
 		select {
 		case <-ctx.Done():
@@ -63,7 +71,8 @@ func (c *CarCam) StartVideoDataListener(ctx context.Context) {
 				log.Println("video data channel closed, stopping")
 				return
 			}
-			err := c.VideoTrack.WriteSample(media.Sample{Data: data, Duration: time.Millisecond * 17}) //TODO: Tie this to FPS
+
+			err := c.VideoTrack.WriteSample(media.Sample{Data: data, Duration: time.Millisecond * time.Duration(duration)})
 			if err != nil {
 				log.Printf("error writing sample to track: %s\n", err.Error())
 				return
