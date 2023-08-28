@@ -304,8 +304,8 @@ func (s *Servo) SetValue(value int) error {
 
 	finalValue := float32(value) / float32(s.config.MaxValue)
 
-	if s.config.Name == "steer" {
-		log.Printf("Steer Pos: %f\n", finalValue)
+	if s.config.Name == "esc" {
+		log.Printf("Esc Pos: %f\n", finalValue)
 	}
 
 	err = s.servo.Fraction(finalValue)
