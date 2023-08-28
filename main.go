@@ -53,12 +53,12 @@ func main() {
 	app.speaker = carspeaker
 
 	//Play startup sound
-	go func() {
-		err = app.speaker.Play(app.ctx, "startup")
-		if err != nil {
-			log.Printf("caraudio error: %s\n", err.Error())
-		}
-	}()
+	// go func() {
+	// 	err = app.speaker.Play(app.ctx, "startup")
+	// 	if err != nil {
+	// 		log.Printf("caraudio error: %s\n", err.Error())
+	// 	}
+	// }()
 
 	carmic, err := app.StartMic()
 	if err != nil {
