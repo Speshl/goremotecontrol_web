@@ -224,14 +224,14 @@ func (s *Servo) getValueWithGear(value int) (int, error) {
 	valueRatio := 0
 	if s.transmission.gear == "R" {
 		if value > s.config.MidValue {
-			//log.Println("Hitting the brakes")
+			log.Println("Reverse And Brakes")
 			if s.config.Inverted {
 				valueRatio = mapToRange(getInvertedValue(value, s.config.MidValue), s.config.MinValue, s.config.MaxValue, s.config.MinValue, s.config.MaxValue)
 			} else {
 				valueRatio = mapToRange(value, s.config.MinValue, s.config.MaxValue, s.config.MinValue, s.config.MaxValue)
 			}
 		} else {
-			//log.Println("Reverse no brake")
+			log.Println("Reverse")
 			if s.config.Inverted {
 				valueRatio = mapToRange(getInvertedValue(value, s.config.MidValue), s.config.MidValue, s.config.MaxValue, s.transmission.gearRatios[s.transmission.gear].min, s.transmission.gearRatios[s.transmission.gear].max)
 			} else {
@@ -240,14 +240,14 @@ func (s *Servo) getValueWithGear(value int) (int, error) {
 		}
 	} else {
 		if value < s.config.MidValue {
-			//log.Println("Hitting the brakes")
+			log.Println("Forward And Brakes")
 			if s.config.Inverted {
 				valueRatio = mapToRange(getInvertedValue(value, s.config.MidValue), s.config.MinValue, s.config.MaxValue, s.config.MinValue, s.config.MaxValue)
 			} else {
 				valueRatio = mapToRange(value, s.config.MinValue, s.config.MaxValue, s.config.MinValue, s.config.MaxValue)
 			}
 		} else {
-			//log.Println("Forward no brake")
+			log.Println("Forward")
 			if s.config.Inverted {
 				valueRatio = mapToRange(getInvertedValue(value, s.config.MidValue), s.config.MinValue, s.config.MidValue, s.transmission.gearRatios[s.transmission.gear].min, s.transmission.gearRatios[s.transmission.gear].max)
 			} else {
@@ -256,6 +256,7 @@ func (s *Servo) getValueWithGear(value int) (int, error) {
 		}
 	}
 
+	log.Println("ESC - Start: %d - End: %d - Gear: %s - Ratio: %+v\n", value, valueRatio, s.transmission.gear, s.transmission.gearRatios[s.transmission.gear])
 	return valueRatio, nil
 }
 
@@ -304,9 +305,9 @@ func (s *Servo) SetValue(value int) error {
 
 	finalValue := float32(value) / float32(s.config.MaxValue)
 
-	if s.config.Name == "esc" {
-		log.Printf("Esc Pos: %f\n", finalValue)
-	}
+	// if s.config.Name == "esc" {
+	// 	log.Printf("Esc Pos: %f\n", finalValue)
+	// }
 
 	err = s.servo.Fraction(finalValue)
 	if err != nil {
