@@ -153,7 +153,7 @@ func (c *CarSpeaker) PlayFromGroup(ctx context.Context, group string) error {
 	return c.Play(ctx, soundGroup[value])
 }
 
-// Plays a named song from the soundMap
+// Plays a named sound from the soundMap
 func (c *CarSpeaker) Play(ctx context.Context, sound string) error {
 
 	gotLock := c.lock.TryLock()
