@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	socketio "github.com/googollee/go-socket.io"
@@ -91,17 +92,18 @@ func (s *Server) NewClientConn(socketConn socketio.Conn) (*Connection, error) {
 	// This will notify you when the peer has connected/disconnected
 	clientConn.PeerConnection.OnConnectionStateChange(func(state webrtc.PeerConnectionState) {
 		log.Printf("Peer Connection State has changed: %s\n", state.String())
-		if state == webrtc.PeerConnectionStateConnecting {
-			s.memeSoundChannel <- "client_disconnected"
-		} else if state == webrtc.PeerConnectionStateClosed {
-			s.memeSoundChannel <- "client_disconnected"
-		}
 		if state == webrtc.PeerConnectionStateFailed {
 			// Wait until PeerConnection has had no network activity for 30 seconds or another failure. It may be reconnected using an ICE Restart.
 			// Use webrtc.PeerConnectionStateDisconnected if you are interested in detecting faster timeout.
 			// Note that the PeerConnection may come back from PeerConnectionStateDisconnected.
 			log.Println("Peer Connection has gone to failed")
 			s.RemoveClient(socketConn.ID())
+		}
+		if state == webrtc.PeerConnectionStateConnecting {
+			s.memeSoundChannel <- "client_connected"
+		} else if state == webrtc.PeerConnectionStateClosed {
+			time.Sleep(2 * time.Second)
+			s.memeSoundChannel <- "client_disconnected"
 		}
 	})
 
