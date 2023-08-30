@@ -123,6 +123,7 @@ func (c *CarSpeaker) TrackPlayer(track *webrtc.TrackRemote, receiver *webrtc.RTP
 	fmt.Printf("Track has started, of type %d: %s \n", track.PayloadType(), codecName)
 	pipeline := gst.CreateRecievePipeline(track.PayloadType(), strings.ToLower(codecName), c.config.Device, c.config.Volume)
 	pipeline.Start()
+	defer pipeline.Stop()
 	buf := make([]byte, 1400)
 	for {
 		i, _, err := track.Read(buf)
