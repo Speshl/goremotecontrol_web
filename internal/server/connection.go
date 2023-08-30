@@ -49,7 +49,7 @@ func (c *Connection) Disconnect() {
 	c.PeerConnection.Close()
 }
 
-func (c *Connection) RegisterHandlers(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample) error {
+func (c *Connection) RegisterHandlers(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample, memeSoundChannel chan string) error {
 
 	_, err := c.PeerConnection.AddTrack(audioTrack)
 	if err != nil {
@@ -66,7 +66,11 @@ func (c *Connection) RegisterHandlers(audioTrack *webrtc.TrackLocalStaticSample,
 	c.PeerConnection.OnICEConnectionStateChange(func(connectionState webrtc.ICEConnectionState) {
 		log.Printf("Connection State has changed: %s\n", connectionState.String())
 		if connectionState == webrtc.ICEConnectionStateConnected {
-			log.Println("Peer ICEConnectionStateConnected")
+			memeSoundChannel <- "client_connected"
+		}
+
+		if connectionState == webrtc.ICEConnectionStateClosed {
+			memeSoundChannel <- "client_disconnected"
 		}
 	})
 

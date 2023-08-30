@@ -36,8 +36,6 @@ func (s *Server) onConnect(socketConn socketio.Conn) error {
 	s.connectionsLock.Lock()
 	s.connections[id] = conn
 	s.connectionsLock.Unlock()
-
-	s.memeSoundChannel <- "client_connected"
 	return nil
 }
 
@@ -72,7 +70,6 @@ func (s *Server) onCommand(socketConn socketio.Conn, msg []byte) {
 func (s *Server) OnDisconnect(socketConn socketio.Conn, reason string) {
 	log.Printf("socketio connection disconnected (%s): %s\n", reason, socketConn.ID())
 	s.RemoveClient(socketConn.ID())
-	s.memeSoundChannel <- "client_disconnected"
 }
 
 func (s *Server) onError(socketConn socketio.Conn, err error) {

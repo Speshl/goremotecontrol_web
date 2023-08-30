@@ -82,7 +82,7 @@ func (s *Server) NewClientConn(socketConn socketio.Conn) (*Connection, error) {
 		return nil, err
 	}
 
-	err = clientConn.RegisterHandlers(s.carAudioTrack, s.carVideoTrack)
+	err = clientConn.RegisterHandlers(s.carAudioTrack, s.carVideoTrack, s.memeSoundChannel)
 	if err != nil {
 		return nil, err
 	}
