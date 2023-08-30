@@ -38,7 +38,7 @@ func main() {
 
 	defer func() {
 		if app.speaker != nil {
-			app.speaker.Play(context.TODO(), "shutdown")
+			app.speaker.Play(context.Background(), "shutdown")
 		}
 		close(app.done)
 		log.Println("server stopped")

@@ -1,16 +1,11 @@
--  Move client audio stuff out of server
--  Add sound for when a user has connected to the car
--  Add sound for when a user has disconnected from the car
--  Add sound when shutting down server
 -  Check on camera resolution and see if can make it the proper 16x9 aspect ratio: https://github.com/ayufan/camera-streamer/blob/main/docs/configure.md
 -  Mic/Speaker audio echo cancellation
--  Fix meme sounds
 -  Fix G27 wheel
--  Fix PS3 controller - BLOCKED - Need a ps3 controller
+
+
+Blocked Tasks:
+-  Support PS3 controller - BLOCKED - Need a ps3 controller
 -  Fix TGT wheel - BLOCKED - Need Chris to help with this one
-
-
-
 
 LONG TERM:
 - Split repo into web/signaling server and car client repo.
@@ -19,3 +14,11 @@ LONG TERM:
 - Invalidate token on client restart so that car doesn't auto reconnect with last client if they don't close the page.
 - Enable support for multiple cars simultaneously
 - Allow selection of a specific car on the frontend
+- Enable audio mixing so that meme sounds, system sounds, and client audio can all be played simultaneously
+
+
+
+SUPER LONG TERM (STRETCH):
+- Add support for gyro and acceleromotor for metrics
+- Add video overlay showing gyro/acceleromotor metrics
+- Add 4g support
