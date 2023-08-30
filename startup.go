@@ -88,9 +88,8 @@ func (a *App) StartSocketServer() *server.Server {
 		a.mic.AudioTrack,
 		a.cam.VideoTrack,
 		a.command.CommandChannel,
-		a.speaker.SpeakerChannel,
-		a.config.SpeakerConfig.Device,
-		a.config.SpeakerConfig.Volume,
+		a.speaker.MemeSoundChannel,
+		a.speaker.PlayTrack,
 	)
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()

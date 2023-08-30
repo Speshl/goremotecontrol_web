@@ -1,0 +1,19 @@
+-  Move client audio stuff out of server
+-  Add sound for when a user has connected to the car
+-  Add sound for when a user has disconnected from the car
+-  Check on camera resolution and see if can make it the proper 16x9 aspect ratio: https://github.com/ayufan/camera-streamer/blob/main/docs/configure.md
+-  Mic/Speaker audio echo cancellation
+-  Fix PS3 controller
+-  Fix G27 wheel
+-  Fix TGT wheel
+
+
+
+
+LONG TERM:
+- Split repo into web/signaling server and car client repo.
+- Finish login process with hard coded username and password
+- Only allow connection to car if JWT token is validated
+- Invalidate token on client restart so that car doesn't auto reconnect with last client if they don't close the page.
+- Enable support for multiple cars simultaneously
+- Allow selection of a specific car on the frontend

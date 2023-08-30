@@ -34,7 +34,7 @@ const DefaultSpeakerVolume = "5.0"
 // Default Camera Options
 const DefaultWidth = "640"
 const DefaultHeight = "480"
-const DefaultFPS = "60"
+const DefaultFPS = "30"
 const DefaultVerticalFlip = false
 const DefaultHorizontalFlip = false
 const DefaultProfile = "high"

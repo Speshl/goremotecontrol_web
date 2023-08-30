@@ -14,14 +14,15 @@ import (
 	"github.com/pion/webrtc/v3"
 )
 
-type Server struct {
-	carAudioTrack  *webrtc.TrackLocalStaticSample
-	carVideoTrack  *webrtc.TrackLocalStaticSample
-	commandChannel chan carcommand.CommandGroup
-	speakerChannel chan string
+type ClientAudioTrackPlayer func(*webrtc.TrackRemote, *webrtc.RTPReceiver)
 
-	clientAudioVolume string
-	clientAudioDevice string
+type Server struct {
+	carAudioTrack    *webrtc.TrackLocalStaticSample
+	carVideoTrack    *webrtc.TrackLocalStaticSample
+	commandChannel   chan carcommand.CommandGroup
+	memeSoundChannel chan string
+
+	clientAudioTrackPlayer ClientAudioTrackPlayer
 
 	socketio        *socketio.Server
 	connections     map[string]*Connection
@@ -32,7 +33,7 @@ var allowOriginFunc = func(r *http.Request) bool {
 	return true
 }
 
-func NewSocketServer(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample, commandChannel chan carcommand.CommandGroup, speakerChannel chan string, device string, volume string) *Server {
+func NewSocketServer(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample, commandChannel chan carcommand.CommandGroup, memeSoundChannel chan string, audioPlayer ClientAudioTrackPlayer) *Server {
 	socketioServer := socketio.NewServer(&engineio.Options{
 		Transports: []transport.Transport{
 			&polling.Transport{
@@ -48,12 +49,11 @@ func NewSocketServer(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webr
 		socketio:    socketioServer,
 		connections: make(map[string]*Connection),
 
-		speakerChannel:    speakerChannel,
-		commandChannel:    commandChannel,
-		carAudioTrack:     audioTrack,
-		carVideoTrack:     videoTrack,
-		clientAudioVolume: volume,
-		clientAudioDevice: device,
+		memeSoundChannel:       memeSoundChannel,
+		commandChannel:         commandChannel,
+		carAudioTrack:          audioTrack,
+		carVideoTrack:          videoTrack,
+		clientAudioTrackPlayer: audioPlayer,
 	}
 }
 
@@ -70,7 +70,7 @@ func (s *Server) GetHandler() *socketio.Server {
 }
 
 func (s *Server) NewClientConn(socketConn socketio.Conn) (*Connection, error) {
-	clientConn, err := NewConnection(socketConn, s.clientAudioDevice, s.clientAudioVolume)
+	clientConn, err := NewConnection(socketConn, s.clientAudioTrackPlayer)
 	if err != nil {
 		return nil, err
 	}

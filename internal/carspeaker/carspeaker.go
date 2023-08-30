@@ -6,8 +6,12 @@ import (
 	"log"
 	"math/rand"
 	"os/exec"
+	"strings"
 	"sync"
 	"time"
+
+	"github.com/Speshl/goremotecontrol_web/internal/gst"
+	"github.com/pion/webrtc/v3"
 )
 
 const DelayBetweenSounds = 2 * time.Second
@@ -45,10 +49,11 @@ var soundGroups = map[string][]string{
 }
 
 type CarSpeaker struct {
-	SpeakerChannel chan string
-	config         SpeakerConfig
-	lock           sync.RWMutex
-	playing        bool
+	MemeSoundChannel chan string
+	//ClientAudioChannel chan []byte
+	config  SpeakerConfig
+	lock    sync.RWMutex
+	playing bool
 }
 
 type SpeakerConfig struct {
@@ -58,8 +63,10 @@ type SpeakerConfig struct {
 
 func NewCarSpeaker(cfg SpeakerConfig) (*CarSpeaker, error) {
 	carSpeaker := CarSpeaker{
-		SpeakerChannel: make(chan string, 10),
-		config:         cfg,
+		MemeSoundChannel: make(chan string, 10),
+		//ClientAudioChannel: make(chan []byte, 10),
+
+		config: cfg,
 	}
 	return &carSpeaker, nil
 }
@@ -70,7 +77,7 @@ func (c *CarSpeaker) Start(ctx context.Context) error {
 		case <-ctx.Done():
 			log.Println("speaker listener done due to ctx")
 			return nil
-		case data, ok := <-c.SpeakerChannel:
+		case data, ok := <-c.MemeSoundChannel:
 			if !ok {
 				log.Println("speaker listener channel closed, stopping")
 				return nil
@@ -92,6 +99,41 @@ func (c *CarSpeaker) Start(ctx context.Context) error {
 	}
 }
 
+func (c *CarSpeaker) PlayTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
+	log.Println("start playing client track")
+	defer log.Println("done playing client track")
+	// Send a PLI on an interval so that the publisher is pushing a keyframe every rtcpPLIInterval. Not sure what this means or if I need it?
+	// go func() {
+	// 	ticker := time.NewTicker(time.Second * 3)
+	// 	for range ticker.C {
+	// 		if err := c.CTX.Err(); err != nil {
+	// 			return
+	// 		}
+	// 		rtcpSendErr := c.PeerConnection.WriteRTCP([]rtcp.Packet{&rtcp.PictureLossIndication{MediaSSRC: uint32(track.SSRC())}})
+	// 		if rtcpSendErr != nil {
+	// 			log.Printf("error sending keyframe on ticker - %w\n", rtcpSendErr)
+	// 			return
+	// 		}
+	// 	}
+	// }()
+
+	codecName := strings.Split(track.Codec().RTPCodecCapability.MimeType, "/")[1]
+	fmt.Printf("Track has started, of type %d: %s \n", track.PayloadType(), codecName)
+	pipeline := gst.CreateRecievePipeline(track.PayloadType(), strings.ToLower(codecName), c.config.Device, c.config.Volume)
+	pipeline.Start()
+	buf := make([]byte, 1400)
+	for {
+		i, _, err := track.Read(buf)
+		if err != nil {
+			log.Printf("stopping client audio - error reading client audio track buffer - %w\n", err)
+			return
+		}
+		//log.Printf("Pushing %d bytes to pipeline", i)
+		pipeline.Push(buf[:i])
+	}
+}
+
+// Plays a random prebaked meme sound from the specified group (affirmative, negative, aggressive, sorry)
 func (c *CarSpeaker) PlayFromGroup(ctx context.Context, group string) error {
 	soundGroup, ok := soundGroups[group]
 	if !ok {
@@ -102,6 +144,7 @@ func (c *CarSpeaker) PlayFromGroup(ctx context.Context, group string) error {
 	return c.Play(ctx, soundGroup[value])
 }
 
+// Plays a named song from the soundMap
 func (c *CarSpeaker) Play(ctx context.Context, sound string) error {
 
 	log.Printf("start playing %s sound\n", sound)
