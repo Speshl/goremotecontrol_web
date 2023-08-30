@@ -11,6 +11,7 @@ import (
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	"github.com/Speshl/goremotecontrol_web/internal/carmic"
 	"github.com/Speshl/goremotecontrol_web/internal/carspeaker"
+	"github.com/Speshl/goremotecontrol_web/internal/server"
 	"github.com/googolgl/go-pca9685"
 )
 
@@ -22,6 +23,9 @@ const AppEnvBase = "GORRC_"
 const DefaultPort = "8181"
 const DefaultCarName = "GORRC"
 const DefaultSilentStart = false
+
+// Default Socket Server Config
+const DefaultSilentConnections = false
 
 // Default Mic Config
 const DefaultMicDevice = "0"
@@ -61,23 +65,26 @@ type ServerConfig struct {
 }
 
 type CarConfig struct {
-	ServerConfig  ServerConfig
-	CamConfig     carcam.CamConfig
-	CommandConfig carcommand.CarCommandConfig
-	SpeakerConfig carspeaker.SpeakerConfig
-	MicConfig     carmic.MicConfig
+	ServerConfig       ServerConfig
+	SocketServerConfig server.SocketServerConfig
+	CamConfig          carcam.CamConfig
+	CommandConfig      carcommand.CarCommandConfig
+	SpeakerConfig      carspeaker.SpeakerConfig
+	MicConfig          carmic.MicConfig
 }
 
 func GetConfig(ctx context.Context) CarConfig {
 	carConfig := CarConfig{
-		ServerConfig:  GetServerConfig(ctx),
-		CamConfig:     GetCamConfig(ctx),
-		CommandConfig: GetCommandConfig(ctx),
-		MicConfig:     GetMicConfig(ctx),
-		SpeakerConfig: GetSpeakerConfig(ctx),
+		ServerConfig:       GetServerConfig(ctx),
+		SocketServerConfig: GetSocketServerConfig(ctx),
+		CamConfig:          GetCamConfig(ctx),
+		CommandConfig:      GetCommandConfig(ctx),
+		MicConfig:          GetMicConfig(ctx),
+		SpeakerConfig:      GetSpeakerConfig(ctx),
 	}
 
 	log.Printf("Server Config: \n%+v\n", carConfig.ServerConfig)
+	log.Printf("Socket Config: \n%+v\n", carConfig.SocketServerConfig)
 	log.Printf("Cam Config: \n%+v\n", carConfig.CamConfig)
 	log.Printf("Mic Config: \n%+v\n", carConfig.MicConfig)
 	log.Printf("Speaker Config: \n%+v\n", carConfig.SpeakerConfig)
@@ -90,6 +97,12 @@ func GetServerConfig(ctx context.Context) ServerConfig {
 		Name:        GetStringEnv("NAME", DefaultCarName),
 		Port:        GetStringEnv("PORT", DefaultPort),
 		SilentStart: GetBoolEnv("SILENTSTART", DefaultSilentStart),
+	}
+}
+
+func GetSocketServerConfig(ctx context.Context) server.SocketServerConfig {
+	return server.SocketServerConfig{
+		SilentConnects: GetBoolEnv("SILENTCONNECTIONS", DefaultSilentConnections),
 	}
 }
 

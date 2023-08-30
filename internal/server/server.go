@@ -27,13 +27,19 @@ type Server struct {
 	socketio        *socketio.Server
 	connections     map[string]*Connection
 	connectionsLock sync.RWMutex
+
+	config SocketServerConfig
+}
+
+type SocketServerConfig struct {
+	SilentConnects bool
 }
 
 var allowOriginFunc = func(r *http.Request) bool {
 	return true
 }
 
-func NewSocketServer(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample, commandChannel chan carcommand.CommandGroup, memeSoundChannel chan string, audioPlayer ClientAudioTrackPlayer) *Server {
+func NewSocketServer(cfg SocketServerConfig, audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample, commandChannel chan carcommand.CommandGroup, memeSoundChannel chan string, audioPlayer ClientAudioTrackPlayer) *Server {
 	socketioServer := socketio.NewServer(&engineio.Options{
 		Transports: []transport.Transport{
 			&polling.Transport{
@@ -54,6 +60,7 @@ func NewSocketServer(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webr
 		carAudioTrack:          audioTrack,
 		carVideoTrack:          videoTrack,
 		clientAudioTrackPlayer: audioPlayer,
+		config:                 cfg,
 	}
 }
 

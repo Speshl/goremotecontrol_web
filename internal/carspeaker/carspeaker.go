@@ -14,7 +14,7 @@ import (
 	"github.com/pion/webrtc/v3"
 )
 
-const DelayBetweenSounds = 2 * time.Second
+const DelayBetweenSounds = 1 * time.Second
 
 const DefaultDevice = "0"
 const DefaultVolume = "5.0"
@@ -94,7 +94,7 @@ func (c *CarSpeaker) Start(ctx context.Context) error {
 				defer c.lock.Unlock()
 				err := c.PlaySound(ctx, data)
 				if err != nil {
-					log.Printf("failed to play sound from group - %s\n", err.Error())
+					log.Printf("failed to play sound - %s\n", err.Error())
 				}
 			}()
 		}
