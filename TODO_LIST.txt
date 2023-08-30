@@ -1,11 +1,13 @@
 -  Move client audio stuff out of server
 -  Add sound for when a user has connected to the car
 -  Add sound for when a user has disconnected from the car
+-  Add sound when shutting down server
 -  Check on camera resolution and see if can make it the proper 16x9 aspect ratio: https://github.com/ayufan/camera-streamer/blob/main/docs/configure.md
 -  Mic/Speaker audio echo cancellation
--  Fix PS3 controller
+-  Fix meme sounds
 -  Fix G27 wheel
--  Fix TGT wheel
+-  Fix PS3 controller - BLOCKED - Need a ps3 controller
+-  Fix TGT wheel - BLOCKED - Need Chris to help with this one
 
 
 

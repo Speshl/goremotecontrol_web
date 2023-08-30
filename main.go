@@ -94,6 +94,7 @@ func main() {
 		select {
 		case msg := <-app.done:
 			log.Printf("Shutting down server... %s\n", msg.String())
+			app.speaker.Play(app.ctx, "shutdown")
 			app.cancel()
 			//give some time for everything to close
 			time.Sleep(5 * time.Second)

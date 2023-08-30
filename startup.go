@@ -89,7 +89,7 @@ func (a *App) StartSocketServer() *server.Server {
 		a.cam.VideoTrack,
 		a.command.CommandChannel,
 		a.speaker.MemeSoundChannel,
-		a.speaker.PlayTrack,
+		a.speaker.TrackPlayer,
 	)
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()

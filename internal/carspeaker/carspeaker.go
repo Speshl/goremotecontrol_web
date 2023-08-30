@@ -38,7 +38,10 @@ var soundMap = map[string]string{
 	//Sorry
 
 	//other
-	"startup": "./internal/carspeaker/audio/startup.wav",
+	"startup":             "./internal/carspeaker/audio/startup.wav",
+	"shutdown":            "./internal/carspeaker/audio/shutting_down.wav",
+	"client_connected":    "./internal/carspeaker/audio/jarvis_connected.wav",
+	"client_disconnected": "./internal/carspeaker/audio/jarvis_disconnected.wav",
 }
 
 var soundGroups = map[string][]string{
@@ -65,7 +68,6 @@ func NewCarSpeaker(cfg SpeakerConfig) (*CarSpeaker, error) {
 	carSpeaker := CarSpeaker{
 		MemeSoundChannel: make(chan string, 10),
 		//ClientAudioChannel: make(chan []byte, 10),
-
 		config: cfg,
 	}
 	return &carSpeaker, nil
@@ -90,7 +92,7 @@ func (c *CarSpeaker) Start(ctx context.Context) error {
 
 			go func() {
 				defer c.lock.Unlock()
-				err := c.PlayFromGroup(ctx, data)
+				err := c.PlaySound(ctx, data)
 				if err != nil {
 					log.Printf("failed to play sound from group - %s\n", err.Error())
 				}
@@ -99,7 +101,7 @@ func (c *CarSpeaker) Start(ctx context.Context) error {
 	}
 }
 
-func (c *CarSpeaker) PlayTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
+func (c *CarSpeaker) TrackPlayer(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
 	log.Println("start playing client track")
 	defer log.Println("done playing client track")
 	// Send a PLI on an interval so that the publisher is pushing a keyframe every rtcpPLIInterval. Not sure what this means or if I need it?
@@ -131,6 +133,16 @@ func (c *CarSpeaker) PlayTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPRe
 		//log.Printf("Pushing %d bytes to pipeline", i)
 		pipeline.Push(buf[:i])
 	}
+}
+
+// Plays a named sound, if the sound is a group name, will randomly play a sound from that group
+func (c *CarSpeaker) PlaySound(ctx context.Context, sound string) error {
+	_, ok := soundGroups[sound]
+	if !ok {
+		return c.Play(ctx, sound)
+	}
+	return c.PlayFromGroup(ctx, sound)
+
 }
 
 // Plays a random prebaked meme sound from the specified group (affirmative, negative, aggressive, sorry)
