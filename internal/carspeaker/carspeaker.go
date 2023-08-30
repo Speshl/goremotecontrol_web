@@ -118,7 +118,8 @@ func (c *CarSpeaker) TrackPlayer(track *webrtc.TrackRemote, receiver *webrtc.RTP
 	// 		}
 	// 	}
 	// }()
-
+	c.lock.Lock()
+	defer c.lock.Unlock()
 	codecName := strings.Split(track.Codec().RTPCodecCapability.MimeType, "/")[1]
 	fmt.Printf("Track has started, of type %d: %s \n", track.PayloadType(), codecName)
 	pipeline := gst.CreateRecievePipeline(track.PayloadType(), strings.ToLower(codecName), c.config.Device, c.config.Volume)
@@ -159,6 +160,16 @@ func (c *CarSpeaker) PlayFromGroup(ctx context.Context, group string) error {
 
 // Plays a named song from the soundMap
 func (c *CarSpeaker) Play(ctx context.Context, sound string) error {
+
+	gotLock := c.lock.TryLock()
+	if !gotLock {
+		if sound == "client_disconnected" {
+			c.lock.Lock() //Wait for the lock to end if its the shutdown signal, should be unlocked soon
+		} else {
+			return fmt.Errorf("speaker is locked, other sound is playing")
+		}
+	}
+	defer c.lock.Unlock()
 
 	log.Printf("start playing %s sound\n", sound)
 	defer log.Printf("finished playing %s sound\n", sound)
