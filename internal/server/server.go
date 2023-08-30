@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 	"sync"
-	"time"
 
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	socketio "github.com/googollee/go-socket.io"
@@ -99,10 +98,9 @@ func (s *Server) NewClientConn(socketConn socketio.Conn) (*Connection, error) {
 			log.Println("Peer Connection has gone to failed")
 			s.RemoveClient(socketConn.ID())
 		}
-		if state == webrtc.PeerConnectionStateConnecting {
+		if state == webrtc.PeerConnectionStateConnecting { //Using this event for audio event so it triggers before gstreamer takes over playing client audio
 			s.memeSoundChannel <- "client_connected"
 		} else if state == webrtc.PeerConnectionStateClosed {
-			time.Sleep(5 * time.Second)
 			s.memeSoundChannel <- "client_disconnected"
 		}
 	})
