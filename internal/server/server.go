@@ -102,7 +102,7 @@ func (s *Server) NewClientConn(socketConn socketio.Conn) (*Connection, error) {
 		if state == webrtc.PeerConnectionStateConnecting {
 			s.memeSoundChannel <- "client_connected"
 		} else if state == webrtc.PeerConnectionStateClosed {
-			time.Sleep(2 * time.Second)
+			time.Sleep(5 * time.Second)
 			s.memeSoundChannel <- "client_disconnected"
 		}
 	})
