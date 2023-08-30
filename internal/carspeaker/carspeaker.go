@@ -118,7 +118,7 @@ func (c *CarSpeaker) TrackPlayer(track *webrtc.TrackRemote, receiver *webrtc.RTP
 	pipeline.Start()
 	defer func() {
 		pipeline.Stop()
-		time.Sleep(3 * time.Second) //Adding delay to give time for gstreamer to give back the speaker device
+		time.Sleep(4 * time.Second) //Adding delay to give time for gstreamer to give back the speaker device
 	}()
 	buf := make([]byte, 1400)
 	for {
