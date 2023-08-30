@@ -65,13 +65,13 @@ func (c *Connection) RegisterHandlers(audioTrack *webrtc.TrackLocalStaticSample,
 	// This will notify you when the peer has connected/disconnected
 	c.PeerConnection.OnICEConnectionStateChange(func(connectionState webrtc.ICEConnectionState) {
 		log.Printf("Connection State has changed: %s\n", connectionState.String())
-		if connectionState == webrtc.ICEConnectionStateConnected {
-			memeSoundChannel <- "client_connected"
-		}
+		// if connectionState == webrtc.ICEConnectionStateConnected {
+		// 	memeSoundChannel <- "client_connected"
+		// }
 
-		if connectionState == webrtc.ICEConnectionStateClosed {
-			memeSoundChannel <- "client_disconnected"
-		}
+		// if connectionState == webrtc.ICEConnectionStateClosed {
+		// 	memeSoundChannel <- "client_disconnected"
+		// }
 	})
 
 	// Handle ICE candidate messages from the client

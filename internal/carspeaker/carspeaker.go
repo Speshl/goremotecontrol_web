@@ -8,13 +8,10 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/Speshl/goremotecontrol_web/internal/gst"
 	"github.com/pion/webrtc/v3"
 )
-
-const DelayBetweenSounds = 1 * time.Second
 
 const DefaultDevice = "0"
 const DefaultVolume = "5.0"
@@ -85,13 +82,7 @@ func (c *CarSpeaker) Start(ctx context.Context) error {
 				return nil
 			}
 
-			gotLock := c.lock.TryLock()
-			if !gotLock {
-				continue
-			}
-
 			go func() {
-				defer c.lock.Unlock()
 				err := c.PlaySound(ctx, data)
 				if err != nil {
 					log.Printf("failed to play sound - %s\n", err.Error())
@@ -129,7 +120,7 @@ func (c *CarSpeaker) TrackPlayer(track *webrtc.TrackRemote, receiver *webrtc.RTP
 	for {
 		i, _, err := track.Read(buf)
 		if err != nil {
-			log.Printf("stopping client audio - error reading client audio track buffer - %w\n", err)
+			log.Printf("stopping client audio - error reading client audio track buffer - %s\n", err)
 			return
 		}
 		//log.Printf("Pushing %d bytes to pipeline", i)

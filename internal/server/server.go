@@ -91,6 +91,11 @@ func (s *Server) NewClientConn(socketConn socketio.Conn) (*Connection, error) {
 	// This will notify you when the peer has connected/disconnected
 	clientConn.PeerConnection.OnConnectionStateChange(func(state webrtc.PeerConnectionState) {
 		log.Printf("Peer Connection State has changed: %s\n", state.String())
+		if state == webrtc.PeerConnectionStateConnecting {
+			s.memeSoundChannel <- "client_disconnected"
+		} else if state == webrtc.PeerConnectionStateClosed {
+			s.memeSoundChannel <- "client_disconnected"
+		}
 		if state == webrtc.PeerConnectionStateFailed {
 			// Wait until PeerConnection has had no network activity for 30 seconds or another failure. It may be reconnected using an ICE Restart.
 			// Use webrtc.PeerConnectionStateDisconnected if you are interested in detecting faster timeout.
