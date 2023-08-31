@@ -42,6 +42,7 @@ const DefaultFPS = "30"
 const DefaultVerticalFlip = false
 const DefaultHorizontalFlip = false
 const DefaultProfile = "high"
+const DefaultMode = ""
 
 // Default Command Options
 const DefaultRefreshRate = 60 //command refresh rate
@@ -128,6 +129,7 @@ func GetCamConfig(ctx context.Context) carcam.CamConfig {
 		VerticalFlip:   GetBoolEnv("VFLIP", DefaultVerticalFlip),
 		HorizontalFlip: GetBoolEnv("HFLIP", DefaultHorizontalFlip),
 		Profile:        GetStringEnv("PROFILE", DefaultProfile),
+		Mode:           GetStringEnv("MODE", DefaultMode),
 	}
 }
 

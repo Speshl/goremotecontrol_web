@@ -17,14 +17,14 @@
     height: 80vh;
     margin: 0 auto;
     border: 1px solid;
-    aspect-ratio: 5/4;
+    aspect-ratio: 16/9;
 }
 
 .videoTrack {
     height: 80vh;
     /* margin: 0 auto;
     border: 1px solid; */
-    aspect-ratio: 5/4;
+    aspect-ratio: 16/9;
 }
 
 #infoContainer {

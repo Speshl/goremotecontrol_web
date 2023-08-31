@@ -1,5 +1,6 @@
 -  Check on camera resolution and see if can make it the proper 16x9 aspect ratio: https://github.com/ayufan/camera-streamer/blob/main/docs/configure.md
 -  Mic/Speaker audio echo cancellation
+-  Support pwm switch (headlights / winch / diff/ gear)
 -  Fix G27 wheel
 
 
@@ -15,6 +16,7 @@ LONG TERM:
 - Enable support for multiple cars simultaneously
 - Allow selection of a specific car on the frontend
 - Enable audio mixing so that meme sounds, system sounds, and client audio can all be played simultaneously
+- Mix in car's transmission into gear ratios and shifting
 
 
 
