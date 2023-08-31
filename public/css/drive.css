@@ -14,14 +14,14 @@
 }
 
 #videoDiv {
-    width: 80vw;
+    height: 60vh;
     margin: 0 auto;
     border: 1px solid;
     aspect-ratio: 16/9;
 }
 
 .videoTrack {
-    width: 80vw;
+    height: 60vh;
     /* margin: 0 auto;
     border: 1px solid; */
     aspect-ratio: 16/9;
