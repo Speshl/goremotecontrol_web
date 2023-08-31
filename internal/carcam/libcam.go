@@ -35,7 +35,7 @@ func (c *CarCam) StartStreaming(ctx context.Context) error {
 	}
 
 	if c.config.Mode != "" {
-		args = append(args, fmt.Sprintf("--mode %s"), c.config.Mode)
+		args = append(args, "--mode", c.config.Mode)
 	}
 	// if !c.config.deNoise {
 	// 	args = append(args, "--denoise", "cdn_off")
