@@ -56,7 +56,7 @@ class CamPlayer {
                 el.muted = true;
                 el.playsinline = true;
                 el.controls = true;
-                el.style.setProperty("height", "50vh");
+                el.style.setProperty("width", "60vh");
                 
                 document.getElementById('videoDiv').appendChild(el);
 

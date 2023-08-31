@@ -1,3 +1,4 @@
+Next Tasks To Pickup:
 -  Mic/Speaker audio echo cancellation
 -  Support pwm switch (headlights / winch / diff/ gear)
 -  Render video to canvas
