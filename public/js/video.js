@@ -151,7 +151,7 @@ class CamPlayer {
     }
 
     drawVideo() {
-        context.drawImage(this.videoElement, 0, 0, canvasEl.width, canvasEl.height);
+        this.videoContext.drawImage(this.videoElement, 0, 0, canvasEl.width, canvasEl.height);
         window.requestAnimationFrame(drawVideo);
     }
 
