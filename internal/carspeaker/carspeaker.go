@@ -175,7 +175,10 @@ func (c *CarSpeaker) Play(ctx context.Context, sound string) error {
 	}
 
 	args := []string{
-		"-D", "hw:CARD=wm8960soundcard,DEV=0", //TODO: Make these changeable by environment variable
+		//"-D", "hw:CARD=wm8960soundcard,DEV=0", //TODO: Make these changeable by environment variable
+		"-E",
+		"aplay",
+		"-D", "hw:CARD=wm8960soundcard,DEV=0",
 		soundPath,
 	}
 	cmd := exec.CommandContext(ctx, "aplay", args...)
