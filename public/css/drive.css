@@ -25,6 +25,7 @@
     /* margin: 0 auto;
     border: 1px solid; */
     aspect-ratio: 16/9;
+    display: none;
 }
 
 #videoCanvas {
