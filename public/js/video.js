@@ -79,8 +79,10 @@ class CamPlayer {
                
 
                 el.addEventListener("loadeddata", () => {
-                    this.canvas.width = this.videoElement.width;
-                    this.canvas.height = this.videoElement.height;
+                    const canvas = document.getElementById('videoCanvas');
+                    const videoElement = document.getElementById('videoElement');
+                    canvas.width = videoElement.width;
+                    canvas.height = videoElement.height;
                     
                     console.log("Canvas Size: ",this.canvas.width, this.canvas.height);
                     this.drawVideo();
@@ -145,9 +147,9 @@ class CamPlayer {
     }
 
     drawVideo() {
-        let canvas = document.getElementById('videoCanvas');
-        let videoContext = canvas.getContext('2d');
-        let videoElement = document.getElementById('videoElement');
+        const canvas = document.getElementById('videoCanvas');
+        const videoContext = canvas.getContext('2d');
+        const videoElement = document.getElementById('videoElement');
 
         videoContext.drawImage(videoElement, 0, 0, 320,180/*this.canvas.width, this.canvas.height*/);
         window.requestAnimationFrame(drawVideo);
