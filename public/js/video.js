@@ -58,7 +58,7 @@ class CamPlayer {
                 //const el = document.createElement("video");
                 const el = document.getElementById('videoEl');
 
-                el.id = "videoTrack";
+                el.id = "videoEl";
                 el.srcObject = event.streams[0];
                 el.autoplay = true;
                 el.muted = true;
@@ -78,15 +78,15 @@ class CamPlayer {
 
                 el.addEventListener("volumechange", () =>{
                     const audio = document.getElementById('audioTrack');
-                    const video = document.getElementById('videoTrack');
+                    const video = document.getElementById('videoEl');
                     audio.volume = video.volume;
                 });
 
                
 
                 el.addEventListener("loadeddata", () => {
-                    this.videoCanvas.width = el.width;
-                    this.canvas.height = el.height;
+                    this.canvas.width = this.videoElement.width;
+                    this.canvas.height = this.videoElement.height;
                     
                     console.log("Canvas Size: ",this.canvas.width, this.canvas.height);
                     this.drawVideo();
