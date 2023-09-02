@@ -52,9 +52,10 @@ var soundGroups = map[string][]string{
 type CarSpeaker struct {
 	MemeSoundChannel chan string
 	//ClientAudioChannel chan []byte
-	config  SpeakerConfig
-	lock    sync.RWMutex
-	playing bool
+	config     SpeakerConfig
+	lock       sync.RWMutex
+	clientLock sync.RWMutex
+	playing    bool
 }
 
 type SpeakerConfig struct {
@@ -110,8 +111,8 @@ func (c *CarSpeaker) TrackPlayer(track *webrtc.TrackRemote, receiver *webrtc.RTP
 	// 		}
 	// 	}
 	// }()
-	c.lock.Lock()
-	defer c.lock.Unlock()
+	c.clientLock.Lock()
+	defer c.clientLock.Unlock()
 	codecName := strings.Split(track.Codec().RTPCodecCapability.MimeType, "/")[1]
 	fmt.Printf("Track has started, of type %d: %s \n", track.PayloadType(), codecName)
 	pipeline := gst.CreateRecievePipeline(track.PayloadType(), strings.ToLower(codecName), c.config.Device, c.config.Volume)
