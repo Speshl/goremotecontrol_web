@@ -82,12 +82,14 @@ class CamPlayer {
                     audio.volume = video.volume;
                 });
 
-                let canvas = document.getElementById('videoCanvas');
+               
 
                 el.addEventListener("loadeddata", () => {
-                    canvas.width = el.width;
-                    canvas.height = el.height;
-                    console.log("Canvas Size: ",canvas.width, canvas.height);
+                    this.videoCanvas.width = el.width;
+                    this.canvas.height = el.height;
+                    
+                    console.log("Canvas Size: ",this.canvas.width, this.canvas.height);
+                    this.drawVideo();
                 });
 
 
