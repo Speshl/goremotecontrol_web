@@ -1,6 +1,12 @@
 class CamPlayer {
     constructor() {
         this.socket = io();
+
+        this.canvas = document.getElementById('videoCanvas');
+
+        this.videoContext = this.canvas.getContext('2d');
+
+        this.videoElement = document.getElementById('videoEl');
         
         this.gotAnswer = false;
 
@@ -49,7 +55,9 @@ class CamPlayer {
         this.pc.ontrack = (event) => {
             if(event.track.kind == "video"){
                 console.log("Creating Video Track");
-                const el = document.createElement("video");
+                //const el = document.createElement("video");
+                const el = document.getElementById('videoEl');
+
                 el.id = "videoTrack";
                 el.srcObject = event.streams[0];
                 el.autoplay = true;
@@ -58,7 +66,7 @@ class CamPlayer {
                 el.controls = true;
                 el.style.setProperty("width", "60vw");
                 
-                document.getElementById('videoDiv').appendChild(el);
+                //document.getElementById('videoDiv').appendChild(el);                
 
                 el.addEventListener("play", () => {
                     this.playMedia();
@@ -73,6 +81,16 @@ class CamPlayer {
                     const video = document.getElementById('videoTrack');
                     audio.volume = video.volume;
                 });
+
+                let canvas = document.getElementById('videoCanvas');
+
+                el.addEventListener("loadeddata", () => {
+                    canvas.width = el.width;
+                    canvas.height = el.height;
+                    console.log("Canvas Size: ",canvas.width, canvas.height);
+                });
+
+
 
                 console.log("Video Track Added");
             }else{
@@ -127,6 +145,12 @@ class CamPlayer {
                 alert(e);
             }
         });
+
+    }
+
+    drawVideo() {
+        context.drawImage(this.videoElement, 0, 0, canvasEl.width, canvasEl.height);
+        window.requestAnimationFrame(drawVideo);
     }
 
     sendOffer() {
