@@ -10,6 +10,7 @@ package gst
 import "C"
 import (
 	"fmt"
+	"log"
 	"sync"
 	"time"
 	"unsafe"
@@ -40,11 +41,11 @@ const (
 	pcmClockRate   = 8000
 )
 
-func CreateMicSendPipeline(tracks []*webrtc.TrackLocalStaticSample, volume string) *SendPipeline {
+func CreateMicSendPipeline(tracks []*webrtc.TrackLocalStaticSample, device, volume string) *SendPipeline {
 	pipelineStr := "appsink name=appsink"
 	var clockRate float32
 
-	pipelineStr = fmt.Sprintf("pulsesrc volume=%s ! audioconvert ! opusenc ! appsink name=appsink", volume)
+	pipelineStr = fmt.Sprintf("pulsesrc device=%s volume=%s ! audioconvert ! opusenc ! appsink name=appsink", device, volume)
 	clockRate = videoClockRate
 
 	pipelineStrUnsafe := C.CString(pipelineStr)
@@ -102,6 +103,8 @@ func CreateSendPipeline(codecName string, tracks []*webrtc.TrackLocalStaticSampl
 	default:
 		panic("Unhandled codec " + codecName)
 	}
+
+	log.Printf("carmic gstreamer pipeline: %s\n", pipelineStr)
 
 	pipelineStrUnsafe := C.CString(pipelineStr)
 	defer C.free(unsafe.Pointer(pipelineStrUnsafe))

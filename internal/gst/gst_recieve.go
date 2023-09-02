@@ -47,10 +47,9 @@ func CreateRecievePipeline(payloadType webrtc.PayloadType, codecName string, dev
 	default:
 		panic("Unhandled codec " + codecName)
 	}
-
+	log.Printf("client audio pipeline: %s\n", pipelineStr)
 	pipelineStrUnsafe := C.CString(pipelineStr)
 	defer C.free(unsafe.Pointer(pipelineStrUnsafe))
-	log.Printf("client audio pipeline: %s\n", pipelineStr)
 	return &RecievePipeline{Pipeline: C.gstreamer_receive_create_pipeline(pipelineStrUnsafe)}
 }
 

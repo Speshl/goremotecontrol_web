@@ -4,11 +4,13 @@ Next Tasks To Pickup:
 -  Render video to canvas
 -  Overlay commands on video and also try to keep them there when going to full screen
 -  Fix G27 wheel
--  Add onscreen touch controls for mobile with a button on something on the page to turn it on and off
-
+-  Add onscreen touch controls for mobile with a button or something on the page to turn it on and off
+-  Create env setup script
+-  Figure out how to run on car startup
+-  Capture break better and don't let it go into reverse unless in the reverse gear
 
 Blocked Tasks:
--  Support PS3 controller - BLOCKED - Need a ps3 controller
+-  Support PS3 controller - BLOCKED - Need a ps3 controller (Akuma)
 -  Fix TGT wheel - BLOCKED - Need Chris to help with this one
 
 LONG TERM:

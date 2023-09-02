@@ -1,0 +1,5 @@
+pacmd list-sources
+
+aplay -L
+
+arecord -L
