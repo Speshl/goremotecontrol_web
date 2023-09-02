@@ -6,7 +6,7 @@ class CamPlayer {
 
         this.videoContext = this.canvas.getContext('2d');
 
-        this.videoElement = document.getElementById('videoEl');
+        this.videoElement = document.getElementById('videoElement');
         
         this.gotAnswer = false;
 
@@ -56,9 +56,9 @@ class CamPlayer {
             if(event.track.kind == "video"){
                 console.log("Creating Video Track");
                 //const el = document.createElement("video");
-                const el = document.getElementById('videoEl');
+                const el = document.getElementById('videoElement');
 
-                el.id = "videoEl";
+                el.id = "videoElement";
                 el.srcObject = event.streams[0];
                 el.autoplay = true;
                 el.muted = true;
@@ -151,7 +151,7 @@ class CamPlayer {
     }
 
     drawVideo() {
-        this.videoContext.drawImage(this.videoElement, 0, 0, this.canvas.width, this.canvas.height);
+        this.videoContext.drawImage(this.videoElement, 0, 0, 320,180/*this.canvas.width, this.canvas.height*/);
         window.requestAnimationFrame(this.drawVideo);
     }
 
