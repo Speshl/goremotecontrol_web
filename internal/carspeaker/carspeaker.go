@@ -181,7 +181,7 @@ func (c *CarSpeaker) Play(ctx context.Context, sound string) error {
 		"-D", "hw:CARD=wm8960soundcard,DEV=0",
 		soundPath,
 	}
-	cmd := exec.CommandContext(ctx, "aplay", args...)
+	cmd := exec.CommandContext(ctx, "sudo", args...)
 	err := cmd.Start()
 	if err != nil {
 		return fmt.Errorf("error starting audio playback - %w", err)
