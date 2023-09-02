@@ -84,7 +84,7 @@ class CamPlayer {
                     canvas.width = videoElement.width;
                     canvas.height = videoElement.height;
                     
-                    console.log("Canvas Size: ",this.canvas.width, this.canvas.height);
+                    console.log("Canvas Size: ",canvas.width, canvas.height);
                     this.drawVideo();
                 });
 
