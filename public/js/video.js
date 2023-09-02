@@ -85,7 +85,7 @@ class CamPlayer {
                     canvas.height = videoElement.height;
                     
                     console.log("Canvas Size: ",canvas.width, canvas.height);
-                    this.drawVideo();
+                    drawVideo();
                 });
 
 
@@ -146,15 +146,6 @@ class CamPlayer {
 
     }
 
-    drawVideo() {
-        const canvas = document.getElementById('videoCanvas');
-        const videoContext = canvas.getContext('2d');
-        const videoElement = document.getElementById('videoElement');
-
-        videoContext.drawImage(videoElement, 0, 0, 320,180/*this.canvas.width, this.canvas.height*/);
-        window.requestAnimationFrame(this.drawVideo);
-    }
-
     sendOffer() {
         document.getElementById('statusMsg').innerHTML = "Sending Offer...";
         this.pc.createOffer().then(d => this.pc.setLocalDescription(d)).catch();
@@ -203,4 +194,13 @@ class CamPlayer {
         const audio = document.getElementById('audioElement');
         audio.play();
     }
+}
+
+function drawVideo() {
+    const canvas = document.getElementById('videoCanvas');
+    const videoContext = canvas.getContext('2d');
+    const videoElement = document.getElementById('videoElement');
+
+    videoContext.drawImage(videoElement, 0, 0, 320,180/*this.canvas.width, this.canvas.height*/);
+    window.requestAnimationFrame(drawVideo);
 }
