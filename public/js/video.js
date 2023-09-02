@@ -1,12 +1,6 @@
 class CamPlayer {
     constructor() {
         this.socket = io();
-
-        this.canvas = document.getElementById('videoCanvas');
-
-        this.videoContext = this.canvas.getContext('2d');
-
-        this.videoElement = document.getElementById('videoElement');
         
         this.gotAnswer = false;
 
@@ -151,9 +145,12 @@ class CamPlayer {
     }
 
     drawVideo() {
-        this.videoContext = this.canvas.getContext('2d');
-        this.videoContext.drawImage(this.videoElement, 0, 0, 320,180/*this.canvas.width, this.canvas.height*/);
-        window.requestAnimationFrame(this.drawVideo);
+        let canvas = document.getElementById('videoCanvas');
+        let videoContext = canvas.getContext('2d');
+        let videoElement = document.getElementById('videoElement');
+
+        videoContext.drawImage(videoElement, 0, 0, 320,180/*this.canvas.width, this.canvas.height*/);
+        window.requestAnimationFrame(drawVideo);
     }
 
     sendOffer() {
