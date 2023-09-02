@@ -45,7 +45,7 @@ func CreateMicSendPipeline(tracks []*webrtc.TrackLocalStaticSample, device, volu
 	pipelineStr := "appsink name=appsink"
 	var clockRate float32
 
-	pipelineStr = fmt.Sprintf("pulsesrc volume=%s ! audioconvert ! opusenc ! appsink name=appsink", volume)
+	pipelineStr = fmt.Sprintf("pulsesrc device=%s volume=%s ! audioconvert ! opusenc ! appsink name=appsink", device, volume)
 	clockRate = videoClockRate
 
 	pipelineStrUnsafe := C.CString(pipelineStr)
