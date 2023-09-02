@@ -20,10 +20,15 @@
     aspect-ratio: 16/9;
 }
 
-.videoTrack {
+#videoElement {
     width: 60vw;
     /* margin: 0 auto;
     border: 1px solid; */
+    aspect-ratio: 16/9;
+}
+
+#videoCanvas {
+    width: 60vw;
     aspect-ratio: 16/9;
 }
 

@@ -77,8 +77,8 @@ class CamPlayer {
                 });
 
                 el.addEventListener("volumechange", () =>{
-                    const audio = document.getElementById('audioTrack');
-                    const video = document.getElementById('videoEl');
+                    const audio = document.getElementById('audioElement');
+                    const video = document.getElementById('videoElement');
                     audio.volume = video.volume;
                 });
 
@@ -98,7 +98,7 @@ class CamPlayer {
             }else{
                 console.log("Creating Audio Track");
                 const el = document.createElement("audio");
-                el.id = "audioTrack";
+                el.id = "audioElement";
                 el.srcObject = event.streams[0];
                 el.autoplay = true;
                 el.muted = false;
@@ -152,7 +152,7 @@ class CamPlayer {
 
     drawVideo() {
         this.videoContext.drawImage(this.videoElement, 0, 0, this.canvas.width, this.canvas.height);
-        window.requestAnimationFrame(drawVideo);
+        window.requestAnimationFrame(this.drawVideo);
     }
 
     sendOffer() {
@@ -188,19 +188,19 @@ class CamPlayer {
 
     pauseMedia() {
         console.log("Pausing...");
-        const video = document.getElementById('videoTrack');
+        const video = document.getElementById('videoElement');
         video.pause();
 
-        const audio = document.getElementById('audioTrack');
+        const audio = document.getElementById('audioElement');
         audio.pause();
     }
 
     playMedia() {
         console.log("Playing...");
-        const video = document.getElementById('videoTrack');
+        const video = document.getElementById('videoElement');
         video.play();
 
-        const audio = document.getElementById('audioTrack');
+        const audio = document.getElementById('audioElement');
         audio.play();
     }
 }
