@@ -11,6 +11,7 @@ import (
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	"github.com/Speshl/goremotecontrol_web/internal/carmic"
 	"github.com/Speshl/goremotecontrol_web/internal/carspeaker"
+	"github.com/Speshl/goremotecontrol_web/internal/server"
 	"github.com/googolgl/go-pca9685"
 )
 
@@ -23,6 +24,9 @@ const DefaultPort = "8181"
 const DefaultCarName = "GORRC"
 const DefaultSilentStart = false
 
+// Default Socket Server Config
+const DefaultSilentConnections = false
+
 // Default Mic Config
 const DefaultMicDevice = "0"
 const DefaultMicVolume = "5.0"
@@ -34,10 +38,11 @@ const DefaultSpeakerVolume = "5.0"
 // Default Camera Options
 const DefaultWidth = "640"
 const DefaultHeight = "480"
-const DefaultFPS = "60"
+const DefaultFPS = "30"
 const DefaultVerticalFlip = false
 const DefaultHorizontalFlip = false
 const DefaultProfile = "high"
+const DefaultMode = ""
 
 // Default Command Options
 const DefaultRefreshRate = 60 //command refresh rate
@@ -61,23 +66,26 @@ type ServerConfig struct {
 }
 
 type CarConfig struct {
-	ServerConfig  ServerConfig
-	CamConfig     carcam.CamConfig
-	CommandConfig carcommand.CarCommandConfig
-	SpeakerConfig carspeaker.SpeakerConfig
-	MicConfig     carmic.MicConfig
+	ServerConfig       ServerConfig
+	SocketServerConfig server.SocketServerConfig
+	CamConfig          carcam.CamConfig
+	CommandConfig      carcommand.CarCommandConfig
+	SpeakerConfig      carspeaker.SpeakerConfig
+	MicConfig          carmic.MicConfig
 }
 
 func GetConfig(ctx context.Context) CarConfig {
 	carConfig := CarConfig{
-		ServerConfig:  GetServerConfig(ctx),
-		CamConfig:     GetCamConfig(ctx),
-		CommandConfig: GetCommandConfig(ctx),
-		MicConfig:     GetMicConfig(ctx),
-		SpeakerConfig: GetSpeakerConfig(ctx),
+		ServerConfig:       GetServerConfig(ctx),
+		SocketServerConfig: GetSocketServerConfig(ctx),
+		CamConfig:          GetCamConfig(ctx),
+		CommandConfig:      GetCommandConfig(ctx),
+		MicConfig:          GetMicConfig(ctx),
+		SpeakerConfig:      GetSpeakerConfig(ctx),
 	}
 
 	log.Printf("Server Config: \n%+v\n", carConfig.ServerConfig)
+	log.Printf("Socket Config: \n%+v\n", carConfig.SocketServerConfig)
 	log.Printf("Cam Config: \n%+v\n", carConfig.CamConfig)
 	log.Printf("Mic Config: \n%+v\n", carConfig.MicConfig)
 	log.Printf("Speaker Config: \n%+v\n", carConfig.SpeakerConfig)
@@ -90,6 +98,12 @@ func GetServerConfig(ctx context.Context) ServerConfig {
 		Name:        GetStringEnv("NAME", DefaultCarName),
 		Port:        GetStringEnv("PORT", DefaultPort),
 		SilentStart: GetBoolEnv("SILENTSTART", DefaultSilentStart),
+	}
+}
+
+func GetSocketServerConfig(ctx context.Context) server.SocketServerConfig {
+	return server.SocketServerConfig{
+		SilentConnects: GetBoolEnv("SILENTCONNECTIONS", DefaultSilentConnections),
 	}
 }
 
@@ -115,6 +129,7 @@ func GetCamConfig(ctx context.Context) carcam.CamConfig {
 		VerticalFlip:   GetBoolEnv("VFLIP", DefaultVerticalFlip),
 		HorizontalFlip: GetBoolEnv("HFLIP", DefaultHorizontalFlip),
 		Profile:        GetStringEnv("PROFILE", DefaultProfile),
+		Mode:           GetStringEnv("MODE", DefaultMode),
 	}
 }
 

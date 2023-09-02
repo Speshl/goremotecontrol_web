@@ -31,6 +31,7 @@ type CamConfig struct {
 	Rotation       int
 	Level          string
 	Profile        string
+	Mode           string
 }
 
 func NewCarCam(cfg CamConfig) (*CarCam, error) {

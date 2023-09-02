@@ -14,25 +14,32 @@ import (
 	"github.com/pion/webrtc/v3"
 )
 
-type Server struct {
-	carAudioTrack  *webrtc.TrackLocalStaticSample
-	carVideoTrack  *webrtc.TrackLocalStaticSample
-	commandChannel chan carcommand.CommandGroup
-	speakerChannel chan string
+type ClientAudioTrackPlayer func(*webrtc.TrackRemote, *webrtc.RTPReceiver)
 
-	clientAudioVolume string
-	clientAudioDevice string
+type Server struct {
+	carAudioTrack    *webrtc.TrackLocalStaticSample
+	carVideoTrack    *webrtc.TrackLocalStaticSample
+	commandChannel   chan carcommand.CommandGroup
+	memeSoundChannel chan string
+
+	clientAudioTrackPlayer ClientAudioTrackPlayer
 
 	socketio        *socketio.Server
 	connections     map[string]*Connection
 	connectionsLock sync.RWMutex
+
+	config SocketServerConfig
+}
+
+type SocketServerConfig struct {
+	SilentConnects bool
 }
 
 var allowOriginFunc = func(r *http.Request) bool {
 	return true
 }
 
-func NewSocketServer(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample, commandChannel chan carcommand.CommandGroup, speakerChannel chan string, device string, volume string) *Server {
+func NewSocketServer(cfg SocketServerConfig, audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webrtc.TrackLocalStaticSample, commandChannel chan carcommand.CommandGroup, memeSoundChannel chan string, audioPlayer ClientAudioTrackPlayer) *Server {
 	socketioServer := socketio.NewServer(&engineio.Options{
 		Transports: []transport.Transport{
 			&polling.Transport{
@@ -48,12 +55,12 @@ func NewSocketServer(audioTrack *webrtc.TrackLocalStaticSample, videoTrack *webr
 		socketio:    socketioServer,
 		connections: make(map[string]*Connection),
 
-		speakerChannel:    speakerChannel,
-		commandChannel:    commandChannel,
-		carAudioTrack:     audioTrack,
-		carVideoTrack:     videoTrack,
-		clientAudioVolume: volume,
-		clientAudioDevice: device,
+		memeSoundChannel:       memeSoundChannel,
+		commandChannel:         commandChannel,
+		carAudioTrack:          audioTrack,
+		carVideoTrack:          videoTrack,
+		clientAudioTrackPlayer: audioPlayer,
+		config:                 cfg,
 	}
 }
 
@@ -70,12 +77,12 @@ func (s *Server) GetHandler() *socketio.Server {
 }
 
 func (s *Server) NewClientConn(socketConn socketio.Conn) (*Connection, error) {
-	clientConn, err := NewConnection(socketConn, s.clientAudioDevice, s.clientAudioVolume)
+	clientConn, err := NewConnection(socketConn, s.clientAudioTrackPlayer)
 	if err != nil {
 		return nil, err
 	}
 
-	err = clientConn.RegisterHandlers(s.carAudioTrack, s.carVideoTrack)
+	err = clientConn.RegisterHandlers(s.carAudioTrack, s.carVideoTrack, s.memeSoundChannel)
 	if err != nil {
 		return nil, err
 	}
@@ -90,6 +97,11 @@ func (s *Server) NewClientConn(socketConn socketio.Conn) (*Connection, error) {
 			// Note that the PeerConnection may come back from PeerConnectionStateDisconnected.
 			log.Println("Peer Connection has gone to failed")
 			s.RemoveClient(socketConn.ID())
+		}
+		if state == webrtc.PeerConnectionStateConnecting { //Using this event for audio event so it triggers before gstreamer takes over playing client audio
+			s.memeSoundChannel <- "client_connected"
+		} else if state == webrtc.PeerConnectionStateClosed {
+			s.memeSoundChannel <- "client_disconnected"
 		}
 	})
 

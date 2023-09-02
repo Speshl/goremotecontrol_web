@@ -30,13 +30,19 @@ type App struct {
 }
 
 func main() {
-	log.Println("starting server...")
-	defer log.Println("server stopped")
-
 	app := App{
 		done: make(chan os.Signal, 1),
 	}
-	defer close(app.done)
+
+	log.Println("starting server...")
+
+	defer func() {
+		if app.speaker != nil {
+			app.speaker.Play(context.Background(), "shutdown")
+		}
+		close(app.done)
+		log.Println("server stopped")
+	}()
 
 	app.ctx, app.cancel = context.WithCancel(context.Background())
 	app.config = config.GetConfig(app.ctx)
@@ -96,7 +102,7 @@ func main() {
 			log.Printf("Shutting down server... %s\n", msg.String())
 			app.cancel()
 			//give some time for everything to close
-			time.Sleep(5 * time.Second)
+			time.Sleep(6 * time.Second)
 			return
 		}
 	}

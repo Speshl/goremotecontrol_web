@@ -37,7 +37,7 @@ func CreateRecievePipeline(payloadType webrtc.PayloadType, codecName string, dev
 	// case "vp8":
 	// 	pipelineStr += fmt.Sprintf(", payload=%d, encoding-name=VP8-DRAFT-IETF-01 ! rtpvp8depay ! decodebin ! autovideosink", payloadType)
 	case "opus":
-		pipelineStr += fmt.Sprintf(", payload=%d, encoding-name=OPUS ! rtpopusdepay ! decodebin ! pulsesink device=1 volume=%s", payloadType, volume)
+		pipelineStr += fmt.Sprintf(", payload=%d, encoding-name=OPUS ! rtpopusdepay ! decodebin ! pulsesink device=%s volume=%s", payloadType, device, volume)
 	// case "vp9":
 	// 	pipelineStr += " ! rtpvp9depay ! decodebin ! autovideosink"
 	// case "h264":
@@ -47,10 +47,9 @@ func CreateRecievePipeline(payloadType webrtc.PayloadType, codecName string, dev
 	default:
 		panic("Unhandled codec " + codecName)
 	}
-
+	log.Printf("client audio pipeline: %s\n", pipelineStr)
 	pipelineStrUnsafe := C.CString(pipelineStr)
 	defer C.free(unsafe.Pointer(pipelineStrUnsafe))
-	log.Printf("client audio pipeline: %s\n", pipelineStr)
 	return &RecievePipeline{Pipeline: C.gstreamer_receive_create_pipeline(pipelineStrUnsafe)}
 }
 

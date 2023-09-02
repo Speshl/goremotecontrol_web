@@ -36,7 +36,6 @@ func (s *Server) onConnect(socketConn socketio.Conn) error {
 	s.connectionsLock.Lock()
 	s.connections[id] = conn
 	s.connectionsLock.Unlock()
-
 	return nil
 }
 
@@ -119,13 +118,13 @@ func (s *Server) commandParser(msg []byte) {
 	case 0:
 		break
 	case 1:
-		s.speakerChannel <- "affirmative"
+		s.memeSoundChannel <- "affirmative"
 	case 2:
-		s.speakerChannel <- "negative"
+		s.memeSoundChannel <- "negative"
 	case 3:
-		s.speakerChannel <- "aggressive"
+		s.memeSoundChannel <- "aggressive"
 	case 4:
-		s.speakerChannel <- "sorry"
+		s.memeSoundChannel <- "sorry"
 	default:
 		log.Println("error: invalid sound command")
 	}

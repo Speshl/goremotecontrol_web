@@ -1,0 +1,33 @@
+https://app.shortcut.com/gorrc
+
+Next Tasks To Pickup:
+-  Mic/Speaker audio echo cancellation
+-  Support pwm switch (headlights / winch / diff/ gear)
+-  Render video to canvas
+-  Overlay commands on video and also try to keep them there when going to full screen
+-  Fix G27 wheel
+-  Add onscreen touch controls for mobile with a button or something on the page to turn it on and off
+-  Create env setup script
+-  Figure out how to run on car startup
+-  Capture break better and don't let it go into reverse unless in the reverse gear
+
+Blocked Tasks:
+-  Support PS3 controller - BLOCKED - Need a ps3 controller (Akuma)
+-  Fix TGT wheel - BLOCKED - Need Chris to help with this one
+
+LONG TERM:
+- Split repo into web/signaling server and car client repo.
+- Finish login process with hard coded username and password
+- Only allow connection to car if JWT token is validated
+- Invalidate token on client restart so that car doesn't auto reconnect with last client if they don't close the page.
+- Enable support for multiple cars simultaneously
+- Allow selection of a specific car on the frontend
+- Enable audio mixing so that meme sounds, system sounds, and client audio can all be played simultaneously
+- Mix in car's transmission into gear ratios and shifting
+
+
+
+SUPER LONG TERM (STRETCH):
+- Add support for gyro and acceleromotor for metrics
+- Add video overlay showing gyro/acceleromotor metrics
+- Add 4g support

@@ -10,19 +10,8 @@ import (
 	"github.com/Speshl/goremotecontrol_web/internal/carcommand"
 	"github.com/Speshl/goremotecontrol_web/internal/carmic"
 	"github.com/Speshl/goremotecontrol_web/internal/carspeaker"
-	"github.com/Speshl/goremotecontrol_web/internal/gst"
 	"github.com/Speshl/goremotecontrol_web/internal/server"
 )
-
-func (a *App) StartGStreamerPipelines() {
-	go func() {
-		log.Println("starting gstreamer main send recieve loops")
-		gst.StartMainSendLoop() //Start gstreamer main send loop from main thread
-		log.Println("starting gstreamer main recieve loops")
-		gst.StartMainRecieveLoop() //Start gstreamer main recieve loop from main thread
-		log.Println("warning: gstreamer main loops ended")
-	}()
-}
 
 func (a *App) StartSpeaker() (*carspeaker.CarSpeaker, error) {
 	carSpeaker, err := carspeaker.NewCarSpeaker(a.config.SpeakerConfig)
@@ -85,12 +74,12 @@ func (a *App) StartCommand() *carcommand.CarCommand {
 
 func (a *App) StartSocketServer() *server.Server {
 	socketServer := server.NewSocketServer(
+		a.config.SocketServerConfig,
 		a.mic.AudioTrack,
 		a.cam.VideoTrack,
 		a.command.CommandChannel,
-		a.speaker.SpeakerChannel,
-		a.config.SpeakerConfig.Device,
-		a.config.SpeakerConfig.Volume,
+		a.speaker.MemeSoundChannel,
+		a.speaker.TrackPlayer,
 	)
 	socketServer.RegisterHTTPHandlers()
 	socketServer.RegisterSocketIOHandlers()
