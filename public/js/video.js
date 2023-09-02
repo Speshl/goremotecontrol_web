@@ -152,7 +152,7 @@ class CamPlayer {
         const videoElement = document.getElementById('videoElement');
 
         videoContext.drawImage(videoElement, 0, 0, 320,180/*this.canvas.width, this.canvas.height*/);
-        window.requestAnimationFrame(drawVideo);
+        window.requestAnimationFrame(this.drawVideo);
     }
 
     sendOffer() {
