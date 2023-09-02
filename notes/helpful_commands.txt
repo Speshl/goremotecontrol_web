@@ -1,5 +1,8 @@
 pacmd list-sources
 
+pactl list
+sudo pactl list
+
 aplay -L
 
 arecord -L
