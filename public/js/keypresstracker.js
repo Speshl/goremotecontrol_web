@@ -23,6 +23,9 @@ class KeyPressTracker {
         this.volumeDownPress = false;
         this.volumeMutePress = false;
 
+        this.volumeMuted = false;
+        this.volumeAtMute = 0;
+
         this.upShiftPress = false;
         this.downShiftPress = false;
 
@@ -69,8 +72,13 @@ class KeyPressTracker {
     volumeUp() {
         const volumeSlider = document.getElementById('streamVolume');
         const audioElement = document.getElementById('audioElement');
+
+        if(this.volumeMuted){
+            this.volumeUnMute();
+        }
+
         let currentVolume = volumeSlider.value;
-        let newVolume = currentVolume + 10;
+        let newVolume = parseInt(currentVolume) + 10;
 
         if (newVolume < 100) {
             audioElement.volume = newVolume/100;
@@ -85,7 +93,7 @@ class KeyPressTracker {
         const volumeSlider = document.getElementById('streamVolume');
         const audioElement = document.getElementById('audioElement');
         let currentVolume = volumeSlider.value;
-        let newVolume = currentVolume - 10;
+        let newVolume = parseInt(currentVolume) - 10;
 
         if (newVolume > 0) {
             audioElement.volume = newVolume/100;
@@ -99,8 +107,26 @@ class KeyPressTracker {
     volumeMute() {
         const volumeSlider = document.getElementById('streamVolume');
         const audioElement = document.getElementById('audioElement');
+        this.volumeAtMute = volumeSlider.value;
         audioElement.volume = 0;
         volumeSlider.value = 0;
+        this.volumeMuted = true;
+    }
+
+    volumeUnMute() {
+        const volumeSlider = document.getElementById('streamVolume');
+        const audioElement = document.getElementById('audioElement');
+        this.volumeAtMute = 0;
+        audioElement.volume = this.volumeAtMute / 100;
+        volumeSlider.value = this.volumeAtMute;
+        this.volumeMuted = false;
+    }
+
+    volumeSync() {
+        const volumeSlider = document.getElementById('streamVolume');
+        if(this.volumeMuted && volumeSlider.value > 0) {
+            this.volumeMuted = false;
+        }
     }
 
     upShift() {
@@ -144,6 +170,8 @@ class KeyPressTracker {
             steerCommand = this.midPosition;
         }
 
+        this.volumeSync();
+
         //Voume Up
         if(this.pressedKeys[']'] && this.volumeUpPress == false){ //new press
             this.volumeUpPress = true;
@@ -165,8 +193,11 @@ class KeyPressTracker {
         //Voume Mute
         if(this.pressedKeys['m'] && this.volumeMutePress == false){ //new press
             this.volumeMutePress = true;
-            this.volumeMute();
-            
+            if(this.volumeMuted){
+                this.volumeUnMute();
+            }else{
+                this.volumeMute();
+            } 
         }else if (!this.pressedKeys['m'] && this.volumeMutePress == true){
             this.volumeMutePress = false;
         }
