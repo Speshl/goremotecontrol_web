@@ -8,7 +8,7 @@ body.light-mode {
     border-color: #ccc;
 }
 
-#videoDiv.light-mode {
+#mediaDiv.light-mode {
     border-color: #ccc;
     border: 1px solid #ccc;
 }

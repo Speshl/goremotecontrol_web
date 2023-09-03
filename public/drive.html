@@ -17,8 +17,9 @@
         <div id="canvasDiv">
             <canvas id="videoCanvas"></canvas>
         </div>
-        <div id="videoDiv">
+        <div id="mediaDiv">
             <video id="videoElement"></video>
+            <audio id="audioElement"></audio>
         </div>
 
         <div id="infoContainer">
@@ -31,6 +32,14 @@
                 <div id="controllerType">Keyboard</div>
             </div>
 
+            <div class="infoItem">
+                <div>Volume</div>
+                <input id="streamVolume" type="range" min="1" max="100" value="100" step="5" class="slider">
+            </div>
+
+            
+        </div>
+        <div id="hiddenInfoContainer">
             <div class="hiddenInfoItem">
                 <div>ESC</div>
                 <div id="escAndGear"></div>

@@ -58,26 +58,8 @@ class CamPlayer {
                 el.muted = true;
                 el.playsinline = true;
                 el.controls = true;
-                //el.style.setProperty("width", "60vw");
-                
-                //document.getElementById('videoDiv').appendChild(el);                
-
-                el.addEventListener("play", () => {
-                    this.playMedia();
-                });
-
-                el.addEventListener("pause", () => {
-                    this.pauseMedia();
-                });
-
-                el.addEventListener("volumechange", () =>{
-                    const audio = document.getElementById('audioElement');
-                    const video = document.getElementById('videoElement');
-                    audio.volume = video.volume;
-                });
 
                 const canvas = document.getElementById('videoCanvas');
-
                 canvas.addEventListener("click", () =>{
                     const canvas = document.getElementById('videoCanvas');
                     if (canvas.requestFullscreen) {
@@ -103,14 +85,18 @@ class CamPlayer {
                 console.log("Video Track Added");
             }else{
                 console.log("Creating Audio Track");
-                const el = document.createElement("audio");
-                el.id = "audioElement";
+                const volumeSlider = document.getElementById('streamVolume');
+                const el = document.getElementById('audioElement');
                 el.srcObject = event.streams[0];
                 el.autoplay = true;
                 el.muted = false;
                 el.playsinline = true;
                 el.controls = false;
-                document.getElementById('videoDiv').appendChild(el);
+                el.volume = volumeSlider.value/100;
+
+                volumeSlider.addEventListener('oninput', (e) => {
+                    el.volume = e.target.value/100;
+                })
                 console.log("Audio Track Added");
             }
             
@@ -186,24 +172,6 @@ class CamPlayer {
     gotRemoteDescription() {
         return this.gotAnswer;
     }
-
-    // pauseMedia() {
-    //     console.log("Pausing...");
-    //     const video = document.getElementById('videoElement');
-    //     video.pause();
-
-    //     const audio = document.getElementById('audioElement');
-    //     audio.pause();
-    // }
-
-    // playMedia() {
-    //     console.log("Playing...");
-    //     const video = document.getElementById('videoElement');
-    //     video.play();
-
-    //     const audio = document.getElementById('audioElement');
-    //     audio.play();
-    // }
 }
 
 function drawVideo() {
