@@ -94,7 +94,7 @@ class CamPlayer {
                 el.controls = false;
                 el.volume = volumeSlider.value/100;
 
-                volumeSlider.addEventListener('oninput', (e) => {
+                volumeSlider.addEventListener('input', (e) => {
                     el.volume = e.target.value/100;
                 })
                 console.log("Audio Track Added");
