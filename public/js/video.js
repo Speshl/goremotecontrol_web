@@ -76,7 +76,18 @@ class CamPlayer {
                     audio.volume = video.volume;
                 });
 
-               
+                const canvas = document.getElementById('videoCanvas');
+
+                canvas.addEventListener("click", () =>{
+                    const canvas = document.getElementById('videoCanvas');
+                    if (canvas.requestFullscreen) {
+                        canvas.requestFullscreen();
+                    } else if (canvas.webkitRequestFullscreen) { /* Safari */
+                        canvas.webkitRequestFullscreen();
+                    } else if (canvas.msRequestFullscreen) { /* IE11 */
+                        canvas.msRequestFullscreen();
+                    }  
+                })
 
                 el.addEventListener("loadeddata", () => {
                     const canvas = document.getElementById('videoCanvas');
@@ -87,7 +98,6 @@ class CamPlayer {
                     console.log("Canvas Size: ",canvas.width, canvas.height);
                     drawVideo();
                 });
-
 
 
                 console.log("Video Track Added");
@@ -201,20 +211,16 @@ function drawVideo() {
     const videoContext = canvas.getContext('2d');
     const videoElement = document.getElementById('videoElement');
 
-    const status = document.getElementById('statusMsg').innerHTML;
-    const controllerType = document.getElementById('controllerType').innerHTML;
     const escAndGear = document.getElementById('escAndGear').innerHTML;
     const steerAndTrim = document.getElementById('steerAndTrim').innerHTML;
-    const pandAndTilt = document.getElementById('panAndTilt').innerHTML;
+    const panAndTilt = document.getElementById('panAndTilt').innerHTML;
+    const combined = escAndGear + " " +steerAndTrim + " "+ panAndTilt;
 
 
     videoContext.drawImage(videoElement, 0, 0, 320,180); //TODO Make this dynamic
 
-    videoContext.font = "24px monospace";
-    videoContext.fillText("Status", 10, 160);
-    videoContext.fillText("Controller", 70, 160);
-    videoContext.fillText("Esc&Gear", 130, 160);
-    videoContext.fillText("Steer&Trim", 190, 160);
-    videoContext.fillText("Pan&Tilt", 250, 160);
+    videoContext.fillStyle = "white";
+    videoContext.font = "10px monospace";
+    videoContext.fillText(combined, 10, 175);
     window.requestAnimationFrame(drawVideo);
 }
