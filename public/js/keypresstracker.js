@@ -116,9 +116,9 @@ class KeyPressTracker {
     volumeUnMute() {
         const volumeSlider = document.getElementById('streamVolume');
         const audioElement = document.getElementById('audioElement');
-        this.volumeAtMute = 0;
         audioElement.volume = this.volumeAtMute / 100;
         volumeSlider.value = this.volumeAtMute;
+        this.volumeAtMute = 0;
         this.volumeMuted = false;
     }
 
