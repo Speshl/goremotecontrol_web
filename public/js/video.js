@@ -201,6 +201,20 @@ function drawVideo() {
     const videoContext = canvas.getContext('2d');
     const videoElement = document.getElementById('videoElement');
 
-    videoContext.drawImage(videoElement, 0, 0, 320,180/*this.canvas.width, this.canvas.height*/);
+    const status = document.getElementById('statusMsg').innerHTML;
+    const controllerType = document.getElementById('controllerType').innerHTML;
+    const escAndGear = document.getElementById('escAndGear').innerHTML;
+    const steerAndTrim = document.getElementById('steerAndTrim').innerHTML;
+    const pandAndTilt = document.getElementById('pandAndTilt').innerHTML;
+
+
+    videoContext.drawImage(videoElement, 0, 0, 320,180); //TODO Make this dynamic
+
+    ctx.font = "24px monospace";
+    ctx.fillText("Status", 10, 160);
+    ctx.fillText("Controller", 70, 160);
+    ctx.fillText("Esc&Gear", 130, 160);
+    ctx.fillText("Steer&Trim", 190, 160);
+    ctx.fillText("Pan&Tilt", 250, 160);
     window.requestAnimationFrame(drawVideo);
 }
