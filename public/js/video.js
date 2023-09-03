@@ -177,23 +177,23 @@ class CamPlayer {
         return this.gotAnswer;
     }
 
-    pauseMedia() {
-        console.log("Pausing...");
-        const video = document.getElementById('videoElement');
-        video.pause();
+    // pauseMedia() {
+    //     console.log("Pausing...");
+    //     const video = document.getElementById('videoElement');
+    //     video.pause();
 
-        const audio = document.getElementById('audioElement');
-        audio.pause();
-    }
+    //     const audio = document.getElementById('audioElement');
+    //     audio.pause();
+    // }
 
-    playMedia() {
-        console.log("Playing...");
-        const video = document.getElementById('videoElement');
-        video.play();
+    // playMedia() {
+    //     console.log("Playing...");
+    //     const video = document.getElementById('videoElement');
+    //     video.play();
 
-        const audio = document.getElementById('audioElement');
-        audio.play();
-    }
+    //     const audio = document.getElementById('audioElement');
+    //     audio.play();
+    // }
 }
 
 function drawVideo() {
@@ -210,11 +210,11 @@ function drawVideo() {
 
     videoContext.drawImage(videoElement, 0, 0, 320,180); //TODO Make this dynamic
 
-    ctx.font = "24px monospace";
-    ctx.fillText("Status", 10, 160);
-    ctx.fillText("Controller", 70, 160);
-    ctx.fillText("Esc&Gear", 130, 160);
-    ctx.fillText("Steer&Trim", 190, 160);
-    ctx.fillText("Pan&Tilt", 250, 160);
+    videoContext.font = "24px monospace";
+    videoContext.fillText("Status", 10, 160);
+    videoContext.fillText("Controller", 70, 160);
+    videoContext.fillText("Esc&Gear", 130, 160);
+    videoContext.fillText("Steer&Trim", 190, 160);
+    videoContext.fillText("Pan&Tilt", 250, 160);
     window.requestAnimationFrame(drawVideo);
 }
