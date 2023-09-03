@@ -1,3 +1,5 @@
+libcamera-vid
+
 pacmd list-sources
 
 pactl list
