@@ -205,7 +205,7 @@ function drawVideo() {
     const controllerType = document.getElementById('controllerType').innerHTML;
     const escAndGear = document.getElementById('escAndGear').innerHTML;
     const steerAndTrim = document.getElementById('steerAndTrim').innerHTML;
-    const pandAndTilt = document.getElementById('pandAndTilt').innerHTML;
+    const pandAndTilt = document.getElementById('panAndTilt').innerHTML;
 
 
     videoContext.drawImage(videoElement, 0, 0, 320,180); //TODO Make this dynamic
