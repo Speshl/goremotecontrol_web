@@ -14,6 +14,12 @@
 }
 
 #videoDiv {
+    visibility: hidden;
+    width: 0%;
+    height: 0%;
+}
+
+#canvasDiv {
     width: 60vw;
     margin: 0 auto;
     border: 1px solid;
@@ -21,15 +27,15 @@
 }
 
 #videoElement {
-    width: 60vw;
+    width: 0vw;
     /* margin: 0 auto;
     border: 1px solid; */
     aspect-ratio: 16/9;
-    display: none;
+    visibility: hidden;
 }
 
 #videoCanvas {
-    width: 60vw;
+    width: 100%;
     aspect-ratio: 16/9;
 }
 
