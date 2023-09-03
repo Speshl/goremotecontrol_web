@@ -122,13 +122,6 @@ class KeyPressTracker {
         this.volumeMuted = false;
     }
 
-    volumeSync() {
-        const volumeSlider = document.getElementById('streamVolume');
-        if(this.volumeMuted && volumeSlider.value > 0) {
-            this.volumeMuted = false;
-        }
-    }
-
     upShift() {
         if(this.currentGear == this.reverseGear){
             this.currentGear = this.neutralGear;
@@ -169,8 +162,6 @@ class KeyPressTracker {
         }else{
             steerCommand = this.midPosition;
         }
-
-        this.volumeSync();
 
         //Voume Up
         if(this.pressedKeys[']'] && this.volumeUpPress == false){ //new press
