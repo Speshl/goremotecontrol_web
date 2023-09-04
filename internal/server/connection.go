@@ -22,11 +22,11 @@ func NewConnection(socketConn socketio.Conn, audioPlayer ClientAudioTrackPlayer)
 	log.Printf("Creating Client %s\n", socketConn.ID())
 
 	peerConnection, err := webrtc.NewPeerConnection(webrtc.Configuration{
-		ICEServers: []webrtc.ICEServer{
-			{
-				URLs: []string{"stun:stun.l.google.com:19302"},
-			},
-		},
+		// ICEServers: []webrtc.ICEServer{
+		// 	{
+		// 		URLs: []string{"stun:stun.l.google.com:19302"},
+		// 	},
+		// },
 	})
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create Peer Connection: %s", err)
