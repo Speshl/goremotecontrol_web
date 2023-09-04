@@ -1,14 +1,18 @@
 class CamPlayer {
-    constructor() {
+    constructor(forceLocal) {
         this.socket = io();
         
         this.gotAnswer = false;
 
-        this.pc = new RTCPeerConnection({
-            // iceServers: [{
-            // urls: 'stun:stun.l.google.com:19302'
-            // }]
-        })
+        if (forceLocal == true) {
+            this.pc = new RTCPeerConnection()
+        }else{
+            this.pc = new RTCPeerConnection({
+                iceServers: [{
+                urls: 'stun:stun.l.google.com:19302'
+                }]
+            })
+        }
     }
 
     setupListeners() {

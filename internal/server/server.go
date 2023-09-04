@@ -33,6 +33,7 @@ type Server struct {
 
 type SocketServerConfig struct {
 	SilentConnects bool
+	ForceLocal     bool
 }
 
 var allowOriginFunc = func(r *http.Request) bool {
@@ -77,7 +78,7 @@ func (s *Server) GetHandler() *socketio.Server {
 }
 
 func (s *Server) NewClientConn(socketConn socketio.Conn) (*Connection, error) {
-	clientConn, err := NewConnection(socketConn, s.clientAudioTrackPlayer)
+	clientConn, err := NewConnection(socketConn, s.clientAudioTrackPlayer, s.config.ForceLocal)
 	if err != nil {
 		return nil, err
 	}
