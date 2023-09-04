@@ -1,7 +1,7 @@
 //Startup all the processes we need
 let forceLocalDrive = false;
 const forceLocalDiv = document.getElementById('localDrive');
-if(forceLocalDiv == null){
+if(forceLocalDiv != null){
     forceLocalDrive = true;
 }
 const camPlayer = new CamPlayer(forceLocalDrive);
