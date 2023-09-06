@@ -1,6 +1,9 @@
 class CamPlayer {
     constructor(forceLocal) {
         this.socket = io();
+
+        this.lastVolume = 0;
+        this.timesToShowVolume = 0;
         
         this.gotAnswer = false;
 
@@ -97,6 +100,7 @@ class CamPlayer {
                 el.playsinline = true;
                 el.controls = false;
                 el.volume = volumeSlider.value/100;
+                this.lastVolume = volumeSlider.value/100;
 
                 volumeSlider.addEventListener('input', (e) => {
                     el.volume = e.target.value/100;
@@ -146,6 +150,18 @@ class CamPlayer {
 
     }
 
+    showVolume(volume) {
+        if(volume != this.lastVolume){
+            this.lastVolume = volume;
+            this.timesToShowVolume = 60;
+        }
+        if(this.timesToShowVolume > 0){
+            this.timesToShowVolume--;
+            return true;
+        }
+        return false;
+    }
+
     sendOffer() {
         document.getElementById('statusMsg').innerHTML = "Sending Offer...";
         this.pc.createOffer().then(d => this.pc.setLocalDescription(d)).catch();
@@ -183,16 +199,23 @@ function drawVideo() {
     const videoContext = canvas.getContext('2d');
     const videoElement = document.getElementById('videoElement');
 
+    const audioElement = document.getElementById('audioElement');
+    let currentVolume = audioElement.volume;
+
     const escAndGear = document.getElementById('escAndGear').innerHTML;
     const steerAndTrim = document.getElementById('steerAndTrim').innerHTML;
     const panAndTilt = document.getElementById('panAndTilt').innerHTML;
     const combined = escAndGear + " " +steerAndTrim + " "+ panAndTilt;
 
-
     videoContext.drawImage(videoElement, 0, 0, 320,180); //TODO Make this dynamic
 
     videoContext.fillStyle = "white";
     videoContext.font = "10px monospace";
+
+    if(camPlayer.showVolume(currentVolume)){
+        videoContext.fillText("Volume: "+currentVolume, 140, 150)
+    }
+
     videoContext.fillText(combined, 10, 175);
     window.requestAnimationFrame(drawVideo);
 }
