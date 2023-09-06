@@ -37,7 +37,7 @@ func (a *App) StartMic() (*carmic.CarMic, error) {
 		return nil, fmt.Errorf("error creating carmic: %w\n", err)
 	}
 
-	carMic.Start()
+	//carMic.Start()
 	return carMic, nil
 }
 
