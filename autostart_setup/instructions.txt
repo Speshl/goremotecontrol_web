@@ -1,0 +1,15 @@
+Place the built executable in as - /usr/local/bin/gorrc
+
+Make a folder at - /usr/local/scripts/gorrc
+
+Place the run script in the created folder - /usr/local/scripts/gorrc/run_gorrc.sh
+
+Also place the env file in the same directory - /usr/local/scripts/gorrc/gorrc.env
+
+Place the unit file (gorrc.service) in this folder - /lib/systemd/system/gorrc.service
+
+Reload daemon to pickup changes to the gorrc.service file - sudo systemctl daemon-reload 
+
+Enable gorrc to start at boot - sudo systemctl enable gorrc.service
+
+Verify gorrc is running - sudo systemctl status gorrc.service

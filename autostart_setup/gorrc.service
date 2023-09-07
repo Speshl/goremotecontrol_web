@@ -1,0 +1,11 @@
+[Unit]
+Description=Start GORRC
+After=network-online.target
+
+
+[Service]
+ExecStart=/usr/local/scripts/gorrc/run_gorrc.sh
+Restart=always
+RestartSec=10s
+KillMode=process
+TimeoutSec=infinity
