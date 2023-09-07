@@ -1,5 +1,10 @@
 //Startup all the processes we need
-const camPlayer = new CamPlayer();
+let forceLocalDrive = false;
+const forceLocalDiv = document.getElementById('localDrive');
+if(forceLocalDiv != null){
+    forceLocalDrive = true;
+}
+const camPlayer = new CamPlayer(forceLocalDrive);
 camPlayer.setupListeners();
 
 setTimeout(() => {

@@ -18,16 +18,19 @@ type Connection struct {
 	AudioPlayer    ClientAudioTrackPlayer
 }
 
-func NewConnection(socketConn socketio.Conn, audioPlayer ClientAudioTrackPlayer) (*Connection, error) {
+func NewConnection(socketConn socketio.Conn, audioPlayer ClientAudioTrackPlayer, forceLocal bool) (*Connection, error) {
 	log.Printf("Creating Client %s\n", socketConn.ID())
 
-	peerConnection, err := webrtc.NewPeerConnection(webrtc.Configuration{
-		ICEServers: []webrtc.ICEServer{
+	webrtcCfg := webrtc.Configuration{}
+	if !forceLocal {
+		webrtcCfg.ICEServers = []webrtc.ICEServer{
 			{
 				URLs: []string{"stun:stun.l.google.com:19302"},
 			},
-		},
-	})
+		}
+	}
+
+	peerConnection, err := webrtc.NewPeerConnection(webrtcCfg)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create Peer Connection: %s", err)
 	}

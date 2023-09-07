@@ -5,10 +5,8 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
-	"os/exec"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/Speshl/goremotecontrol_web/internal/gst"
 	"github.com/pion/webrtc/v3"
@@ -52,10 +50,9 @@ var soundGroups = map[string][]string{
 type CarSpeaker struct {
 	MemeSoundChannel chan string
 	//ClientAudioChannel chan []byte
-	config     SpeakerConfig
-	lock       sync.RWMutex
-	clientLock sync.RWMutex
-	playing    bool
+	config  SpeakerConfig
+	lock    sync.RWMutex
+	playing bool
 }
 
 type SpeakerConfig struct {
@@ -111,16 +108,12 @@ func (c *CarSpeaker) TrackPlayer(track *webrtc.TrackRemote, receiver *webrtc.RTP
 	// 		}
 	// 	}
 	// }()
-	c.clientLock.Lock()
-	defer c.clientLock.Unlock()
 	codecName := strings.Split(track.Codec().RTPCodecCapability.MimeType, "/")[1]
-	fmt.Printf("Track has started, of type %d: %s \n", track.PayloadType(), codecName)
+	log.Printf("Track has started, of type %d: %s \n", track.PayloadType(), codecName)
 	pipeline := gst.CreateRecievePipeline(track.PayloadType(), strings.ToLower(codecName), c.config.Device, c.config.Volume)
 	pipeline.Start()
-	defer func() {
-		pipeline.Stop()
-		time.Sleep(5 * time.Second) //Adding delay to give time for gstreamer to give back the speaker device
-	}()
+	defer pipeline.Stop()
+
 	buf := make([]byte, 1400)
 	for {
 		i, _, err := track.Read(buf)
@@ -170,26 +163,26 @@ func (c *CarSpeaker) Play(ctx context.Context, sound string) error {
 	log.Printf("start playing %s sound\n", sound)
 	defer log.Printf("finished playing %s sound\n", sound)
 
-	soundPath, ok := soundMap[sound]
-	if !ok {
-		return fmt.Errorf("error: sound not found")
-	}
+	// soundPath, ok := soundMap[sound]
+	// if !ok {
+	// 	return fmt.Errorf("error: sound not found")
+	// }
 
-	args := []string{
-		//"-D", "hw:CARD=wm8960soundcard,DEV=0", //TODO: Make these changeable by environment variable
-		"-E",
-		"aplay",
-		"-D", "hw:CARD=wm8960soundcard,DEV=0",
-		soundPath,
-	}
-	cmd := exec.CommandContext(ctx, "sudo", args...)
-	err := cmd.Start()
-	if err != nil {
-		return fmt.Errorf("error starting audio playback - %w", err)
-	}
-	err = cmd.Wait()
-	if err != nil {
-		return fmt.Errorf("error during audio playback - %w", err)
-	}
+	// args := []string{
+	// 	//"-D", "hw:CARD=wm8960soundcard,DEV=0", //TODO: Make these changeable by environment variable
+	// 	"-E",
+	// 	"aplay",
+	// 	"-D", "hw:CARD=wm8960soundcard,DEV=0",
+	// 	soundPath,
+	// }
+	// cmd := exec.CommandContext(ctx, "sudo", args...)
+	// err := cmd.Start()
+	// if err != nil {
+	// 	return fmt.Errorf("error starting audio playback - %w", err)
+	// }
+	// err = cmd.Wait()
+	// if err != nil {
+	// 	return fmt.Errorf("error during audio playback - %w", err)
+	// }
 	return nil
 }

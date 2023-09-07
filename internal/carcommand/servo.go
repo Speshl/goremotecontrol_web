@@ -227,7 +227,18 @@ func (s *Servo) getValueWithGear(value int) (int, error) {
 		value = getInvertedValue(value, s.config.MidValue)
 	}
 
-	valueRatio = mapToRange(value, s.config.MinValue, s.config.MaxValue, s.transmission.gearRatios[s.transmission.gear].min, s.transmission.gearRatios[s.transmission.gear].max)
+	if s.transmission.gear == "R" {
+		if value > s.config.MidValue {
+			value = s.config.MidValue //Can't go forward while in reverse
+		}
+		valueRatio = mapToRange(value, s.config.MinValue, s.config.MidValue, s.transmission.gearRatios[s.transmission.gear].min, s.transmission.gearRatios[s.transmission.gear].max)
+	} else {
+		valueRatio = mapToRange(value, s.config.MinValue, s.config.MaxValue, s.transmission.gearRatios[s.transmission.gear].min, s.transmission.gearRatios[s.transmission.gear].max)
+	}
+
+	if s.transmission.gear == "R" {
+		log.Printf("Value: %d GearMin: %d GearMax: %d ValueRatio: %d\n", value, s.transmission.gearRatios[s.transmission.gear].min, s.transmission.gearRatios[s.transmission.gear].max, valueRatio)
+	}
 	return valueRatio, nil
 }
 
@@ -276,9 +287,9 @@ func (s *Servo) SetValue(value int) error {
 
 	finalValue := float32(value) / float32(s.config.MaxValue)
 
-	// if s.config.Name == "esc" {
-	// 	log.Printf("Esc Pos: %f\n", finalValue)
-	// }
+	if s.transmission.gear == "R" {
+		log.Printf("FinalValue: %f\n", finalValue)
+	}
 
 	err = s.servo.Fraction(finalValue)
 	if err != nil {

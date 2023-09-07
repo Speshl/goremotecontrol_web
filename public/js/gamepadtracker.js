@@ -20,6 +20,13 @@ class GamePadTracker {
         this.gamepadIndex = -1;
         this.steeringTrim = 0;
 
+        this.volumeUpPress = false;
+        this.volumeDownPress = false;
+        this.volumeMutePress = false;
+
+        this.volumeMuted = false;
+        this.volumeAtMute = 0;
+
         this.upShiftPress = false;
         this.downShiftPress = false;
 
@@ -139,7 +146,62 @@ class GamePadTracker {
         }
     }
 
+    volumeUp() {
+        const volumeSlider = document.getElementById('streamVolume');
+        const audioElement = document.getElementById('audioElement');
+
+        if(this.volumeMuted){
+            this.volumeUnMute();
+        }
+
+        let currentVolume = volumeSlider.value;
+        let newVolume = parseInt(currentVolume) + 10;
+
+        if (newVolume < 100) {
+            audioElement.volume = newVolume/100;
+            volumeSlider.value = newVolume;
+        }else{
+            audioElement.volume = 1;
+            volumeSlider.value = 100;
+        }  
+    }
+
+    volumeDown() {
+        const volumeSlider = document.getElementById('streamVolume');
+        const audioElement = document.getElementById('audioElement');
+        let currentVolume = volumeSlider.value;
+        let newVolume = parseInt(currentVolume) - 10;
+
+        if (newVolume > 0) {
+            audioElement.volume = newVolume/100;
+            volumeSlider.value = newVolume;
+        }else{
+            audioElement.volume = 0;
+            volumeSlider.value = 0;
+        }        
+    }
+
+    volumeMute() {
+        const volumeSlider = document.getElementById('streamVolume');
+        const audioElement = document.getElementById('audioElement');
+        this.volumeAtMute = volumeSlider.value;
+        audioElement.volume = 0;
+        volumeSlider.value = 0;
+        this.volumeMuted = true;
+    }
+
+    volumeUnMute() {
+        const volumeSlider = document.getElementById('streamVolume');
+        const audioElement = document.getElementById('audioElement');
+        audioElement.volume = this.volumeAtMute / 100;
+        volumeSlider.value = this.volumeAtMute;
+        this.volumeAtMute = 0;
+        this.volumeMuted = false;
+    }
+
     commandFromXbox(myGamepad) {
+        //DPAD UP/Down/Left/Right
+        // 12/13/14/15
         let command = this.neutralCommand;
         //esc
         if (myGamepad.buttons[6].value > .1 && myGamepad.buttons[6].value >= myGamepad.buttons[7].value) {
@@ -151,6 +213,36 @@ class GamePadTracker {
         } else {
             //neutral
             command[0] = this.midPosition;
+        }
+
+         //Voume Up
+         if(myGamepad.buttons[12].pressed && this.volumeUpPress == false){ //new press
+            this.volumeUpPress = true;
+            this.volumeUp();
+            
+        }else if (!myGamepad.buttons[12].pressed && this.volumeUpPress == true){
+            this.volumeUpPress = false;
+        }
+
+        //Voume Down
+        if(myGamepad.buttons[13].pressed && this.volumeDownPress == false){ //new press
+            this.volumeDownPress = true;
+            this.volumeDown();
+            
+        }else if (!myGamepad.buttons[13].pressed && this.volumeDownPress == true){
+            this.volumeDownPress = false;
+        }
+
+        //Voume Mute
+        if(myGamepad.buttons[9].pressed && this.volumeMutePress == false){ //new press
+            this.volumeMutePress = true;
+            if(this.volumeMuted){
+                this.volumeUnMute();
+            }else{
+                this.volumeMute();
+            } 
+        }else if (!myGamepad.buttons[9].pressed && this.volumeMutePress == true){
+            this.volumeMutePress = false;
         }
 
         //Upshift

@@ -19,6 +19,13 @@ class KeyPressTracker {
         this.pressedKeys = {};
         this.steeringTrim = 0;
 
+        this.volumeUpPress = false;
+        this.volumeDownPress = false;
+        this.volumeMutePress = false;
+
+        this.volumeMuted = false;
+        this.volumeAtMute = 0;
+
         this.upShiftPress = false;
         this.downShiftPress = false;
 
@@ -62,6 +69,59 @@ class KeyPressTracker {
         }
     }
 
+    volumeUp() {
+        const volumeSlider = document.getElementById('streamVolume');
+        const audioElement = document.getElementById('audioElement');
+
+        if(this.volumeMuted){
+            this.volumeUnMute();
+        }
+
+        let currentVolume = volumeSlider.value;
+        let newVolume = parseInt(currentVolume) + 10;
+
+        if (newVolume < 100) {
+            audioElement.volume = newVolume/100;
+            volumeSlider.value = newVolume;
+        }else{
+            audioElement.volume = 1;
+            volumeSlider.value = 100;
+        }  
+    }
+
+    volumeDown() {
+        const volumeSlider = document.getElementById('streamVolume');
+        const audioElement = document.getElementById('audioElement');
+        let currentVolume = volumeSlider.value;
+        let newVolume = parseInt(currentVolume) - 10;
+
+        if (newVolume > 0) {
+            audioElement.volume = newVolume/100;
+            volumeSlider.value = newVolume;
+        }else{
+            audioElement.volume = 0;
+            volumeSlider.value = 0;
+        }        
+    }
+
+    volumeMute() {
+        const volumeSlider = document.getElementById('streamVolume');
+        const audioElement = document.getElementById('audioElement');
+        this.volumeAtMute = volumeSlider.value;
+        audioElement.volume = 0;
+        volumeSlider.value = 0;
+        this.volumeMuted = true;
+    }
+
+    volumeUnMute() {
+        const volumeSlider = document.getElementById('streamVolume');
+        const audioElement = document.getElementById('audioElement');
+        audioElement.volume = this.volumeAtMute / 100;
+        volumeSlider.value = this.volumeAtMute;
+        this.volumeAtMute = 0;
+        this.volumeMuted = false;
+    }
+
     upShift() {
         if(this.currentGear == this.reverseGear){
             this.currentGear = this.neutralGear;
@@ -101,6 +161,36 @@ class KeyPressTracker {
             steerCommand = this.maxPosition;
         }else{
             steerCommand = this.midPosition;
+        }
+
+        //Voume Up
+        if(this.pressedKeys[']'] && this.volumeUpPress == false){ //new press
+            this.volumeUpPress = true;
+            this.volumeUp();
+            
+        }else if (!this.pressedKeys[']'] && this.volumeUpPress == true){
+            this.volumeUpPress = false;
+        }
+
+        //Voume Down
+        if(this.pressedKeys['['] && this.volumeDownPress == false){ //new press
+            this.volumeDownPress = true;
+            this.volumeDown();
+            
+        }else if (!this.pressedKeys['['] && this.volumeDownPress == true){
+            this.volumeDownPress = false;
+        }
+
+        //Voume Mute
+        if(this.pressedKeys['m'] && this.volumeMutePress == false){ //new press
+            this.volumeMutePress = true;
+            if(this.volumeMuted){
+                this.volumeUnMute();
+            }else{
+                this.volumeMute();
+            } 
+        }else if (!this.pressedKeys['m'] && this.volumeMutePress == true){
+            this.volumeMutePress = false;
         }
 
         //Upshift

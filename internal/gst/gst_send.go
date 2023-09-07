@@ -48,6 +48,7 @@ func CreateMicSendPipeline(tracks []*webrtc.TrackLocalStaticSample, device, volu
 	pipelineStr = fmt.Sprintf("pulsesrc device=%s volume=%s ! audioconvert ! opusenc ! appsink name=appsink", device, volume)
 	clockRate = videoClockRate
 
+	log.Printf("carmic gstreamer pipeline: %s\n", pipelineStr)
 	pipelineStrUnsafe := C.CString(pipelineStr)
 	defer C.free(unsafe.Pointer(pipelineStrUnsafe))
 

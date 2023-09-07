@@ -23,6 +23,7 @@ const AppEnvBase = "GORRC_"
 const DefaultPort = "8181"
 const DefaultCarName = "GORRC"
 const DefaultSilentStart = false
+const DefaultForceLocal = false
 
 // Default Socket Server Config
 const DefaultSilentConnections = false
@@ -104,6 +105,7 @@ func GetServerConfig(ctx context.Context) ServerConfig {
 func GetSocketServerConfig(ctx context.Context) server.SocketServerConfig {
 	return server.SocketServerConfig{
 		SilentConnects: GetBoolEnv("SILENTCONNECTIONS", DefaultSilentConnections),
+		ForceLocal:     GetBoolEnv("FORCELOCAL", DefaultForceLocal),
 	}
 }
 

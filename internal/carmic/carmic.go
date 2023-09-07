@@ -37,6 +37,6 @@ func NewCarMic(cfg MicConfig) (*CarMic, error) {
 }
 
 func (c *CarMic) Start() {
-	log.Println("Creating Pipeline")
+	log.Println("Creating Mic Pipeline")
 	gst.CreateMicSendPipeline([]*webrtc.TrackLocalStaticSample{c.AudioTrack}, c.config.Device, c.config.Volume).Start()
 }

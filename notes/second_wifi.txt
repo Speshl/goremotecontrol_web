@@ -1,0 +1,3 @@
+https://www.thedigitalpictureframe.com/how-to-add-a-second-wifi-network-to-your-raspberry-pi/
+
+sudo nano /etc/wpa_supplicant/wpa_supplicant.conf

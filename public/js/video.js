@@ -1,14 +1,21 @@
 class CamPlayer {
-    constructor() {
+    constructor(forceLocal) {
         this.socket = io();
+
+        this.lastVolume = 0;
+        this.timesToShowVolume = 0;
         
         this.gotAnswer = false;
 
-        this.pc = new RTCPeerConnection({
-            iceServers: [{
-            urls: 'stun:stun.l.google.com:19302'
-            }]
-        })
+        if (forceLocal == true) {
+            this.pc = new RTCPeerConnection()
+        }else{
+            this.pc = new RTCPeerConnection({
+                iceServers: [{
+                urls: 'stun:stun.l.google.com:19302'
+                }]
+            })
+        }
     }
 
     setupListeners() {
@@ -49,42 +56,55 @@ class CamPlayer {
         this.pc.ontrack = (event) => {
             if(event.track.kind == "video"){
                 console.log("Creating Video Track");
-                const el = document.createElement("video");
-                el.id = "videoTrack";
+                //const el = document.createElement("video");
+                const el = document.getElementById('videoElement');
+
+                el.id = "videoElement";
                 el.srcObject = event.streams[0];
                 el.autoplay = true;
                 el.muted = true;
                 el.playsinline = true;
                 el.controls = true;
-                el.style.setProperty("width", "60vw");
-                
-                document.getElementById('videoDiv').appendChild(el);
 
-                el.addEventListener("play", () => {
-                    this.playMedia();
+                const canvas = document.getElementById('videoCanvas');
+                canvas.addEventListener("click", () =>{
+                    const canvas = document.getElementById('videoCanvas');
+                    if (canvas.requestFullscreen) {
+                        canvas.requestFullscreen();
+                    } else if (canvas.webkitRequestFullscreen) { /* Safari */
+                        canvas.webkitRequestFullscreen();
+                    } else if (canvas.msRequestFullscreen) { /* IE11 */
+                        canvas.msRequestFullscreen();
+                    }  
+                })
+
+                el.addEventListener("loadeddata", () => {
+                    const canvas = document.getElementById('videoCanvas');
+                    const videoElement = document.getElementById('videoElement');
+                    canvas.width = videoElement.videoWidth;
+                    canvas.height = videoElement.videoHeight;
+                    
+                    console.log("Canvas Size: ",canvas.width, canvas.height);
+                    drawVideo();
                 });
 
-                el.addEventListener("pause", () => {
-                    this.pauseMedia();
-                });
-
-                el.addEventListener("volumechange", () =>{
-                    const audio = document.getElementById('audioTrack');
-                    const video = document.getElementById('videoTrack');
-                    audio.volume = video.volume;
-                });
 
                 console.log("Video Track Added");
             }else{
                 console.log("Creating Audio Track");
-                const el = document.createElement("audio");
-                el.id = "audioTrack";
+                const volumeSlider = document.getElementById('streamVolume');
+                const el = document.getElementById('audioElement');
                 el.srcObject = event.streams[0];
                 el.autoplay = true;
                 el.muted = false;
                 el.playsinline = true;
                 el.controls = false;
-                document.getElementById('videoDiv').appendChild(el);
+                el.volume = volumeSlider.value/100;
+                this.lastVolume = volumeSlider.value/100;
+
+                volumeSlider.addEventListener('input', (e) => {
+                    el.volume = e.target.value/100;
+                })
                 console.log("Audio Track Added");
             }
             
@@ -127,6 +147,19 @@ class CamPlayer {
                 alert(e);
             }
         });
+
+    }
+
+    showVolume(volume) {
+        if(volume != this.lastVolume){
+            this.lastVolume = volume;
+            this.timesToShowVolume = 60;
+        }
+        if(this.timesToShowVolume > 0){
+            this.timesToShowVolume--;
+            return true;
+        }
+        return false;
     }
 
     sendOffer() {
@@ -159,22 +192,30 @@ class CamPlayer {
     gotRemoteDescription() {
         return this.gotAnswer;
     }
+}
 
-    pauseMedia() {
-        console.log("Pausing...");
-        const video = document.getElementById('videoTrack');
-        video.pause();
+function drawVideo() {
+    const canvas = document.getElementById('videoCanvas');
+    const videoContext = canvas.getContext('2d');
+    const videoElement = document.getElementById('videoElement');
 
-        const audio = document.getElementById('audioTrack');
-        audio.pause();
+    const audioElement = document.getElementById('audioElement');
+    let currentVolume = audioElement.volume;
+
+    const escAndGear = document.getElementById('escAndGear').innerHTML;
+    const steerAndTrim = document.getElementById('steerAndTrim').innerHTML;
+    const panAndTilt = document.getElementById('panAndTilt').innerHTML;
+    const combined = escAndGear + " " +steerAndTrim + " "+ panAndTilt;
+
+    videoContext.drawImage(videoElement, 0, 0, 320,180); //TODO Make this dynamic
+
+    videoContext.fillStyle = "white";
+    videoContext.font = "10px monospace";
+
+    if(camPlayer.showVolume(currentVolume)){
+        videoContext.fillText("Volume: "+currentVolume, 140, 150)
     }
 
-    playMedia() {
-        console.log("Playing...");
-        const video = document.getElementById('videoTrack');
-        video.play();
-
-        const audio = document.getElementById('audioTrack');
-        audio.play();
-    }
+    videoContext.fillText(combined, 10, 175);
+    window.requestAnimationFrame(drawVideo);
 }

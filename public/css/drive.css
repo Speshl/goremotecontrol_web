@@ -13,17 +13,34 @@
     /* max-width: 800px; */
 }
 
-#videoDiv {
+#mediaDiv {
+    visibility: hidden;
+    width: 0%;
+    height: 0%;
+}
+
+#canvasDiv {
     width: 60vw;
     margin: 0 auto;
     border: 1px solid;
     aspect-ratio: 16/9;
 }
 
-.videoTrack {
-    width: 60vw;
+#videoElement {
+    width: 0vw;
     /* margin: 0 auto;
     border: 1px solid; */
+    aspect-ratio: 16/9;
+    visibility: hidden;
+}
+
+#audioElement {
+    width: 0vw;
+    visibility: hidden;
+}
+
+#videoCanvas {
+    width: 100%;
     aspect-ratio: 16/9;
 }
 
@@ -37,4 +54,8 @@
 .infoItem {
     padding: 5px;
     text-align: center;
+}
+
+.hiddenInfoItem {
+    visibility: hidden;
 }
