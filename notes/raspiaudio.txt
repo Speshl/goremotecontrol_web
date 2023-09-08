@@ -1,0 +1,3 @@
+https://forum.raspiaudio.com/t/mic-installation-guide/17
+
+wget -O - mic.raspiaudio.com | bash
