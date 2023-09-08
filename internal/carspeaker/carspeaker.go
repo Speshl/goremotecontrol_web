@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os/exec"
 	"strings"
 	"sync"
 
@@ -163,26 +164,25 @@ func (c *CarSpeaker) Play(ctx context.Context, sound string) error {
 	log.Printf("start playing %s sound\n", sound)
 	defer log.Printf("finished playing %s sound\n", sound)
 
-	// soundPath, ok := soundMap[sound]
-	// if !ok {
-	// 	return fmt.Errorf("error: sound not found")
-	// }
+	soundPath, ok := soundMap[sound]
+	if !ok {
+		return fmt.Errorf("error: sound not found")
+	}
 
-	// args := []string{
-	// 	//"-D", "hw:CARD=wm8960soundcard,DEV=0", //TODO: Make these changeable by environment variable
-	// 	"-E",
-	// 	"aplay",
-	// 	"-D", "hw:CARD=wm8960soundcard,DEV=0",
-	// 	soundPath,
-	// }
-	// cmd := exec.CommandContext(ctx, "sudo", args...)
-	// err := cmd.Start()
-	// if err != nil {
-	// 	return fmt.Errorf("error starting audio playback - %w", err)
-	// }
-	// err = cmd.Wait()
-	// if err != nil {
-	// 	return fmt.Errorf("error during audio playback - %w", err)
-	// }
+	args := []string{
+		"-E",
+		"aplay",
+		//"-D", "hw:CARD=wm8960soundcard,DEV=0", //use default
+		soundPath,
+	}
+	cmd := exec.CommandContext(ctx, "sudo", args...)
+	err := cmd.Start()
+	if err != nil {
+		return fmt.Errorf("error starting audio playback - %w", err)
+	}
+	err = cmd.Wait()
+	if err != nil {
+		return fmt.Errorf("error during audio playback - %w", err)
+	}
 	return nil
 }
