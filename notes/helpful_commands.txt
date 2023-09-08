@@ -13,3 +13,8 @@ sudo pactl load-module module-echo-cancel source_master=alsa_input.usb-C-Media_E
 aplay -L
 
 arecord -L
+
+
+sudo amixer scontrols
+
+sudo amixer sset 'Master' 50%
